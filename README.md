@@ -16,7 +16,6 @@ This system allows salon owners to manage reservations and customer information 
 * Service duration calculation
 * Memo management
 
-
 ## Tech Stack
 
 ### Frontend
