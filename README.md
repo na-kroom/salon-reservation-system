@@ -6,7 +6,6 @@ Salon Reservation System is a management application designed for small owner-op
 
 This system allows salon owners to manage reservations and customer information through a simple internal dashboard.
 
-
 ## Features
 
 * Administrator authentication
