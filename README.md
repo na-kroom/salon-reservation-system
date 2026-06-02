@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Salon Reservation System
 
-## Getting Started
+## Overview
 
-First, run the development server:
+Salon Reservation System is a management application designed for small owner-operated hair salons.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This system allows salon owners to manage reservations and customer information through a simple internal dashboard.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The project is being developed as a portfolio application to practice full-stack web development using Next.js, TypeScript, and Supabase.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+* Administrator authentication
+* Daily reservation management
+* Customer management
+* Reservation conflict detection
+* Soft delete support
+* Service duration calculation
+* Memo management
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Frontend
 
-## Deploy on Vercel
+* Next.js
+* TypeScript
+* Tailwind CSS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Backend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Supabase
+
+### Database
+
+* PostgreSQL
+
+### Deployment
+
+* Vercel
+
+---
+
+## Project Status
+
+🚧 Under Development
+
+---
+
+## Future Enhancements
+
+* Sales management
+* Customer visit history
+* Activity logs
+* Mobile responsive support
+
