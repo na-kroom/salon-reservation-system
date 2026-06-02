@@ -6,9 +6,6 @@ Salon Reservation System is a management application designed for small owner-op
 
 This system allows salon owners to manage reservations and customer information through a simple internal dashboard.
 
-The project is being developed as a portfolio application to practice full-stack web development using Next.js, TypeScript, and Supabase.
-
----
 
 ## Features
 
@@ -20,7 +17,6 @@ The project is being developed as a portfolio application to practice full-stack
 * Service duration calculation
 * Memo management
 
----
 
 ## Tech Stack
 
@@ -41,19 +37,4 @@ The project is being developed as a portfolio application to practice full-stack
 ### Deployment
 
 * Vercel
-
----
-
-## Project Status
-
-🚧 Under Development
-
----
-
-## Future Enhancements
-
-* Sales management
-* Customer visit history
-* Activity logs
-* Mobile responsive support
 
