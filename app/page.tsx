@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+
 
 export default function Home() {
   const times = [
@@ -21,6 +24,15 @@ export default function Home() {
     "18:00",
   ];
 
+  const [reservations, setReservations] = useState([
+  {
+    time: "11:00",
+    lane: "A",
+    customer: "田中",
+  },
+]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [date, setDate] = useState(new Date());
   return (
     <main className="p-8">
       <h1 className="mb-6 text-3xl font-bold">
@@ -33,7 +45,7 @@ export default function Home() {
         </button>
 
         <span className="font-semibold">
-          2026/06/02
+          {date.toLocaleDateString("ja-JP")}  
         </span>
 
         <button className="border px-3 py-1 rounded">
@@ -42,12 +54,18 @@ export default function Home() {
       </div>
 
       <div className="mb-6">
-        <button className="rounded bg-black px-4 py-2 text-white">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="rounded bg-black px-4 py-2 text-white"
+        >
+
           ＋ 予約追加
-        </button>
+      </button>
+        
+      
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
         <div className="font-bold">Time</div>
         <div className="font-bold text-center">A Lane</div>
         <div className="font-bold text-center">B Lane</div>
@@ -57,13 +75,45 @@ export default function Home() {
             <div className="border p-2">
               {time}
             </div>
-
-            <div className="border p-2 h-12" />
-
-            <div className="border p-2 h-12" />
+          <div className="border p-2 h-12">
+            {reservations
+              .filter(
+                (r) =>
+                  r.time === time &&
+                  r.lane === "A"
+              )
+              .map((r) => r.customer)}
+          </div>
+  
+           <div className="border p-2 h-12">
+              {reservations
+                .filter(
+                  (r) =>
+                    r.time === time &&
+                    r.lane === "B"
+                )
+                .map((r) => r.customer)}
+            </div>   
+           
           </React.Fragment>
         ))}
       </div>
+      {isModalOpen && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg w-96">
+          <h2 className="text-xl font-bold mb-4">
+            予約登録
+          </h2>
+
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="border px-3 py-1 rounded"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    )}
     </main>
-  );
+  );s
 }
