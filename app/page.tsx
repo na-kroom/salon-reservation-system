@@ -24,11 +24,13 @@ export default function Home() {
     "18:00",
   ];
 
+
   const [reservations, setReservations] = useState([
   {
     time: "11:00",
     lane: "A",
     customer: "田中",
+    date: "2026-06-08",
   },
 ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,27 +42,57 @@ export default function Home() {
       </h1>
 
       <div className="mb-6 flex items-center gap-4">
-        <button className="border px-3 py-1 rounded">
+       <button
+          className="border px-3 py-1 rounded"
+          onClick={() => {
+            const newDate = new Date(date);
+            newDate.setDate(date.getDate() - 1);
+            setDate(newDate);
+          }}
+        >
           ◀
-        </button>
+        </button> 
 
         <span className="font-semibold">
           {date.toLocaleDateString("ja-JP")}  
         </span>
 
-        <button className="border px-3 py-1 rounded">
+       <button
+          className="border px-3 py-1 rounded"
+          onClick={() => {
+            const newDate = new Date(date);
+            newDate.setDate(date.getDate() + 1);
+            setDate(newDate);
+          }}
+        >
           ▶
         </button>
       </div>
 
       <div className="mb-6">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            const customer = prompt("お客様名を入力");
+            const time = prompt("時間を入力（例:11:00）");
+            const lane = prompt("レーンを入力（A または B）");
+            
+            if(!customer||!time||!lane){
+              return;
+            }
+            setReservations([
+              ...reservations,
+              {
+                customer,
+                time,
+                lane,
+                date: date.toISOString().split("T")[0],
+              },
+            ]);
+          }}
           className="rounded bg-black px-4 py-2 text-white"
         >
-
-          ＋ 予約追加
-      </button>
+          ＋予約追加
+        </button>
         
       
       </div>
@@ -80,7 +112,8 @@ export default function Home() {
               .filter(
                 (r) =>
                   r.time === time &&
-                  r.lane === "A"
+                  r.lane === "A" &&
+                  r.date === date.toISOString().split("T")[0]
               )
               .map((r) => r.customer)}
           </div>
@@ -90,7 +123,8 @@ export default function Home() {
                 .filter(
                   (r) =>
                     r.time === time &&
-                    r.lane === "B"
+                    r.lane === "B" &&
+                    r.date === date.toISOString().split("T")[0]
                 )
                 .map((r) => r.customer)}
             </div>   
@@ -115,5 +149,5 @@ export default function Home() {
       </div>
     )}
     </main>
-  );s
+  );
 }
