@@ -35,6 +35,10 @@ export default function Home() {
 ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [customer, setCustomer] = useState("");
+  const [time, setTime] = useState("10:00");
+  const [lane, setLane] = useState("A");
+  
   return (
     <main className="p-8">
       <h1 className="mb-6 text-3xl font-bold">
@@ -70,25 +74,8 @@ export default function Home() {
       </div>
 
       <div className="mb-6">
-        <button
-          onClick={() => {
-            const customer = prompt("お客様名を入力");
-            const time = prompt("時間を入力（例:11:00）");
-            const lane = prompt("レーンを入力（A または B）");
-            
-            if(!customer||!time||!lane){
-              return;
-            }
-            setReservations([
-              ...reservations,
-              {
-                customer,
-                time,
-                lane,
-                date: date.toISOString().split("T")[0],
-              },
-            ]);
-          }}
+       <button
+          onClick={() => setIsModalOpen(true)}
           className="rounded bg-black px-4 py-2 text-white"
         >
           ＋予約追加
@@ -107,28 +94,60 @@ export default function Home() {
             <div className="border p-2">
               {time}
             </div>
-          <div className="border p-2 h-12">
-            {reservations
-              .filter(
-                (r) =>
-                  r.time === time &&
-                  r.lane === "A" &&
-                  r.date === date.toISOString().split("T")[0]
-              )
-              .map((r) => r.customer)}
-          </div>
-  
-           <div className="border p-2 h-12">
+            <div className="border p-2 h-12">
               {reservations
                 .filter(
                   (r) =>
                     r.time === time &&
-                    r.lane === "B" &&
+                    r.lane === "A" &&
                     r.date === date.toISOString().split("T")[0]
                 )
-                .map((r) => r.customer)}
-            </div>   
-           
+                .map((r) => (
+                  <div
+                    key={r.customer}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (confirm("削除しますか？")) {
+                        setReservations(
+                          reservations.filter(
+                            (reservation) => reservation !== r
+                          )
+                        );
+                      }
+                    }}
+                  >
+                    {r.customer}
+                  </div>
+                ))}
+            </div>
+  
+           <div className="border p-2 h-12">
+            {reservations
+              .filter(
+                (r) =>
+                  r.time === time &&
+                  r.lane === "B" &&
+                  r.date === date.toISOString().split("T")[0]
+              )
+              .map((r) => (
+                <div
+                  key={r.customer}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (confirm("削除しますか？")) {
+                      setReservations(
+                        reservations.filter(
+                          (reservation) => reservation !== r
+                        )
+                      );
+                    }
+                  }}
+                >
+                  {r.customer}
+                </div>
+              ))}
+          </div>
+
           </React.Fragment>
         ))}
       </div>
@@ -138,6 +157,58 @@ export default function Home() {
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>
+
+          <input
+            type="text"
+            placeholder="お客様名"
+            value={customer}
+            onChange={(e) => setCustomer(e.target.value)}
+            className="border p-2 w-full mb-3"
+          />
+
+          <select
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="border p-2 w-full mb-3"
+          >
+            {times.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={lane}
+            onChange={(e) => setLane(e.target.value)}
+            className="border p-2 w-full mb-4"
+          >
+            <option value="A">Aレーン</option>
+            <option value="B">Bレーン</option>
+          </select>
+
+          <button
+            onClick={() => {
+              setReservations([
+                ...reservations,
+                {
+                  customer,
+                  time,
+                  lane,
+                  date: date.toISOString().split("T")[0],
+                },
+              ]);
+
+              setCustomer("");
+              setTime("10:00");
+              setLane("A");
+
+              setIsModalOpen(false);
+            }}
+            className="bg-black text-white px-4 py-2 rounded mr-2"
+          >
+            登録
+          </button>
 
           <button
             onClick={() => setIsModalOpen(false)}
