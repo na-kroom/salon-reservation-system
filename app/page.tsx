@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 
 export default function Home() {
@@ -33,6 +33,25 @@ export default function Home() {
     date: "2026-06-08",
   },
 ]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "reservations",
+    JSON.stringify(reservations)
+  );
+}, [reservations]);
+
+useEffect(() => {
+  const savedReservations =
+    localStorage.getItem("reservations");
+
+  if (savedReservations) {
+    setReservations(
+      JSON.parse(savedReservations)
+    );
+  }
+}, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [customer, setCustomer] = useState("");
@@ -189,6 +208,16 @@ export default function Home() {
 
           <button
             onClick={() => {
+              const exists = reservations.some(
+                (r) =>
+                  r.time === time &&
+                  r.lane === lane &&
+                  r.date === date.toISOString().split("T")[0]
+              );
+              if (exists) {
+                alert("その時間は既に予約があります");
+                return;
+              }
               setReservations([
                 ...reservations,
                 {
