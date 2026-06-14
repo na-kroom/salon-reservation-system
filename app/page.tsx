@@ -31,6 +31,8 @@ export default function Home() {
     lane: "A",
     customer: "田中",
     date: "2026-06-08",
+    menu: "カット",
+    price: 5000,
   },
 ]);
 
@@ -57,6 +59,18 @@ useEffect(() => {
   const [customer, setCustomer] = useState("");
   const [time, setTime] = useState("10:00");
   const [lane, setLane] = useState("A");
+  const [menu, setMenu] = useState("カット");
+  const [price, setPrice] = useState(5000);
+  const todaySales = reservations
+  .filter(
+    (r) =>
+      r.date ===
+      date.toISOString().split("T")[0]
+  )
+  .reduce(
+    (sum, r) => sum + (r.price || 0),
+    0
+  );
   
   return (
     <main className="p-8">
@@ -162,7 +176,15 @@ useEffect(() => {
                     }
                   }}
                 >
-                  {r.customer}
+                <div>
+                    <div>{r.customer}</div>
+                    <div className="text-xs text-gray-500">
+                      {r.menu}
+                    </div>
+                    <div className="text-xs text-green-600">
+                    ¥{r.price}
+                  </div>
+                  </div>
                 </div>
               ))}
           </div>
@@ -206,6 +228,27 @@ useEffect(() => {
             <option value="B">Bレーン</option>
           </select>
 
+          <select
+            value={menu}
+            onChange={(e) => setMenu(e.target.value)}
+            className="border p-2 w-full mb-4"
+          >
+            <option value="カット">カット</option>
+            <option value="カラー">カラー</option>
+            <option value="カット＋カラー">
+              カット＋カラー
+            </option>
+            <option value="パーマ">パーマ</option>
+          </select>
+          <input
+              type="number"
+              value={price}
+              onChange={(e) =>
+                setPrice(Number(e.target.value))
+              }
+              className="border p-2 w-full mb-4"
+              placeholder="料金"
+            />
           <button
             onClick={() => {
               const exists = reservations.some(
@@ -225,6 +268,8 @@ useEffect(() => {
                   time,
                   lane,
                   date: date.toISOString().split("T")[0],
+                  menu,
+                  price,
                 },
               ]);
 
