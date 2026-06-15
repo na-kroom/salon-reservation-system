@@ -4,6 +4,15 @@ import React, { useState, useEffect } from "react";
 
 
 export default function Home() {
+  type Reservation = {
+    time: string;
+    lane: string;
+    customer: string;
+    date: string;
+    menu: string;
+    price: number;
+    memo?: string;
+  };
   const times = [
     "10:00",
     "10:30",
@@ -25,16 +34,16 @@ export default function Home() {
   ];
 
 
-  const [reservations, setReservations] = useState([
-  {
-    time: "11:00",
-    lane: "A",
-    customer: "田中",
-    date: "2026-06-08",
-    menu: "カット",
-    price: 5000,
-  },
-]);
+  const [reservations, setReservations] = useState<Reservation[]>([
+    {
+      time: "11:00",
+      lane: "A",
+      customer: "田中",
+      date: "2026-06-08",
+      menu: "カット",
+      price: 5000,
+    },
+  ]);
 
 useEffect(() => {
   localStorage.setItem(
@@ -60,7 +69,8 @@ useEffect(() => {
   const [time, setTime] = useState("10:00");
   const [lane, setLane] = useState("A");
   const [menu, setMenu] = useState("カット");
-  const [price, setPrice] = useState(5000);
+  const [price, setPrice] = useState("");
+  const [memo, setMemo] = useState("");
   const todaySales = reservations
   .filter(
     (r) =>
@@ -71,6 +81,9 @@ useEffect(() => {
     (sum, r) => sum + (r.price || 0),
     0
   );
+  const [selectedReservation, setSelectedReservation] =
+  useState<any>(null);
+
   
   return (
     <main className="p-8">
@@ -140,14 +153,9 @@ useEffect(() => {
                     key={r.customer}
                     className="cursor-pointer"
                     onClick={() => {
-                      if (confirm("削除しますか？")) {
-                        setReservations(
-                          reservations.filter(
-                            (reservation) => reservation !== r
-                          )
-                        );
-                      }
-                    }}
+                      setSelectedReservation(r);
+                    }
+                    }
                   >
                     {r.customer}
                   </div>
@@ -244,10 +252,15 @@ useEffect(() => {
               type="number"
               value={price}
               onChange={(e) =>
-                setPrice(Number(e.target.value))
-              }
+              setPrice(e.target.value)}
+              placeholder="料金を入力"
               className="border p-2 w-full mb-4"
-              placeholder="料金"
+            />
+            <textarea
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              placeholder="メモ"
+              className="border p-2 w-full mb-4"
             />
           <button
             onClick={() => {
@@ -261,6 +274,10 @@ useEffect(() => {
                 alert("その時間は既に予約があります");
                 return;
               }
+              if (!price) {
+                alert("料金を入力してください");
+                return;
+              }
               setReservations([
                 ...reservations,
                 {
@@ -269,14 +286,15 @@ useEffect(() => {
                   lane,
                   date: date.toISOString().split("T")[0],
                   menu,
-                  price,
+                  price: Number(price),
+                  memo,
                 },
               ]);
 
               setCustomer("");
               setTime("10:00");
               setLane("A");
-
+              setMemo("");
               setIsModalOpen(false);
             }}
             className="bg-black text-white px-4 py-2 rounded mr-2"
@@ -292,7 +310,25 @@ useEffect(() => {
           </button>
         </div>
       </div>
-    )}
+      )}
+      {selectedReservation && (
+        <div className="mb-4 border p-4">
+          <div>
+            顧客名:
+            {selectedReservation.customer}
+          </div>
+
+          <div>
+            メニュー:
+            {selectedReservation.menu}
+          </div>
+
+          <div>
+            料金:
+            ¥{selectedReservation.price}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
