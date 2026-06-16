@@ -51,15 +51,18 @@ useEffect(() => {
     JSON.stringify(reservations)
   );
 }, [reservations]);
-
 useEffect(() => {
-  const savedReservations =
-    localStorage.getItem("reservations");
+  try {
+    const savedReservations =
+      localStorage.getItem("reservations");
 
-  if (savedReservations) {
-    setReservations(
-      JSON.parse(savedReservations)
-    );
+    if (savedReservations) {
+      setReservations(
+        JSON.parse(savedReservations)
+      );
+    }
+  } catch (error) {
+    console.error("予約データの読み込み失敗", error);
   }
 }, []);
 
@@ -83,6 +86,28 @@ useEffect(() => {
   );
   const [selectedReservation, setSelectedReservation] =
   useState<any>(null);
+  const currentMonth =
+  date.getMonth();
+
+const currentYear =
+  date.getFullYear();
+
+const monthlySales = reservations
+  .filter((r) => {
+    const reservationDate =
+      new Date(r.date);
+
+    return (
+      reservationDate.getMonth() ===
+        currentMonth &&
+      reservationDate.getFullYear() ===
+        currentYear
+    );
+  })
+  .reduce(
+    (sum, r) => sum + r.price,
+    0
+  );
 
   
   return (
@@ -188,10 +213,7 @@ useEffect(() => {
                     <div>{r.customer}</div>
                     <div className="text-xs text-gray-500">
                       {r.menu}
-                    </div>
-                    <div className="text-xs text-green-600">
-                    ¥{r.price}
-                  </div>
+                    </div>C
                   </div>
                 </div>
               ))}
@@ -323,9 +345,13 @@ useEffect(() => {
             {selectedReservation.menu}
           </div>
 
-          <div>
-            料金:
-            ¥{selectedReservation.price}
+          <div className="mb-4 text-lg font-bold">
+            本日の売上:
+            ¥{todaySales.toLocaleString()}
+          </div>
+          <div className="mb-4 text-lg font-bold">
+            今月の売上:
+            ¥{monthlySales.toLocaleString()}
           </div>
         </div>
       )}
