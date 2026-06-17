@@ -2,9 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 
+type Reservation = {
+  id: number;
+  customer: string;
+  time: string;
+  lane: string;
+  date: string;
+  menu: string;
+  price: number;
+  memo: string;
+};
 
 export default function Home() {
   type Reservation = {
+    id: number;
     time: string;
     lane: string;
     customer: string;
@@ -36,12 +47,14 @@ export default function Home() {
 
   const [reservations, setReservations] = useState<Reservation[]>([
     {
+      id: 1,
       time: "11:00",
       lane: "A",
       customer: "田中",
       date: "2026-06-08",
       menu: "カット",
       price: 5000,
+      memo: "",
     },
   ]);
 
@@ -108,6 +121,8 @@ const monthlySales = reservations
     (sum, r) => sum + r.price,
     0
   );
+  const [isEditing, setIsEditing] =
+  useState(false);
 
   
   return (
@@ -175,12 +190,12 @@ const monthlySales = reservations
                 )
                 .map((r) => (
                   <div
-                    key={r.customer}
+                    key={r.id}
                     className="cursor-pointer"
                     onClick={() => {
                       setSelectedReservation(r);
-                    }
-                    }
+                      setIsEditing(true);
+                    }}
                   >
                     {r.customer}
                   </div>
@@ -197,7 +212,7 @@ const monthlySales = reservations
               )
               .map((r) => (
                 <div
-                  key={r.customer}
+                  key={r.id}
                   className="cursor-pointer"
                   onClick={() => {
                     if (confirm("削除しますか？")) {
@@ -303,6 +318,7 @@ const monthlySales = reservations
               setReservations([
                 ...reservations,
                 {
+                  id: Date.now(),
                   customer,
                   time,
                   lane,
@@ -310,7 +326,7 @@ const monthlySales = reservations
                   menu,
                   price: Number(price),
                   memo,
-                },
+                }
               ]);
 
               setCustomer("");
@@ -339,6 +355,32 @@ const monthlySales = reservations
             顧客名:
             {selectedReservation.customer}
           </div>
+          <input
+            type="text"
+            value={selectedReservation.customer}
+            onChange={(e) =>
+              setSelectedReservation({
+                ...selectedReservation,
+                customer: e.target.value,
+              })
+            }
+            className="border p-2 w-full mb-2"
+          />
+          <button
+            onClick={() => {
+              setReservations(
+                reservations.map((r) =>
+                  r === selectedReservation
+                    ? selectedReservation
+                    : r
+                )
+              );
+
+              setIsEditing(false);
+            }}
+          >
+            保存
+          </button>
 
           <div>
             メニュー:
@@ -353,6 +395,54 @@ const monthlySales = reservations
             今月の売上:
             ¥{monthlySales.toLocaleString()}
           </div>
+              <div className="mt-4">
+          <h3 className="font-bold">
+            顧客履歴
+          </h3>
+
+  {reservations
+    .filter(
+      (r) =>
+        r.customer ===
+        selectedReservation.customer
+    )
+    .map((r, index) => (
+      <div
+        key={index}
+        className="border-b py-2"
+      >
+        <div>{r.date}</div>
+
+        <div>{r.menu}</div>
+
+        <div>¥{r.price}</div>
+      </div>
+      
+    ))}
+        </div><div className="mt-4">
+          <h3 className="font-bold">
+            顧客履歴
+          </h3>
+
+          {reservations
+            .filter(
+              (r) =>
+                r.customer ===
+                selectedReservation.customer
+            )
+            .map((r, index) => (
+              <div
+                key={index}
+                className="border-b py-2"
+              >
+                <div>{r.date}</div>
+
+                <div>{r.menu}</div>
+
+                <div>¥{r.price}</div>
+              </div>
+            ))}
+        </div>
         </div>
       )}
     </main>
