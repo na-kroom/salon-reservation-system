@@ -123,7 +123,10 @@ const monthlySales = reservations
   );
   const [isEditing, setIsEditing] =
   useState(false);
-
+  const [searchTerm, setSearchTerm] =
+  useState("");
+const [editingId, setEditingId] =
+  useState<number | null>(null);
   
   return (
     <main className="p-8">
@@ -169,6 +172,15 @@ const monthlySales = reservations
         
       
       </div>
+      <input
+          type="text"
+          placeholder="顧客検索"
+          value={searchTerm}
+          onChange={(e) =>
+            setSearchTerm(e.target.value)
+          }
+          className="border p-2 mb-4"
+        />
 
         <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
         <div className="font-bold">Time</div>
@@ -187,6 +199,8 @@ const monthlySales = reservations
                     r.time === time &&
                     r.lane === "A" &&
                     r.date === date.toISOString().split("T")[0]
+                    &&
+r.customer.includes(searchTerm)
                 )
                 .map((r) => (
                   <div
@@ -208,7 +222,8 @@ const monthlySales = reservations
                 (r) =>
                   r.time === time &&
                   r.lane === "B" &&
-                  r.date === date.toISOString().split("T")[0]
+                  r.date === date.toISOString().split("T")[0] &&
+                  r.customer.includes(searchTerm)
               )
               .map((r) => (
                 <div
@@ -315,24 +330,45 @@ const monthlySales = reservations
                 alert("料金を入力してください");
                 return;
               }
-              setReservations([
-                ...reservations,
-                {
-                  id: Date.now(),
-                  customer,
-                  time,
-                  lane,
-                  date: date.toISOString().split("T")[0],
-                  menu,
-                  price: Number(price),
-                  memo,
-                }
-              ]);
 
+
+              if (editingId !== null) {
+                setReservations(
+                  reservations.map((r) =>
+                    r.id === editingId
+                      ? {
+                          ...r,
+                          customer,
+                          time,
+                          lane,
+                          menu,
+                          price: Number(price),
+                          memo,
+                        }
+                      : r
+                  )
+                );
+              } else {
+                setReservations([
+                  ...reservations,
+                  {
+                    id: Date.now(),
+                    customer,
+                    time,
+                    lane,
+                    date: date.toISOString().split("T")[0],
+                    menu,
+                    price: Number(price),
+                    memo,
+                  },
+                ]);
+              } 
+              setEditingId(null);          
               setCustomer("");
               setTime("10:00");
               setLane("A");
               setMemo("");
+              setPrice("");
               setIsModalOpen(false);
             }}
             className="bg-black text-white px-4 py-2 rounded mr-2"
@@ -399,7 +435,19 @@ const monthlySales = reservations
           <h3 className="font-bold">
             顧客履歴
           </h3>
+          <button
+            onClick={() => {
+              setCustomer(selectedReservation.customer);
+              setMenu(selectedReservation.menu);
+              setPrice(String(selectedReservation.price));
+              setMemo(selectedReservation.memo);
 
+              setIsModalOpen(true);
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            編集
+          </button>
   {reservations
     .filter(
       (r) =>
@@ -417,7 +465,6 @@ const monthlySales = reservations
 
         <div>¥{r.price}</div>
       </div>
-      
     ))}
         </div><div className="mt-4">
           <h3 className="font-bold">
