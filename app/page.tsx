@@ -23,6 +23,8 @@ export default function Home() {
     menu: string;
     price: number;
     memo?: string;
+    product: string;
+    quantity: number;
   };
   const times = [
     "10:00",
@@ -55,7 +57,10 @@ export default function Home() {
       menu: "カット",
       price: 5000,
       memo: "",
-    },
+      product:"",
+      quantity:1,
+    }
+
   ]);
 
 useEffect(() => {
@@ -127,7 +132,33 @@ const monthlySales = reservations
   useState("");
 const [editingId, setEditingId] =
   useState<number | null>(null);
-  
+const [product, setProduct] =
+  useState("");
+const visitCount =
+  selectedReservation
+    ? reservations.filter(
+        (r) =>
+          r.customer ===
+          selectedReservation.customer
+      ).length
+    : 0;
+const totalSales =
+  selectedReservation
+    ? reservations
+        .filter(
+          (r) =>
+            r.customer ===
+            selectedReservation.customer
+        )
+        .reduce(
+          (sum, r) =>
+            sum + r.price,
+          0
+        )
+    : 0;
+
+const [quantity, setQuantity] =
+  useState(1);
   return (
     <main className="p-8">
       <h1 className="mb-6 text-3xl font-bold">
@@ -314,6 +345,25 @@ r.customer.includes(searchTerm)
               placeholder="メモ"
               className="border p-2 w-full mb-4"
             />
+            <input
+            type="text"
+            placeholder="購入商品"
+            value={product}
+            onChange={(e) =>
+              setProduct(e.target.value)
+            }
+            className="border p-2 w-full mb-2"
+          />
+
+          <input
+            type="number"
+            min="1"
+            value={quantity}
+            onChange={(e) =>
+              setQuantity(Number(e.target.value))
+            }
+            className="border p-2 w-full mb-2"
+          />
           <button
             onClick={() => {
               const exists = reservations.some(
@@ -344,6 +394,8 @@ r.customer.includes(searchTerm)
                           menu,
                           price: Number(price),
                           memo,
+                          product,
+                          quantity,
                         }
                       : r
                   )
@@ -360,6 +412,8 @@ r.customer.includes(searchTerm)
                     menu,
                     price: Number(price),
                     memo,
+                    product,
+                    quantity,
                   },
                 ]);
               } 
@@ -435,6 +489,19 @@ r.customer.includes(searchTerm)
           <h3 className="font-bold">
             顧客履歴
           </h3>
+          {reservations
+            .filter(
+              (r) =>
+                r.customer ===
+                selectedReservation.customer &&
+                r.product
+            )
+            .map((r) => (
+              <div key={r.id}>
+                {r.product}
+                （{r.quantity}個）
+              </div>
+          ))}
           <button
             onClick={() => {
               setCustomer(selectedReservation.customer);
