@@ -1,31 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
-type Reservation = {
-  id: number;
-  customer: string;
-  time: string;
-  lane: string;
-  date: string;
-  menu: string;
-  price: number;
-  memo: string;
-};
+import type { Reservation } from "@/types/Reservation";
+import CustomerCard from "@/components/CustomerCard";
 
 export default function Home() {
-  type Reservation = {
-    id: number;
-    time: string;
-    lane: string;
-    customer: string;
-    date: string;
-    menu: string;
-    price: number;
-    memo?: string;
-    product: string;
-    quantity: number;
-  };
+  const [reservations, setReservations] = useState<Reservation[]>([
+    {
+      id: 1,
+      time: "11:00",
+      lane: "A",
+      customer: "田中",
+      date: "2026-06-08",
+      menu: "カット",
+      price: 5000,
+      memo: "",
+      product: "",
+      quantity: 1,
+    }
+  ]);
+
+  
   const times = [
     "10:00",
     "10:30",
@@ -46,22 +41,6 @@ export default function Home() {
     "18:00",
   ];
 
-
-  const [reservations, setReservations] = useState<Reservation[]>([
-    {
-      id: 1,
-      time: "11:00",
-      lane: "A",
-      customer: "田中",
-      date: "2026-06-08",
-      menu: "カット",
-      price: 5000,
-      memo: "",
-      product:"",
-      quantity:1,
-    }
-
-  ]);
 
 useEffect(() => {
   localStorage.setItem(
@@ -156,6 +135,13 @@ const totalSales =
           0
         )
     : 0;
+const customerCount = selectedReservation
+  ? reservations.filter(
+      (r) =>
+        r.customer ===
+        selectedReservation.customer
+    ).length
+  : 0;
 
 const [quantity, setQuantity] =
   useState(1);
@@ -439,126 +425,124 @@ r.customer.includes(searchTerm)
         </div>
       </div>
       )}
-      {selectedReservation && (
-        <div className="mb-4 border p-4">
-          <div>
-            顧客名:
-            {selectedReservation.customer}
-          </div>
-          <input
-            type="text"
-            value={selectedReservation.customer}
-            onChange={(e) =>
-              setSelectedReservation({
-                ...selectedReservation,
-                customer: e.target.value,
-              })
-            }
-            className="border p-2 w-full mb-2"
-          />
-          <button
-            onClick={() => {
-              setReservations(
-                reservations.map((r) =>
-                  r === selectedReservation
-                    ? selectedReservation
-                    : r
-                )
-              );
+<CustomerCard
+  selectedReservation={selectedReservation}
+/>
+{selectedReservation && (
+  <div className="mb-4 border p-4">
+    <div>
+      顧客名:
+      {selectedReservation.customer}
+    </div>
 
-              setIsEditing(false);
-            }}
+    <input
+      type="text"
+      value={selectedReservation.customer}
+      onChange={(e) =>
+        setSelectedReservation({
+          ...selectedReservation,
+          customer: e.target.value,
+        })
+      }
+      className="border p-2 w-full mb-2"
+    />
+
+    <button
+      onClick={() => {
+        setReservations(
+          reservations.map((r) =>
+            r.id === selectedReservation.id
+              ? selectedReservation
+              : r
+          )
+        );
+
+        setIsEditing(false);
+      }}
+      className="bg-green-500 text-white px-4 py-2 rounded mb-2"
+    >
+      保存
+    </button>
+
+    <div>
+      メニュー:
+      {selectedReservation.menu}
+    </div>
+
+    <div className="mb-4 text-lg font-bold">
+      本日の売上:
+      ¥{todaySales.toLocaleString()}
+    </div>
+
+    <div className="mb-4 text-lg font-bold">
+      今月の売上:
+      ¥{monthlySales.toLocaleString()}
+    </div>
+
+    <div className="mt-4">
+      <h3 className="font-bold">
+        購入履歴
+      </h3>
+
+      {reservations
+        .filter(
+          (r) =>
+            r.customer ===
+              selectedReservation.customer &&
+            r.product
+        )
+        .map((r) => (
+          <div key={r.id}>
+            {r.product}
+            （{r.quantity}個）
+          </div>
+        ))}
+    </div>
+
+    <button
+      onClick={() => {
+        setEditingId(selectedReservation.id);
+
+        setCustomer(selectedReservation.customer);
+        setMenu(selectedReservation.menu);
+        setPrice(
+          String(selectedReservation.price)
+        );
+        setMemo(selectedReservation.memo);
+
+        setIsModalOpen(true);
+      }}
+      className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+    >
+      編集
+    </button>
+
+    <div className="mt-4">
+      <h3 className="font-bold">
+        顧客履歴
+      </h3>
+
+      {reservations
+        .filter(
+          (r) =>
+            r.customer ===
+            selectedReservation.customer
+        )
+        .map((r) => (
+          <div
+            key={r.id}
+            className="border-b py-2"
           >
-            保存
-          </button>
-
-          <div>
-            メニュー:
-            {selectedReservation.menu}
+            <div>{r.date}</div>
+            <div>{r.menu}</div>
+            <div>
+              ¥{r.price.toLocaleString()}
+            </div>
           </div>
-
-          <div className="mb-4 text-lg font-bold">
-            本日の売上:
-            ¥{todaySales.toLocaleString()}
-          </div>
-          <div className="mb-4 text-lg font-bold">
-            今月の売上:
-            ¥{monthlySales.toLocaleString()}
-          </div>
-              <div className="mt-4">
-          <h3 className="font-bold">
-            顧客履歴
-          </h3>
-          {reservations
-            .filter(
-              (r) =>
-                r.customer ===
-                selectedReservation.customer &&
-                r.product
-            )
-            .map((r) => (
-              <div key={r.id}>
-                {r.product}
-                （{r.quantity}個）
-              </div>
-          ))}
-          <button
-            onClick={() => {
-              setCustomer(selectedReservation.customer);
-              setMenu(selectedReservation.menu);
-              setPrice(String(selectedReservation.price));
-              setMemo(selectedReservation.memo);
-
-              setIsModalOpen(true);
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            編集
-          </button>
-  {reservations
-    .filter(
-      (r) =>
-        r.customer ===
-        selectedReservation.customer
-    )
-    .map((r, index) => (
-      <div
-        key={index}
-        className="border-b py-2"
-      >
-        <div>{r.date}</div>
-
-        <div>{r.menu}</div>
-
-        <div>¥{r.price}</div>
-      </div>
-    ))}
-        </div><div className="mt-4">
-          <h3 className="font-bold">
-            顧客履歴
-          </h3>
-
-          {reservations
-            .filter(
-              (r) =>
-                r.customer ===
-                selectedReservation.customer
-            )
-            .map((r, index) => (
-              <div
-                key={index}
-                className="border-b py-2"
-              >
-                <div>{r.date}</div>
-
-                <div>{r.menu}</div>
-
-                <div>¥{r.price}</div>
-              </div>
-            ))}
-        </div>
-        </div>
-      )}
-    </main>
-  );
+        ))}
+    </div>
+  </div>
+)}
+   </main>
+);
 }
