@@ -1,4 +1,4 @@
-export Reservation = {
+export type Reservation = {
   id: number;
   customer: string;
   time: string;

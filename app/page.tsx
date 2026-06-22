@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import type { Reservation } from "@/types/Reservation";
+import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
 
 export default function Home() {
@@ -81,9 +82,10 @@ useEffect(() => {
     (sum, r) => sum + (r.price || 0),
     0
   );
-  const [selectedReservation, setSelectedReservation] =
-  useState<any>(null);
-  const currentMonth =
+const [selectedReservation, setSelectedReservation] =
+  useState<Reservation | null>(null);
+
+const currentMonth =
   date.getMonth();
 
 const currentYear =
@@ -135,6 +137,21 @@ const totalSales =
           0
         )
     : 0;
+const lastVisit =
+  selectedReservation
+    ? reservations
+        .filter(
+          (r) =>
+            r.customer ===
+            selectedReservation.customer
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.date).getTime() -
+            new Date(a.date).getTime()
+        )[0]?.date ?? "-"
+: "-";
+
 const customerCount = selectedReservation
   ? reservations.filter(
       (r) =>
@@ -434,7 +451,18 @@ r.customer.includes(searchTerm)
       顧客名:
       {selectedReservation.customer}
     </div>
-
+    <div>
+      来店回数:
+      {visitCount}回
+    </div>
+    <div>
+      累計売上:
+      ¥{totalSales.toLocaleString()}
+    </div>
+    <div>
+      前回来店日:
+      {lastVisit}
+    </div>
     <input
       type="text"
       value={selectedReservation.customer}
@@ -469,15 +497,10 @@ r.customer.includes(searchTerm)
       {selectedReservation.menu}
     </div>
 
-    <div className="mb-4 text-lg font-bold">
-      本日の売上:
-      ¥{todaySales.toLocaleString()}
-    </div>
-
-    <div className="mb-4 text-lg font-bold">
-      今月の売上:
-      ¥{monthlySales.toLocaleString()}
-    </div>
+    <SalesSummary
+      todaySales={todaySales}
+      monthlySales={monthlySales}
+    />
 
     <div className="mt-4">
       <h3 className="font-bold">
