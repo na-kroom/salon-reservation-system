@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import type { Reservation } from "@/types/Reservation";
+import type { Product } from "@/types/Product";
 import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
 
@@ -9,10 +10,11 @@ export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
     {
       id: 1,
-      time: "11:00",
       lane: "A",
       customer: "田中",
       date: "2026-06-08",
+      startTime:"11:00",
+      endTime:"12:00",
       menu: "カット",
       price: 5000,
       memo: "",
@@ -67,7 +69,7 @@ useEffect(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [customer, setCustomer] = useState("");
-  const [time, setTime] = useState("10:00");
+  const [startTime, setStartTime] = useState("10:00");
   const [lane, setLane] = useState("A");
   const [menu, setMenu] = useState("カット");
   const [price, setPrice] = useState("");
@@ -123,6 +125,12 @@ const visitCount =
           selectedReservation.customer
       ).length
     : 0;
+const [productName, setProductName] =
+  useState("");
+
+const [productPrice, setProductPrice] =
+  useState("");
+
 const totalSales =
   selectedReservation
     ? reservations
@@ -160,6 +168,43 @@ const customerCount = selectedReservation
     ).length
   : 0;
 
+const [products, setProducts] =
+  useState<Product[]>([
+    {
+      id: 1,
+      name: "N.オイル",
+      price: 3200,
+    },
+  ]);
+const [duration, setDuration] =
+  useState(60);
+const calculateEndTime = (
+  startTime: string,
+  duration: number
+) => {
+  const [hour, minute] =
+    startTime.split(":").map(Number);
+
+  const date = new Date();
+
+  date.setHours(hour);
+  date.setMinutes(minute + duration);
+
+  return date.toLocaleTimeString(
+    "ja-JP",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }
+  );
+};
+const endTime =
+  calculateEndTime(
+    startTime,
+    duration
+  );
+
 const [quantity, setQuantity] =
   useState(1);
   return (
@@ -167,7 +212,87 @@ const [quantity, setQuantity] =
       <h1 className="mb-6 text-3xl font-bold">
         Salon Reservation System
       </h1>
+      <div className="mb-6 border p-4">
+        <h2 className="font-bold text-lg mb-2">
+        <div className="mb-4">
+        <input
+          type="text"
+          placeholder="商品名"
+          value={productName}
+          onChange={(e) =>
+            setProductName(e.target.value)
+          }
+          className="border p-2 mr-2"
+        />
 
+        <input
+          type="number"
+          placeholder="価格"
+          value={productPrice}
+          onChange={(e) =>
+            setProductPrice(e.target.value)
+          }
+          className="border p-2 mr-2"
+        />
+
+        <button
+          onClick={() => {
+            if (!productName || !productPrice) {
+              alert("商品名と価格を入力してください");
+              return;
+            }
+
+            setProducts([
+              ...products,
+              {
+                id: Date.now(),
+                name: productName,
+                price: Number(productPrice),
+              },
+            ]);
+
+            setProductName("");
+            setProductPrice("");
+          }}
+          className="bg-black text-white px-4 py-2 rounded"
+        >
+          商品追加
+        </button>
+      </div>
+          商品一覧
+        </h2>
+
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="border-b py-2 flex justify-between"
+          >
+            <span>
+              {product.name}
+              （¥{product.price.toLocaleString()}）
+            </span>
+
+            <button
+              onClick={() => {
+                if (
+                  confirm(
+                    `${product.name}を削除しますか？`
+                  )
+                ) {
+                  setProducts(
+                    products.filter(
+                      (p) => p.id !== product.id
+                    )
+                  );
+                }
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
+              削除
+            </button>
+          </div>
+        ))}
+      </div>
       <div className="mb-6 flex items-center gap-4">
        <button
           className="border px-3 py-1 rounded"
@@ -230,7 +355,7 @@ const [quantity, setQuantity] =
               {reservations
                 .filter(
                   (r) =>
-                    r.time === time &&
+                    r.startTime === startTime &&
                     r.lane === "A" &&
                     r.date === date.toISOString().split("T")[0]
                     &&
@@ -254,7 +379,7 @@ r.customer.includes(searchTerm)
             {reservations
               .filter(
                 (r) =>
-                  r.time === time &&
+                  r.startTime === startTime &&
                   r.lane === "B" &&
                   r.date === date.toISOString().split("T")[0] &&
                   r.customer.includes(searchTerm)
@@ -275,6 +400,9 @@ r.customer.includes(searchTerm)
                 >
                 <div>
                     <div>{r.customer}</div>
+                                      <div className="text-xs">
+                      {r.startTime}〜{r.endTime}
+                    </div>
                     <div className="text-xs text-gray-500">
                       {r.menu}
                     </div>C
@@ -302,8 +430,8 @@ r.customer.includes(searchTerm)
           />
 
           <select
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
             className="border p-2 w-full mb-3"
           >
             {times.map((t) => (
@@ -312,7 +440,28 @@ r.customer.includes(searchTerm)
               </option>
             ))}
           </select>
-
+          <select
+            value={duration}
+            onChange={(e) =>
+              setDuration(Number(e.target.value))
+            }
+            className="border p-2 w-full mb-4"
+          >
+            {Array.from(
+              { length: 24 },
+              (_, i) => (i + 1) * 10
+            ).map((minutes) => (
+              <option
+                key={minutes}
+                value={minutes}
+              >
+                {minutes}分
+              </option>
+            ))}
+          </select>
+          <div className="mb-4">
+            終了予定: {endTime}
+          </div>
           <select
             value={lane}
             onChange={(e) => setLane(e.target.value)}
@@ -371,7 +520,7 @@ r.customer.includes(searchTerm)
             onClick={() => {
               const exists = reservations.some(
                 (r) =>
-                  r.time === time &&
+                  r.startTime === startTime &&
                   r.lane === lane &&
                   r.date === date.toISOString().split("T")[0]
               );
@@ -392,7 +541,7 @@ r.customer.includes(searchTerm)
                       ? {
                           ...r,
                           customer,
-                          time,
+                          startTime,
                           lane,
                           menu,
                           price: Number(price),
@@ -406,23 +555,27 @@ r.customer.includes(searchTerm)
               } else {
                 setReservations([
                   ...reservations,
-                  {
+                   {
                     id: Date.now(),
                     customer,
-                    time,
+                    startTime,
                     lane,
                     date: date.toISOString().split("T")[0],
                     menu,
+                    endTime: calculateEndTime(
+                      startTime,
+                      duration
+                    ),
                     price: Number(price),
                     memo,
                     product,
                     quantity,
-                  },
-                ]);
+                  }
+              ]);
               } 
               setEditingId(null);          
               setCustomer("");
-              setTime("10:00");
+              setStartTime("10:00");
               setLane("A");
               setMemo("");
               setPrice("");
