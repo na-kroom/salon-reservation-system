@@ -176,6 +176,9 @@ const [products, setProducts] =
       price: 3200,
     },
   ]);
+const [selectedProductId, setSelectedProductId] =
+  useState("");
+
 const [duration, setDuration] =
   useState(60);
 const calculateEndTime = (
@@ -204,6 +207,15 @@ const endTime =
     startTime,
     duration
   );
+
+const timeToMinutes = (
+  time: string
+) => {
+  const [hour, minute] =
+    time.split(":").map(Number);
+
+  return hour * 60 + minute;
+};
 
 const [quantity, setQuantity] =
   useState(1);
@@ -355,7 +367,7 @@ const [quantity, setQuantity] =
               {reservations
                 .filter(
                   (r) =>
-                    r.startTime === startTime &&
+                    r.startTime === time &&
                     r.lane === "A" &&
                     r.date === date.toISOString().split("T")[0]
                     &&
@@ -379,7 +391,7 @@ r.customer.includes(searchTerm)
             {reservations
               .filter(
                 (r) =>
-                  r.startTime === startTime &&
+                  r.startTime === time &&
                   r.lane === "B" &&
                   r.date === date.toISOString().split("T")[0] &&
                   r.customer.includes(searchTerm)
@@ -458,6 +470,19 @@ r.customer.includes(searchTerm)
                 {minutes}分
               </option>
             ))}
+          </select>   
+          <select>
+            {Array.from(
+              { length: 24 },
+              (_, i) => (i + 1) * 10
+            ).map((minutes) => (
+              <option
+                key={minutes}
+                value={minutes}
+              >
+                {minutes}分
+              </option>
+            ))}
           </select>
           <div className="mb-4">
             終了予定: {endTime}
@@ -483,12 +508,16 @@ r.customer.includes(searchTerm)
             </option>
             <option value="パーマ">パーマ</option>
           </select>
-          <input
+            <input
               type="number"
               value={price}
               onChange={(e) =>
-              setPrice(e.target.value)}
-              placeholder="料金を入力"
+                setPrice(e.target.value)
+              }
+              disabled={
+                selectedProductId !== "" &&
+                selectedProductId !== "other"
+              }
               className="border p-2 w-full mb-4"
             />
             <textarea
@@ -497,15 +526,73 @@ r.customer.includes(searchTerm)
               placeholder="メモ"
               className="border p-2 w-full mb-4"
             />
-            <input
-            type="text"
-            placeholder="購入商品"
-            value={product}
-            onChange={(e) =>
-              setProduct(e.target.value)
-            }
+          <select
+            value={selectedProductId}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              setSelectedProductId(value);
+
+              if (value === "other") {
+                setProduct("");
+                return;
+              }
+
+              const selected =
+                products.find(
+                  (p) =>
+                    p.id.toString() === value
+                );
+
+              if (selected) {
+                setProduct(selected.name);
+                setPrice(
+                  String(selected.price)
+                );
+              }
+            }}
             className="border p-2 w-full mb-2"
-          />
+          >
+            <option value="">
+              商品なし
+            </option>
+
+            {products.map((p) => (
+              <option
+                key={p.id}
+                value={p.id}
+              >
+                {p.name}
+              </option>
+            ))}
+
+            <option value="other">
+              その他
+            </option>
+          </select>
+          {selectedProductId === "other" && (
+            <>
+              <input
+                type="text"
+                placeholder="商品名"
+                value={product}
+                onChange={(e) =>
+                  setProduct(e.target.value)
+                }
+                className="border p-2 w-full mb-2"
+              />
+
+              <input
+                type="number"
+                placeholder="商品価格"
+                value={price}
+                onChange={(e) =>
+                  setPrice(e.target.value)
+                }
+                className="border p-2 w-full mb-2"
+              />
+            </>
+          )}
 
           <input
             type="number"
@@ -518,11 +605,38 @@ r.customer.includes(searchTerm)
           />
           <button
             onClick={() => {
+              const newStart =
+                timeToMinutes(startTime);
+
+              const newEnd =
+                timeToMinutes(
+                  calculateEndTime(
+                    startTime,
+                    duration
+                  )
+                );
+
               const exists = reservations.some(
-                (r) =>
-                  r.startTime === startTime &&
-                  r.lane === lane &&
-                  r.date === date.toISOString().split("T")[0]
+                (r) => {
+                  if (
+                    r.lane !== lane ||
+                    r.date !==
+                      date.toISOString().split("T")[0]
+                  ) {
+                    return false;
+                  }
+
+                  const existingStart =
+                    timeToMinutes(r.startTime);
+
+                  const existingEnd =
+                    timeToMinutes(r.endTime);
+
+                  return (
+                    newStart < existingEnd &&
+                    newEnd > existingStart
+                  );
+                }
               );
               if (exists) {
                 alert("その時間は既に予約があります");
