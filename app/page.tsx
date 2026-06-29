@@ -180,6 +180,7 @@ const [products, setProducts] =
   ]);
 const [selectedProductId, setSelectedProductId] =
   useState("");
+const [currentPage, setCurrentPage] = useState("reservation");
 
 const [duration, setDuration] =
   useState(60);
@@ -218,16 +219,46 @@ const timeToMinutes = (
 
   return hour * 60 + minute;
 };
+const handleReservationSubmit = () => {
+
+}
 
 const [quantity, setQuantity] =
   useState(1);
   return (
+  
     <main className="p-8">
       <h1 className="mb-6 text-3xl font-bold">
         Salon Reservation System
       </h1>
-      <div className="mb-6 border p-4">
+      <div className="flex gap-2 mb-6">
+
+        <button
+          onClick={() => setCurrentPage("reservation")}
+          className="border rounded px-4 py-2"
+        >
+          予約
+        </button>
+
+        <button
+          onClick={() => setCurrentPage("service")}
+          className="border rounded px-4 py-2"
+        >
+          施術管理
+        </button>
+
+        <button
+          onClick={() => setCurrentPage("product")}
+          className="border rounded px-4 py-2"
+        >
+          商品管理
+        </button>
+      
+      </div>
+       <div className="mb-6 border p-4">
         <h2 className="font-bold text-lg mb-2">
+          商品一覧
+        </h2>
         <div className="mb-4">
         <input
           type="text"
@@ -273,8 +304,7 @@ const [quantity, setQuantity] =
           商品追加
         </button>
       </div>
-          商品一覧
-        </h2>
+      
 
         {products.map((product) => (
           <div
@@ -436,6 +466,29 @@ r.customer.includes(searchTerm)
   startTime={startTime}
   setStartTime={setStartTime}
   times={times}
+  lane={lane}
+  setLane={setLane}
+  menu={menu}
+  setMenu={setMenu}
+  duration={duration}
+  setDuration={setDuration}
+  endTime={endTime}
+  memo={memo}
+  setMemo={setMemo}
+  price={price}
+  setPrice={setPrice}
+  onSubmit={handleReservationSubmit}
+  products={products}
+
+  selectedProductId={selectedProductId}
+  setSelectedProductId={setSelectedProductId}
+
+  product={product}
+  setProduct={setProduct}
+
+  quantity={quantity}
+  setQuantity={setQuantity}
+  onClose={() => setIsModalOpen(false)}
 />
 
       
@@ -561,8 +614,11 @@ r.customer.includes(searchTerm)
           </div>
         ))}
     </div>
+    
   </div>
 )}
+
    </main>
+
 );
 }

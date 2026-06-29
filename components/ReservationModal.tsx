@@ -1,3 +1,4 @@
+import type { Product } from "@/types/Product";
 type Props = {
   isOpen: boolean;
   customer: string;
@@ -36,6 +37,24 @@ type Props = {
   setPrice: React.Dispatch<
     React.SetStateAction<string>
   >;
+  onSubmit: () => void;
+  products: Product[];
+
+selectedProductId: string;
+setSelectedProductId: React.Dispatch<
+  React.SetStateAction<string>
+>;
+
+product: string;
+setProduct: React.Dispatch<
+  React.SetStateAction<string>
+>;
+
+quantity: number;
+setQuantity: React.Dispatch<
+  React.SetStateAction<number>
+>;
+onClose: () => void;
 };
 
 export default function ReservationModal({
@@ -55,7 +74,16 @@ export default function ReservationModal({
   memo,
   setMemo,
   price,
-  setPrice
+  setPrice,
+  onSubmit,
+  products,
+  selectedProductId,
+  setSelectedProductId,
+  product,
+  setProduct,
+  quantity,
+  setQuantity,  
+  onClose
 }: Props) {
   if (!isOpen) return null;
 
@@ -237,104 +265,15 @@ export default function ReservationModal({
             className="border p-2 w-full mb-2"
           />
           <button
-            onClick={() => {
-              const newStart =
-                timeToMinutes(startTime);
-
-              const newEnd =
-                timeToMinutes(
-                  calculateEndTime(
-                    startTime,
-                    duration
-                  )
-                );
-
-              const exists = reservations.some(
-                (r) => {
-                  if (
-                    r.lane !== lane ||
-                    r.date !==
-                      date.toISOString().split("T")[0]
-                  ) {
-                    return false;
-                  }
-
-                  const existingStart =
-                    timeToMinutes(r.startTime);
-
-                  const existingEnd =
-                    timeToMinutes(r.endTime);
-
-                  return (
-                    newStart < existingEnd &&
-                    newEnd > existingStart
-                  );
-                }
-              );
-              if (exists) {
-                alert("その時間は既に予約があります");
-                return;
-              }
-              if (!price) {
-                alert("料金を入力してください");
-                return;
-              }
-
-
-              if (editingId !== null) {
-                setReservations(
-                  reservations.map((r) =>
-                    r.id === editingId
-                      ? {
-                          ...r,
-                          customer,
-                          startTime,
-                          lane,
-                          menu,
-                          price: Number(price),
-                          memo,
-                          product,
-                          quantity,
-                        }
-                      : r
-                  )
-                );
-              } else {
-                setReservations([
-                  ...reservations,
-                   {
-                    id: Date.now(),
-                    customer,
-                    startTime,
-                    lane,
-                    date: date.toISOString().split("T")[0],
-                    menu,
-                    endTime: calculateEndTime(
-                      startTime,
-                      duration
-                    ),
-                    price: Number(price),
-                    memo,
-                    product,
-                    quantity,
-                  }
-              ]);
-              } 
-              setEditingId(null);          
-              setCustomer("");
-              setStartTime("10:00");
-              setLane("A");
-              setMemo("");
-              setPrice("");
-              setIsModalOpen(false);
-            }}
+            
             className="bg-black text-white px-4 py-2 rounded mr-2"
           >
             登録
           </button>
 
+
           <button
-            onClick={() => setIsModalOpen(false)}
+            onClick={onClose}
             className="border px-3 py-1 rounded"
           >
             閉じる
