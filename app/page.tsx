@@ -7,6 +7,7 @@ import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
 import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
+import ServiceManagement from "@/components/ServiceManagement";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -223,6 +224,7 @@ const handleReservationSubmit = () => {
 
 }
 
+
 const [quantity, setQuantity] =
   useState(1);
   return (
@@ -231,6 +233,7 @@ const [quantity, setQuantity] =
       <h1 className="mb-6 text-3xl font-bold">
         Salon Reservation System
       </h1>
+
       <div className="flex gap-2 mb-6">
 
         <button
@@ -444,7 +447,7 @@ r.customer.includes(searchTerm)
                 >
                 <div>
                     <div>{r.customer}</div>
-                                      <div className="text-xs">
+                      <div className="text-xs">
                       {r.startTime}〜{r.endTime}
                     </div>
                     <div className="text-xs text-gray-500">
@@ -495,6 +498,9 @@ r.customer.includes(searchTerm)
 <CustomerCard
   selectedReservation={selectedReservation}
 />
+{currentPage === "service" && (
+  <ServiceManagement />
+)}
 {selectedReservation && (
   <div className="mb-4 border p-4">
     <div>
