@@ -258,6 +258,7 @@ const [quantity, setQuantity] =
         </button>
       
       </div>
+      {currentPage === "product" && (
        <div className="mb-6 border p-4">
         <h2 className="font-bold text-lg mb-2">
           商品一覧
@@ -340,6 +341,13 @@ const [quantity, setQuantity] =
           </div>
         ))}
       </div>
+      )}
+      {currentPage === "service" && (
+  <ServiceManagement />
+)}
+      {currentPage === "reservation" && (
+  <>
+      
       <div className="mb-6 flex items-center gap-4">
        <button
           className="border px-3 py-1 rounded"
@@ -498,9 +506,7 @@ r.customer.includes(searchTerm)
 <CustomerCard
   selectedReservation={selectedReservation}
 />
-{currentPage === "service" && (
-  <ServiceManagement />
-)}
+
 {selectedReservation && (
   <div className="mb-4 border p-4">
     <div>
@@ -623,7 +629,8 @@ r.customer.includes(searchTerm)
     
   </div>
 )}
-
+</>
+)}
    </main>
 
 );
