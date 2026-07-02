@@ -7,7 +7,7 @@ import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
 import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
-import ServiceManagement from "@/components/ServiceManagement";
+import ReservationPage from "@/components/ReservationPage";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -181,7 +181,9 @@ const [products, setProducts] =
   ]);
 const [selectedProductId, setSelectedProductId] =
   useState("");
-const [currentPage, setCurrentPage] = useState("reservation");
+const [currentPage, setCurrentPage] = useState<
+  "reservation" | "product"
+>("reservation");
 
 const [duration, setDuration] =
   useState(60);
@@ -241,13 +243,6 @@ const [quantity, setQuantity] =
           className="border rounded px-4 py-2"
         >
           予約
-        </button>
-
-        <button
-          onClick={() => setCurrentPage("service")}
-          className="border rounded px-4 py-2"
-        >
-          施術管理
         </button>
 
         <button
@@ -342,59 +337,16 @@ const [quantity, setQuantity] =
         ))}
       </div>
       )}
-      {currentPage === "service" && (
-  <ServiceManagement />
-)}
-      {currentPage === "reservation" && (
-  <>
-      
-      <div className="mb-6 flex items-center gap-4">
-       <button
-          className="border px-3 py-1 rounded"
-          onClick={() => {
-            const newDate = new Date(date);
-            newDate.setDate(date.getDate() - 1);
-            setDate(newDate);
-          }}
-        >
-          ◀
-        </button> 
 
-        <span className="font-semibold">
-          {date.toLocaleDateString("ja-JP")}  
-        </span>
-
-       <button
-          className="border px-3 py-1 rounded"
-          onClick={() => {
-            const newDate = new Date(date);
-            newDate.setDate(date.getDate() + 1);
-            setDate(newDate);
-          }}
-        >
-          ▶
-        </button>
-      </div>
-
-      <div className="mb-6">
-       <button
-          onClick={() => setIsModalOpen(true)}
-          className="rounded bg-black px-4 py-2 text-white"
-        >
-          ＋予約追加
-        </button>
-        
-      
-      </div>
-      <input
-          type="text"
-          placeholder="顧客検索"
-          value={searchTerm}
-          onChange={(e) =>
-            setSearchTerm(e.target.value)
-          }
-          className="border p-2 mb-4"
-        />
+    {currentPage === "reservation" && (
+    <>
+    <ReservationPage
+      date={date}
+      setDate={setDate}
+      setIsModalOpen={setIsModalOpen}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+    /> 
 
         <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
         <div className="font-bold">Time</div>
