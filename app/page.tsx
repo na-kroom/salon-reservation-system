@@ -460,7 +460,7 @@ r.customer.includes(searchTerm)
                     </div>
                     <div className="text-xs text-gray-500">
                       {r.menu}
-                    </div>C
+                    </div>
                   </div>
                 </div>
               ))}
