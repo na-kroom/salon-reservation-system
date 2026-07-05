@@ -8,7 +8,6 @@ import type { Product } from "@/types/Product";
 import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
 import ReservationPage from "@/components/ReservationPage";
-
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
     {
@@ -346,81 +345,14 @@ const [quantity, setQuantity] =
       setIsModalOpen={setIsModalOpen}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
-    /> 
 
-        <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
-        <div className="font-bold">Time</div>
-        <div className="font-bold text-center">A Lane</div>
-        <div className="font-bold text-center">B Lane</div>
+      times={times}
+      reservations={reservations}
+      selectedDate={date.toISOString().split("T")[0]}
+      setSelectedReservation={setSelectedReservation}
+      setIsEditing={setIsEditing}
+    />
 
-        {times.map((time) => (
-          <React.Fragment key={time}>
-            <div className="border p-2">
-              {time}
-            </div>
-            <div className="border p-2 h-12">
-              {reservations
-                .filter(
-                  (r) =>
-                    r.startTime === time &&
-                    r.lane === "A" &&
-                    r.date === date.toISOString().split("T")[0]
-                    &&
-r.customer.includes(searchTerm)
-                )
-                .map((r) => (
-                  <div
-                    key={r.id}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setSelectedReservation(r);
-                      setIsEditing(true);
-                    }}
-                  >
-                    {r.customer}
-                  </div>
-                ))}
-            </div>
-  
-           <div className="border p-2 h-12">
-            {reservations
-              .filter(
-                (r) =>
-                  r.startTime === time &&
-                  r.lane === "B" &&
-                  r.date === date.toISOString().split("T")[0] &&
-                  r.customer.includes(searchTerm)
-              )
-              .map((r) => (
-                <div
-                  key={r.id}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    if (confirm("削除しますか？")) {
-                      setReservations(
-                        reservations.filter(
-                          (reservation) => reservation !== r
-                        )
-                      );
-                    }
-                  }}
-                >
-                <div>
-                    <div>{r.customer}</div>
-                      <div className="text-xs">
-                      {r.startTime}〜{r.endTime}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {r.menu}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-
-          </React.Fragment>
-        ))}
-      </div>
 <ReservationModal
   isOpen={isModalOpen}
 
