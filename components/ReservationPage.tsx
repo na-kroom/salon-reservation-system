@@ -41,7 +41,7 @@ export default function ReservationPage({
 }: ReservationPageProps) {
   return (
     <>
-      /* 日付切替 */
+      {/* 日付切替 */}
       <div className="mb-6 flex items-center gap-4">
         <button
           className="border px-3 py-1 rounded"
@@ -70,7 +70,7 @@ export default function ReservationPage({
         </button>
       </div>
 
-      /* 予約追加 */
+      {/* 予約追加 */}
       <div className="mb-6">
         <button
           onClick={() => setIsModalOpen(true)}
@@ -80,7 +80,7 @@ export default function ReservationPage({
         </button>
       </div>
 
-      /* 顧客検索 */
+      {/* 顧客検索 */}
       <input
         type="text"
         placeholder="顧客検索"
@@ -89,7 +89,7 @@ export default function ReservationPage({
         className="border p-2 mb-4"
       />
 
-      /* タイムテーブル */
+      {/* タイムテーブル */}
       <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
         <div className="font-bold">Time</div>
         <div className="font-bold text-center">A Lane</div>

@@ -39,7 +39,25 @@ export default function ProductManagement({
       alert("商品名と価格を入力してください");
       return;
     }
+    if (editingProductId !== null) {
+      setProducts(
+        products.map((product) =>
+          product.id === editingProductId
+            ? {
+                ...product,
+                name: productName,
+                price: Number(productPrice),
+              }
+            : product
+        )
+      );
 
+      setEditingProductId(null);
+      setProductName("");
+      setProductPrice("");
+
+      return;
+    }
     setProducts([
       ...products,
       {
@@ -88,7 +106,9 @@ export default function ProductManagement({
           onClick={handleAddProduct}
           className="bg-black text-white px-4 py-2 rounded"
         >
-          商品追加
+        {editingProductId === null
+          ? "商品追加"
+          : "保存"}
         </button>
       </div>
 
@@ -102,20 +122,31 @@ export default function ProductManagement({
             （¥{product.price.toLocaleString()}）
           </span>
 
-          <button
-            onClick={() => {
-              if (
-                confirm(
-                  `${product.name}を削除しますか？`
-                )
-              ) {
-                handleDeleteProduct(product.id);
-              }
-            }}
-            className="bg-red-500 text-white px-2 py-1 rounded"
-          >
-            削除
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setEditingProductId(product.id);
+                setProductName(product.name);
+                setProductPrice(product.price.toString());
+              }}
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+            >
+              編集
+            </button>
+
+            <button
+              onClick={() => {
+                if (
+                  confirm(`${product.name}を削除しますか？`)
+                ) {
+                  handleDeleteProduct(product.id);
+                }
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
+              削除
+            </button>
+          </div>
         </div>
       ))}
     </div>

@@ -9,6 +9,8 @@ import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
+import type { Customer } from "@/types/Customer";
+import CustomerManagement from "@/components/CustomerManagement";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -46,6 +48,7 @@ export default function Home() {
     "17:00",
     "17:30",
     "18:00",
+    "18:30",
   ];
 
 
@@ -182,8 +185,9 @@ const [products, setProducts] =
   ]);
 const [selectedProductId, setSelectedProductId] =
   useState("");
-const [currentPage, setCurrentPage] = useState<
-  "reservation" | "product"
+
+  const [currentPage, setCurrentPage] = useState<
+  "reservation" | "customer" | "product"
 >("reservation");
 
 const [duration, setDuration] =
@@ -228,6 +232,11 @@ const handleReservationSubmit = () => {
 }
 const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
+const [customers, setCustomers] = useState<Customer[]>([]);
+
+const [customerName, setCustomerName] = useState("");
+const [customerPhone, setCustomerPhone] = useState("");
+const [customerMemo, setCustomerMemo] = useState("");
 
 const [quantity, setQuantity] =
   useState(1);
@@ -248,6 +257,13 @@ const [quantity, setQuantity] =
         </button>
 
         <button
+          onClick={() => setCurrentPage("customer")}
+          className="border rounded px-4 py-2"
+        >
+          顧客管理
+        </button>
+
+        <button
           onClick={() => setCurrentPage("product")}
           className="border rounded px-4 py-2"
         >
@@ -255,6 +271,18 @@ const [quantity, setQuantity] =
         </button>
       
       </div>
+      {currentPage === "customer" && (
+        <CustomerManagement
+          customers={customers}
+          customerName={customerName}
+          setCustomerName={setCustomerName}
+          customerPhone={customerPhone}
+          setCustomerPhone={setCustomerPhone}
+          customerMemo={customerMemo}
+          setCustomerMemo={setCustomerMemo}
+          setCustomers={setCustomers}
+        />
+      )}
       {currentPage === "product" && (
         <>
         <ProductManagement
