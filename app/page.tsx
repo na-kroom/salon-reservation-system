@@ -17,6 +17,7 @@ export default function Home() {
     {
       id: 1,
       lane: "A",
+      customerId: 1,
       customer: "田中",
       date: "2026-06-08",
       startTime:"11:00",
@@ -232,7 +233,16 @@ const handleReservationSubmit = () => {
 }
 const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
-const [customers, setCustomers] = useState<Customer[]>([]);
+const [customers, setCustomers] =
+useState<Customer[]>([
+  {
+    id: 1,
+    name: "田中",
+    phone: "09012345678",
+    visitCount: 3,
+    memo: "",
+  },
+]);
 
 const [customerName, setCustomerName] = useState("");
 const [customerPhone, setCustomerPhone] = useState("");
@@ -346,6 +356,7 @@ const [quantity, setQuantity] =
 
   quantity={quantity}
   setQuantity={setQuantity}
+  customers={customers}
   onClose={() => setIsModalOpen(false)}
 />
 

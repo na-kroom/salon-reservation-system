@@ -1,7 +1,9 @@
 import type { Product } from "@/types/Product";
+import type { Customer } from "@/types/Customer";
 type Props = {
   isOpen: boolean;
   customer: string;
+  customers: Customer[];
   setCustomer: React.Dispatch<
     React.SetStateAction<string>
   >;
@@ -54,6 +56,8 @@ quantity: number;
 setQuantity: React.Dispatch<
   React.SetStateAction<number>
 >;
+
+
 onClose: () => void;
 };
 
@@ -83,6 +87,7 @@ export default function ReservationModal({
   setProduct,
   quantity,
   setQuantity,  
+  customers,
   onClose
 }: Props) {
   if (!isOpen) return null;
@@ -94,13 +99,22 @@ export default function ReservationModal({
             予約登録
           </h2>
 
-          <input
-            type="text"
-            placeholder="お客様名"
+          <select
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
-            className="border p-2 w-full mb-3"
-          />
+            className="w-full border rounded p-2"
+          >
+            <option value="">顧客を選択してください</option>
+
+            {customers.map((customer) => (
+              <option
+                key={customer.id}
+                value={customer.name}
+              >
+                {customer.name}
+              </option>
+            ))}
+          </select>
 
           <select
             value={startTime}
