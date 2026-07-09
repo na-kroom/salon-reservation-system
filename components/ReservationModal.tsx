@@ -3,6 +3,11 @@ import type { Customer } from "@/types/Customer";
 type Props = {
   isOpen: boolean;
   customer: string;
+  customerId: number | null;
+
+  setCustomerId: React.Dispatch<
+    React.SetStateAction<number | null>
+  >;
   customers: Customer[];
   setCustomer: React.Dispatch<
     React.SetStateAction<string>
@@ -88,6 +93,8 @@ export default function ReservationModal({
   quantity,
   setQuantity,  
   customers,
+  customerId,
+  setCustomerId,
   onClose
 }: Props) {
   if (!isOpen) return null;
@@ -100,8 +107,20 @@ export default function ReservationModal({
           </h2>
 
           <select
-            value={customer}
-            onChange={(e) => setCustomer(e.target.value)}
+            value={customerId ?? ""}
+            onChange={(e) => {
+              const selectedId = Number(e.target.value);
+
+              setCustomerId(selectedId);
+
+              const selectedCustomer = customers.find(
+                (c) => c.id === selectedId
+              );
+
+              if (selectedCustomer) {
+                setCustomer(selectedCustomer.name);
+              }
+            }}
             className="w-full border rounded p-2"
           >
             <option value="">顧客を選択してください</option>
@@ -109,7 +128,7 @@ export default function ReservationModal({
             {customers.map((customer) => (
               <option
                 key={customer.id}
-                value={customer.name}
+                value={customer.id}
               >
                 {customer.name}
               </option>
@@ -279,7 +298,7 @@ export default function ReservationModal({
             className="border p-2 w-full mb-2"
           />
           <button
-            
+            onClick={onSubmit}
             className="bg-black text-white px-4 py-2 rounded mr-2"
           >
             登録

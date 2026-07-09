@@ -228,9 +228,97 @@ const timeToMinutes = (
 
   return hour * 60 + minute;
 };
-const handleReservationSubmit = () => {
 
-}
+const handleReservationSubmit = () => {
+  if (!customer) {
+    alert("顧客を選択してください");
+    return;
+  }
+
+ const newStart = timeToMinutes(startTime);
+const newEnd = timeToMinutes(endTime);
+
+  const isDuplicate = reservations.some((reservation) => {
+    if (
+      reservation.date !== date.toISOString().split("T")[0] ||
+      reservation.lane !== lane
+    ) {
+      return false;
+    }
+
+    const reservationStart = timeToMinutes(
+      reservation.startTime
+    );
+
+    const reservationEnd = timeToMinutes(
+      reservation.endTime
+    );
+
+    return (
+      newStart < reservationEnd &&
+      newEnd > reservationStart
+    );
+  }); 
+
+  if (isDuplicate) {
+    alert("この時間・レーンには既に予約があります。");
+    return;
+  }
+  if (editingId !== null) {
+    setReservations((prev) => 
+      prev.map((reservation) =>
+        reservation.id === editingId
+          ? {
+              ...reservation,
+              customerId: customerId ?? reservation.customerId,
+              customer,
+              lane,
+              date: date.toISOString().split("T")[0],
+              startTime,
+              endTime,
+              menu,
+              price: Number(price) || 0,
+              memo,
+              product,
+              quantity,
+            }
+          : reservation
+      )
+    );
+
+    setEditingId(null);
+    setIsModalOpen(false);
+
+    return;
+  }
+  const newReservation: Reservation = {
+    id: Date.now(),
+
+    customerId: customerId ?? 0,
+    customer: customer,
+
+    lane,
+    date: date.toISOString().split("T")[0],
+    startTime,
+    endTime,
+    menu,
+
+    price: Number(price) || 0,
+
+    memo,
+
+    product,
+    quantity,
+  };
+
+  setReservations((prev) => [
+    ...prev,
+    newReservation,
+  ]);
+
+  setIsModalOpen(false);
+};
+
 const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
 const [customers, setCustomers] =
@@ -243,6 +331,7 @@ useState<Customer[]>([
     memo: "",
   },
 ]);
+const [customerId, setCustomerId] = useState<number | null>(null);
 
 const [customerName, setCustomerName] = useState("");
 const [customerPhone, setCustomerPhone] = useState("");
@@ -331,6 +420,8 @@ const [quantity, setQuantity] =
 
   customer={customer}
   setCustomer={setCustomer}
+  customerId={customerId}
+  setCustomerId={setCustomerId}
   startTime={startTime}
   setStartTime={setStartTime}
   times={times}
@@ -445,7 +536,7 @@ const [quantity, setQuantity] =
     <button
       onClick={() => {
         setEditingId(selectedReservation.id);
-
+        setCustomerId(selectedReservation.customerId);
         setCustomer(selectedReservation.customer);
         setMenu(selectedReservation.menu);
         setPrice(
