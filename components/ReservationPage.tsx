@@ -1,5 +1,6 @@
 import React from "react";
 import type { Reservation } from "@/types/Reservation";
+import type { Customer } from "@/types/Customer";
 
 type ReservationPageProps = {
   date: Date;
@@ -16,6 +17,7 @@ type ReservationPageProps = {
 
   times: string[];
   reservations: Reservation[];
+  customers: Customer[];
   selectedDate: string;
 
   setSelectedReservation: React.Dispatch<
@@ -36,6 +38,7 @@ export default function ReservationPage({
   times,
   reservations,
   selectedDate,
+  customers,
   setSelectedReservation,
   setIsEditing,
 }: ReservationPageProps) {

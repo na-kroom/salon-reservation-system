@@ -1,8 +1,9 @@
 import type { Customer } from "@/types/Customer";
+import type { Reservation } from "@/types/Reservation";
 
 type CustomerManagementProps = {
   customers: Customer[];
-
+  reservations: Reservation[];
   customerName: string;
   setCustomerName: React.Dispatch<
     React.SetStateAction<string>
@@ -21,12 +22,23 @@ type CustomerManagementProps = {
   setCustomers: React.Dispatch<
     React.SetStateAction<Customer[]>
   >;
+  editingCustomerId: number | null;
+
+  setEditingCustomerId: React.Dispatch<
+    React.SetStateAction<number | null>
+  >;
+  customerSearch: string;
+
+  setCustomerSearch: React.Dispatch<
+    React.SetStateAction<string>
+  >;
 };
 
     export default function CustomerManagement({
     
     
     customers,
+    reservations,
     customerName,
     setCustomerName,
     customerPhone,
@@ -34,13 +46,37 @@ type CustomerManagementProps = {
     customerMemo,
     setCustomerMemo,
     setCustomers,
-    
+    editingCustomerId,
+    setEditingCustomerId,
+    customerSearch,
+    setCustomerSearch,
     }: CustomerManagementProps){
     const handleAddCustomer = () => {
     if (!customerName || !customerPhone) {
       alert("顧客名と電話番号を入力してください。");
       return;
     }
+    if (editingCustomerId !== null) {
+    setCustomers((prev) =>
+      prev.map((customer) =>
+        customer.id === editingCustomerId
+          ? {
+              ...customer,
+              name: customerName,
+              phone: customerPhone,
+              memo: customerMemo,
+            }
+          : customer
+      )
+    );
+
+    setEditingCustomerId(null);
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerMemo("");
+
+    return;
+  }
 
     setCustomers((prev) => [
       ...prev,
@@ -64,6 +100,15 @@ type CustomerManagementProps = {
         </h2>
 
         <p>登録人数：{customers.length}人</p>
+        <input
+          type="text"
+          placeholder="顧客名・電話番号で検索"
+          value={customerSearch}
+          onChange={(e) =>
+            setCustomerSearch(e.target.value)
+          }
+          className="w-full border rounded p-2 mt-4 mb-4"
+        />
         <div className="mt-4 space-y-3">
         <input
           type="text"
@@ -93,7 +138,9 @@ type CustomerManagementProps = {
         onClick={handleAddCustomer}
         className="bg-black text-white px-4 py-2 rounded"
       >
-        顧客登録
+        {editingCustomerId === null
+          ? "顧客登録"
+          : "保存"}
       </button>
       </div>
       <hr className="my-6" />
@@ -103,7 +150,21 @@ type CustomerManagementProps = {
 </h3>
 
   <div className="space-y-3">
-    {customers.map((customer) => (
+    {customers
+      .filter((customer) => {
+        const keyword =
+          customerSearch.toLowerCase();
+
+        return (
+          customer.name
+            .toLowerCase()
+            .includes(keyword) ||
+          customer.phone.includes(
+            customerSearch
+          )
+        );
+      })
+      .map((customer) => (
       <div
         key={customer.id}
         className="border rounded p-3"
@@ -125,6 +186,61 @@ type CustomerManagementProps = {
             メモ：{customer.memo}
           </div>
         )}
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={() => {
+              setEditingCustomerId(customer.id);
+
+              setCustomerName(customer.name);
+              setCustomerPhone(customer.phone);
+              setCustomerMemo(customer.memo);
+            }}
+            className="bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            編集
+          </button>
+
+          <button
+            onClick={() => {
+              const hasReservation = reservations.some(
+                (reservation) =>
+                  reservation.customerId === customer.id
+              );
+
+              if (hasReservation) {
+                alert(
+                  "予約履歴があるため削除できません。"
+                );
+                return;
+              }
+              if (
+                !confirm(
+                  `${customer.name}さんを削除しますか？`
+                )
+              ) {
+                return;
+              }
+
+              setCustomers((prev) =>
+                prev.filter(
+                  (c) => c.id !== customer.id
+                )
+              );
+
+              if (
+                editingCustomerId === customer.id
+              ) {
+                setEditingCustomerId(null);
+                setCustomerName("");
+                setCustomerPhone("");
+                setCustomerMemo("");
+              }
+            }}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            削除
+          </button>
+        </div>
       </div>
     ))}
   </div>

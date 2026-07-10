@@ -336,6 +336,10 @@ const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerName, setCustomerName] = useState("");
 const [customerPhone, setCustomerPhone] = useState("");
 const [customerMemo, setCustomerMemo] = useState("");
+const [customerSearch, setCustomerSearch] =
+  useState("");
+const [editingCustomerId, setEditingCustomerId] =
+  useState<number | null>(null);
 
 const [quantity, setQuantity] =
   useState(1);
@@ -373,6 +377,7 @@ const [quantity, setQuantity] =
       {currentPage === "customer" && (
         <CustomerManagement
           customers={customers}
+          reservations={reservations}
           customerName={customerName}
           setCustomerName={setCustomerName}
           customerPhone={customerPhone}
@@ -380,6 +385,10 @@ const [quantity, setQuantity] =
           customerMemo={customerMemo}
           setCustomerMemo={setCustomerMemo}
           setCustomers={setCustomers}
+          editingCustomerId={editingCustomerId}
+          setEditingCustomerId={setEditingCustomerId}
+          customerSearch={customerSearch}
+          setCustomerSearch={setCustomerSearch}
         />
       )}
       {currentPage === "product" && (
@@ -405,7 +414,7 @@ const [quantity, setQuantity] =
       setIsModalOpen={setIsModalOpen}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
-
+      customers={customers}
       times={times}
       reservations={reservations}
       selectedDate={date.toISOString().split("T")[0]}
@@ -550,7 +559,27 @@ const [quantity, setQuantity] =
     >
       編集
     </button>
+    <button
+      onClick={() => {
+        if (
+          !confirm("この予約を削除しますか？")
+        ) {
+          return;
+        }
 
+        setReservations((prev) =>
+          prev.filter(
+            (reservation) =>
+              reservation.id !== selectedReservation.id
+          )
+        );
+
+        setSelectedReservation(null);
+      }}
+      className="bg-red-500 text-white px-4 py-2 rounded mt-2 ml-2"
+    >
+      削除
+    </button>
     <div className="mt-4">
       <h3 className="font-bold">
         顧客履歴
