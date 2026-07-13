@@ -109,7 +109,9 @@ export default function ReservationPage({
                     r.startTime === time &&
                     r.lane === "A" &&
                     r.date === selectedDate &&
-                    r.customer.includes(searchTerm)
+                    r.customer
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
                 )
                 .map((r) => (
                   <div
@@ -124,7 +126,6 @@ export default function ReservationPage({
                   </div>
                 ))}
             </div>
-
             <div className="border p-2 h-12">
               {reservations
                 .filter(
@@ -132,7 +133,9 @@ export default function ReservationPage({
                     r.startTime === time &&
                     r.lane === "B" &&
                     r.date === selectedDate &&
-                    r.customer.includes(searchTerm)
+                    r.customer
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase())
                 )
                 .map((r) => (
                   <div key={r.id} className="cursor-pointer">

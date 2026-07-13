@@ -11,6 +11,10 @@ import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
 import type { Customer } from "@/types/Customer";
 import CustomerManagement from "@/components/CustomerManagement";
+import {calculateEndTime,timeToMinutes,} from "@/utils/time";
+import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
+import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
+
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -82,161 +86,95 @@ useEffect(() => {
   const [menu, setMenu] = useState("カット");
   const [price, setPrice] = useState("");
   const [memo, setMemo] = useState("");
-  const todaySales = reservations
-  .filter(
-    (r) =>
-      r.date ===
-      date.toISOString().split("T")[0]
-  )
-  .reduce(
-    (sum, r) => sum + (r.price || 0),
-    0
-  );
-const [selectedReservation, setSelectedReservation] =
-  useState<Reservation | null>(null);
-
-const currentMonth =
-  date.getMonth();
-
-const currentYear =
-  date.getFullYear();
-
-const monthlySales = reservations
-  .filter((r) => {
-    const reservationDate =
-      new Date(r.date);
-
-    return (
-      reservationDate.getMonth() ===
-        currentMonth &&
-      reservationDate.getFullYear() ===
-        currentYear
+  const todaySales =
+    calculateTodaySales(
+      reservations,
+      date
     );
-  })
-  .reduce(
-    (sum, r) => sum + r.price,
-    0
-  );
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
+  const monthlySales =
+    calculateMonthlySales(
+      reservations,
+      date
+    );
+
   const [isEditing, setIsEditing] =
   useState(false);
   const [searchTerm, setSearchTerm] =
   useState("");
-const [editingId, setEditingId] =
-  useState<number | null>(null);
-const [product, setProduct] =
-  useState("");
-const visitCount =
-  selectedReservation
+  const [editingId, setEditingId] =
+    useState<number | null>(null);
+  const [product, setProduct] =
+    useState("");
+  const visitCount = selectedReservation
+    ? getVisitCount(
+        reservations,
+        selectedReservation.customer
+      )
+    : 0;
+  const [productName, setProductName] =
+    useState("");
+
+  const [productPrice, setProductPrice] =
+    useState("");
+
+    const totalSales = selectedReservation
+  ? getTotalSales(
+      reservations,
+      selectedReservation.customer
+    )
+  : 0;
+
+  const lastVisit = selectedReservation
+  ? getLastVisit(
+      reservations,
+      selectedReservation.customer
+    )
+  : "-";
+
+  const customerCount = selectedReservation
     ? reservations.filter(
         (r) =>
           r.customer ===
           selectedReservation.customer
       ).length
     : 0;
-const [productName, setProductName] =
-  useState("");
 
-const [productPrice, setProductPrice] =
-  useState("");
+  const [products, setProducts] =
+    useState<Product[]>([
+      {
+        id: 1,
+        name: "N.オイル",
+        price: 3200,
+      },
+    ]);
+  const [selectedProductId, setSelectedProductId] =
+    useState("");
 
-const totalSales =
-  selectedReservation
-    ? reservations
-        .filter(
-          (r) =>
-            r.customer ===
-            selectedReservation.customer
-        )
-        .reduce(
-          (sum, r) =>
-            sum + r.price,
-          0
-        )
-    : 0;
-const lastVisit =
-  selectedReservation
-    ? reservations
-        .filter(
-          (r) =>
-            r.customer ===
-            selectedReservation.customer
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.date).getTime() -
-            new Date(a.date).getTime()
-        )[0]?.date ?? "-"
-: "-";
+    const [currentPage, setCurrentPage] = useState<
+    "reservation" | "customer" | "product"
+  >("reservation");
 
-const customerCount = selectedReservation
-  ? reservations.filter(
-      (r) =>
-        r.customer ===
-        selectedReservation.customer
-    ).length
-  : 0;
+  const [duration, setDuration] =
+    useState(60);
 
-const [products, setProducts] =
-  useState<Product[]>([
-    {
-      id: 1,
-      name: "N.オイル",
-      price: 3200,
-    },
-  ]);
-const [selectedProductId, setSelectedProductId] =
-  useState("");
+  const endTime =
+    calculateEndTime(
+      startTime,
+      duration
+    );
 
-  const [currentPage, setCurrentPage] = useState<
-  "reservation" | "customer" | "product"
->("reservation");
 
-const [duration, setDuration] =
-  useState(60);
-const calculateEndTime = (
-  startTime: string,
-  duration: number
-) => {
-  const [hour, minute] =
-    startTime.split(":").map(Number);
 
-  const date = new Date();
-
-  date.setHours(hour);
-  date.setMinutes(minute + duration);
-
-  return date.toLocaleTimeString(
-    "ja-JP",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
+  const handleReservationSubmit = () => {
+    if (!customer) {
+      alert("顧客を選択してください");
+      return;
     }
-  );
-};
-const endTime =
-  calculateEndTime(
-    startTime,
-    duration
-  );
 
-const timeToMinutes = (
-  time: string
-) => {
-  const [hour, minute] =
-    time.split(":").map(Number);
-
-  return hour * 60 + minute;
-};
-
-const handleReservationSubmit = () => {
-  if (!customer) {
-    alert("顧客を選択してください");
-    return;
-  }
-
- const newStart = timeToMinutes(startTime);
-const newEnd = timeToMinutes(endTime);
+  const newStart = timeToMinutes(startTime);
+  const newEnd = timeToMinutes(endTime);
 
   const isDuplicate = reservations.some((reservation) => {
     if (
