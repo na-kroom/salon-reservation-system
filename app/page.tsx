@@ -14,7 +14,8 @@ import CustomerManagement from "@/components/CustomerManagement";
 import {calculateEndTime,timeToMinutes,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
-
+import {saveReservations,loadReservations,} from "@/utils/storage";
+import {createReservation,updateReservation,} from "@/utils/reservation";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -58,23 +59,21 @@ export default function Home() {
 
 
 useEffect(() => {
-  localStorage.setItem(
-    "reservations",
-    JSON.stringify(reservations)
-  );
+  saveReservations(reservations);
 }, [reservations]);
 useEffect(() => {
   try {
     const savedReservations =
-      localStorage.getItem("reservations");
+      loadReservations();
 
     if (savedReservations) {
-      setReservations(
-        JSON.parse(savedReservations)
-      );
+      setReservations(savedReservations);
     }
   } catch (error) {
-    console.error("予約データの読み込み失敗", error);
+    console.error(
+      "予約データの読み込み失敗",
+      error
+    );
   }
 }, []);
 
@@ -173,6 +172,7 @@ useEffect(() => {
       return;
     }
 
+
   const newStart = timeToMinutes(startTime);
   const newEnd = timeToMinutes(endTime);
 
@@ -203,11 +203,10 @@ useEffect(() => {
     return;
   }
   if (editingId !== null) {
-    setReservations((prev) => 
+    setReservations((prev) =>
       prev.map((reservation) =>
         reservation.id === editingId
-          ? {
-              ...reservation,
+          ? updateReservation(reservation, {
               customerId: customerId ?? reservation.customerId,
               customer,
               lane,
@@ -219,7 +218,7 @@ useEffect(() => {
               memo,
               product,
               quantity,
-            }
+            })
           : reservation
       )
     );
@@ -229,16 +228,16 @@ useEffect(() => {
 
     return;
   }
-  const newReservation: Reservation = {
-    id: Date.now(),
-
+  const newReservation = createReservation({
     customerId: customerId ?? 0,
-    customer: customer,
+    customer,
 
     lane,
     date: date.toISOString().split("T")[0],
+
     startTime,
     endTime,
+
     menu,
 
     price: Number(price) || 0,
@@ -246,9 +245,9 @@ useEffect(() => {
     memo,
 
     product,
-    quantity,
-  };
 
+    quantity,
+  });
   setReservations((prev) => [
     ...prev,
     newReservation,
