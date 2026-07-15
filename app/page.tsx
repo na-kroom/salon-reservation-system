@@ -16,6 +16,7 @@ import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
+import HomeDashboard from "@/components/HomeDashboard";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -151,9 +152,9 @@ useEffect(() => {
   const [selectedProductId, setSelectedProductId] =
     useState("");
 
-    const [currentPage, setCurrentPage] = useState<
-    "reservation" | "customer" | "product"
-  >("reservation");
+  const [currentPage, setCurrentPage] = useState<
+    "home" | "reservation" | "customer" | "product"
+  >("home");
 
   const [duration, setDuration] =
     useState(60);
@@ -288,6 +289,12 @@ const [quantity, setQuantity] =
       </h1>
 
       <div className="flex gap-2 mb-6">
+      <button
+        onClick={() => setCurrentPage("home")}
+        className="border rounded px-4 py-2"
+      >
+        ホーム
+      </button>
 
         <button
           onClick={() => setCurrentPage("reservation")}
@@ -310,7 +317,20 @@ const [quantity, setQuantity] =
           商品管理
         </button>
       
-      </div>
+            </div>
+      {currentPage === "home" && (
+        <HomeDashboard
+          todayReservationCount={reservations.length}
+          todaySales={todaySales}
+          monthlySales={monthlySales}
+          customerCount={customers.length}
+          todayReservations={reservations.filter(
+            (reservation) =>
+              reservation.date ===
+              date.toISOString().split("T")[0]
+          )}
+        />
+      )}
       {currentPage === "customer" && (
         <CustomerManagement
           customers={customers}
