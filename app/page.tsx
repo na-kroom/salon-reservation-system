@@ -282,42 +282,46 @@ const [editingCustomerId, setEditingCustomerId] =
 const [quantity, setQuantity] =
   useState(1);
   return (
-  
-    <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">
-        Salon Reservation System
+    
+    <main className="min-h-screen bg-gray-50">
+      <div className="sticky top-0 z-50 bg-gray-50 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto flex items-center justify-between py-5 px-8">
+      <h1 className="mb-8 text-4xl font-bold text-gray-800">
+        Salon Manager
       </h1>
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-3">
       <button
         onClick={() => setCurrentPage("home")}
-        className="border rounded px-4 py-2"
+        className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
       >
         ホーム
       </button>
 
         <button
           onClick={() => setCurrentPage("reservation")}
-          className="border rounded px-4 py-2"
+          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
         >
           予約
         </button>
 
         <button
           onClick={() => setCurrentPage("customer")}
-          className="border rounded px-4 py-2"
+          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
         >
           顧客管理
         </button>
 
         <button
           onClick={() => setCurrentPage("product")}
-          className="border rounded px-4 py-2"
+          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
         >
           商品管理
         </button>
-      
-            </div>
+        </div>
+          </div>
+        </div>
+    <div className="max-w-7xl mx-auto px-8 py-8">
       {currentPage === "home" && (
         <HomeDashboard
           todayReservationCount={reservations.length}
@@ -328,7 +332,7 @@ const [quantity, setQuantity] =
             (reservation) =>
               reservation.date ===
               date.toISOString().split("T")[0]
-          )}
+          )} 
         />
       )}
       {currentPage === "customer" && (
@@ -566,6 +570,7 @@ const [quantity, setQuantity] =
 
 
     )}
+    </div>
    </main>
 
 );

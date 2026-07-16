@@ -16,47 +16,47 @@ export default function HomeDashboard({
 }: HomeDashboardProps){
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">
+      <h2 className="text-3xl font-bold text-gray-800 font-bold mb-6">
         ダッシュボード
       </h2>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="border rounded-lg p-4 shadow">
-          <p className="text-gray-500">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">
             今日の予約
           </p>
 
-          <p className="text-2xl font-bold">
+          <p className="text-3xl font-bold text-gray-800 font-bold">
             {todayReservationCount}件
           </p>
         </div>
 
-        <div className="border rounded-lg p-4 shadow">
-          <p className="text-gray-500">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">
             今日の売上
           </p>
 
-          <p className="text-2xl font-bold">
+          <p className="text-3xl font-bold text-gray-800 font-bold">
             ¥{todaySales.toLocaleString()}
           </p>
         </div>
 
-        <div className="border rounded-lg p-4 shadow">
-          <p className="text-gray-500">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">
             今月売上
           </p>
 
-          <p className="text-2xl font-bold">
+          <p className="text-3xl font-bold text-gray-800 font-bold">
             ¥{monthlySales.toLocaleString()}
           </p>
         </div>
 
-        <div className="border rounded-lg p-4 shadow">
-          <p className="text-gray-500">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">
             登録顧客
           </p>
 
-          <p className="text-2xl font-bold">
+          <p className="text-3xl font-bold text-gray-800 font-bold">
             {customerCount}人
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function HomeDashboard({
         </h3>
 
         {todayReservations.length === 0 ? (
-            <p className="text-gray-500">
+            <p className="text-sm text-gray-500">
             今日の予約はありません。
             </p>
         ) : (
@@ -74,9 +74,9 @@ export default function HomeDashboard({
             {todayReservations.map((reservation) => (
                 <div
                 key={reservation.id}
-                className="border rounded-lg p-4"
+                className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
                 >
-                <div className="font-bold">
+                <div className="text-lg font-semibold text-gray-800">
                     {reservation.startTime}
                 </div>
 
@@ -84,7 +84,7 @@ export default function HomeDashboard({
                     {reservation.customer}
                 </div>
 
-                <div className="text-gray-500">
+                <div className="text-sm text-gray-500">
                     {reservation.menu}
                 </div>
                 </div>
