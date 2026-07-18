@@ -153,7 +153,7 @@ useEffect(() => {
     useState("");
 
   const [currentPage, setCurrentPage] = useState<
-    "home" | "reservation" | "customer" | "product"
+    "home" | "reservation" | "customer" | "product" | "checkout"
   >("home");
 
   const [duration, setDuration] =
@@ -293,30 +293,56 @@ const [quantity, setQuantity] =
       <div className="flex gap-3">
       <button
         onClick={() => setCurrentPage("home")}
-        className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
+        className={`rounded-lg px-5 py-2 transition ${
+          currentPage === "home"
+            ? "bg-emerald-600 text-white"
+            : "border border-gray-300 bg-white hover:bg-gray-100"
+        }`}
       >
         ホーム
       </button>
 
         <button
           onClick={() => setCurrentPage("reservation")}
-          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
+          className={`rounded-lg px-5 py-2 transition ${
+            currentPage === "reservation"
+              ? "bg-emerald-600 text-white"
+              : "border border-gray-300 bg-white hover:bg-gray-100"
+          }`}
         >
           予約
         </button>
 
         <button
           onClick={() => setCurrentPage("customer")}
-          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
+          className={`rounded-lg px-5 py-2 transition ${
+            currentPage === "customer"
+              ? "bg-emerald-600 text-white"
+              : "border border-gray-300 bg-white hover:bg-gray-100"
+          }`}
         >
           顧客管理
         </button>
 
         <button
           onClick={() => setCurrentPage("product")}
-          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-gray-100"
+          className={`rounded-lg px-5 py-2 transition ${
+            currentPage === "product"
+              ? "bg-emerald-600 text-white"
+              : "border border-gray-300 bg-white hover:bg-gray-100"
+          }`}
         >
           商品管理
+        </button>
+        <button
+          onClick={() => setCurrentPage("checkout")}
+          className={`rounded-lg px-5 py-2 transition ${
+            currentPage === "checkout"
+              ? "bg-emerald-600 text-white"
+              : "border border-gray-300 bg-white hover:bg-gray-100"
+          }`}
+        >
+          会計
         </button>
         </div>
           </div>
@@ -365,6 +391,28 @@ const [quantity, setQuantity] =
           setEditingProductId={setEditingProductId}
         />
           </>
+      )}
+
+      {currentPage === "checkout" && (
+        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+        <h2 className="mb-6 text-3xl font-bold text-gray-800">
+          会計
+        </h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+
+          {/*左側*/}
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          </div>
+
+          {/*右側*/}
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          </div>
+        </div>
+
+          <p className="text-gray-500">
+            会計画面は後
+          </p>
+        </div>
       )}
 
     {currentPage === "reservation" && (
