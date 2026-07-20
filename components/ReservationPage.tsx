@@ -1,7 +1,7 @@
 import React from "react";
 import type { Reservation } from "@/types/Reservation";
 import type { Customer } from "@/types/Customer";
-
+import ReservationCalendar from "@/components/ReservationCalendar";
 type ReservationPageProps = {
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -72,6 +72,8 @@ export default function ReservationPage({
           ▶
         </button>
       </div>
+
+      <ReservationCalendar />
 
       {/* 予約追加 */}
       <div className="mb-6">
