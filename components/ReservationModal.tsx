@@ -18,7 +18,7 @@ type Props = {
     React.SetStateAction<string>
   >;
   times: string[];
-  lane: string;
+  lane: string
 
   setLane: React.Dispatch<
     React.SetStateAction<string>

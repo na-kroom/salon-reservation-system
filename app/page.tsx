@@ -17,6 +17,7 @@ import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
 import HomeDashboard from "@/components/HomeDashboard";
+import Checkout from "@/components/Checkout";
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -393,27 +394,7 @@ const [quantity, setQuantity] =
           </>
       )}
 
-      {currentPage === "checkout" && (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <h2 className="mb-6 text-3xl font-bold text-gray-800">
-          会計
-        </h2>
-        <div className="grid gap-6 lg:grid-cols-2">
 
-          {/*左側*/}
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          </div>
-
-          {/*右側*/}
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          </div>
-        </div>
-
-          <p className="text-gray-500">
-            会計画面は後
-          </p>
-        </div>
-      )}
 
     {currentPage === "reservation" && (
     <>
@@ -431,6 +412,9 @@ const [quantity, setQuantity] =
       setIsEditing={setIsEditing}
     />
     </>
+    )}
+    {currentPage === "checkout" && (
+      <Checkout />
     )}
 
 <ReservationModal
