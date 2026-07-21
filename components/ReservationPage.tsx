@@ -73,7 +73,10 @@ export default function ReservationPage({
         </button>
       </div>
 
-      <ReservationCalendar />
+      <ReservationCalendar
+        date={date}
+        setDate={setDate}
+      />
 
       {/* 予約追加 */}
       <div className="mb-6">
