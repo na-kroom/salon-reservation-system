@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Reservation } from "@/types/Reservation";
 import type { Customer } from "@/types/Customer";
 import ReservationCalendar from "@/components/ReservationCalendar";
+
 type ReservationPageProps = {
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -42,41 +43,58 @@ export default function ReservationPage({
   setSelectedReservation,
   setIsEditing,
 }: ReservationPageProps) {
+  const [showCalendar, setShowCalendar] = useState(false);
+
   return (
     <>
       {/* 日付切替 */}
-      <div className="mb-6 flex items-center gap-4">
-        <button
-          className="border px-3 py-1 rounded"
-          onClick={() => {
-            const newDate = new Date(date);
-            newDate.setDate(date.getDate() - 1);
-            setDate(newDate);
-          }}
-        >
-          ◀
-        </button>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            className="border px-3 py-1 rounded"
+            onClick={() => {
+              const newDate = new Date(date);
+              newDate.setDate(date.getDate() - 1);
+              setDate(newDate);
+            }}
+          >
+            ◀
+          </button>
 
-        <span className="font-semibold">
-          {date.toLocaleDateString("ja-JP")}
-        </span>
+          <span className="font-semibold">
+            {date.toLocaleDateString("ja-JP")}
+          </span>
+
+          <button
+            className="border px-3 py-1 rounded"
+            onClick={() => {
+              const newDate = new Date(date);
+              newDate.setDate(date.getDate() + 1);
+              setDate(newDate);
+            }}
+          >
+            ▶
+          </button>
+        </div>
 
         <button
-          className="border px-3 py-1 rounded"
-          onClick={() => {
-            const newDate = new Date(date);
-            newDate.setDate(date.getDate() + 1);
-            setDate(newDate);
-          }}
+          onClick={() => setShowCalendar(!showCalendar)}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-2 hover:bg-blue-50"
         >
-          ▶
+          📅
         </button>
       </div>
-
-      <ReservationCalendar
-        date={date}
-        setDate={setDate}
-      />
+      <div className="relative mb-6">
+        {showCalendar && (
+          <div className="absolute right-0 top-12 z-50 w-[340px] rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl">
+          <ReservationCalendar
+            date={date}
+            setDate={setDate}
+            onClose={() => setShowCalendar(false)}
+          />
+          </div>
+        )}
+      </div>
 
       {/* 予約追加 */}
       <div className="mb-6">

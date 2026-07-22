@@ -296,7 +296,7 @@ const [quantity, setQuantity] =
         onClick={() => setCurrentPage("home")}
         className={`rounded-lg px-5 py-2 transition ${
           currentPage === "home"
-            ? "bg-emerald-600 text-white"
+            ? "bg-slate-600 text-white border border-slate-600 text-white"
             : "border border-gray-300 bg-white hover:bg-gray-100"
         }`}
       >
@@ -307,7 +307,7 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("reservation")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "reservation"
-              ? "bg-emerald-600 text-white"
+              ? "bg-slate-600 text-white border border-slate-600 text-white"
               : "border border-gray-300 bg-white hover:bg-gray-100"
           }`}
         >
@@ -318,7 +318,7 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("customer")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "customer"
-              ? "bg-emerald-600 text-white"
+              ? "bg-slate-600 text-white border border-slate-600 text-white"
               : "border border-gray-300 bg-white hover:bg-gray-100"
           }`}
         >
@@ -329,7 +329,7 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("product")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "product"
-              ? "bg-emerald-600 text-white"
+              ? "bg-slate-600 text-white border border-slate-600 text-white"
               : "border border-gray-300 bg-white hover:bg-gray-100"
           }`}
         >
@@ -339,7 +339,7 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("checkout")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "checkout"
-              ? "bg-emerald-600 text-white"
+              ? "bg-slate-600 text-white border border-slate-600 text-white"
               : "border border-gray-300 bg-white hover:bg-gray-100"
           }`}
         >
