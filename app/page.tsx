@@ -284,31 +284,31 @@ const [quantity, setQuantity] =
   useState(1);
   return (
     
-    <main className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-50 bg-gray-50 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between py-5 px-8">
+<main className="min-h-screen bg-gray-50">
+  <div className="sticky top-0 z-50 bg-gray-50 border-b border-gray-200">
+    <div className="max-w-7xl mx-auto flex items-center justify-between py-5 px-8">
       <h1 className="mb-8 text-4xl font-bold text-gray-800">
         Salon Manager
       </h1>
 
       <div className="flex gap-3">
-      <button
-        onClick={() => setCurrentPage("home")}
-        className={`rounded-lg px-5 py-2 transition ${
-          currentPage === "home"
-            ? "bg-slate-600 text-white border border-slate-600 text-white"
-            : "border border-gray-300 bg-white hover:bg-gray-100"
-        }`}
-      >
-        ホーム
-      </button>
+        <button
+          onClick={() => setCurrentPage("home")}
+          className={`rounded-lg px-5 py-2 transition ${
+            currentPage === "home"
+              ? "bg-slate-800 text-white border border-slate-800"
+              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
+          }`}
+        >
+          ホーム
+        </button>
 
         <button
           onClick={() => setCurrentPage("reservation")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "reservation"
-              ? "bg-slate-600 text-white border border-slate-600 text-white"
-              : "border border-gray-300 bg-white hover:bg-gray-100"
+              ? "bg-slate-800 text-white border border-slate-800"
+              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
           }`}
         >
           予約
@@ -318,8 +318,8 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("customer")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "customer"
-              ? "bg-slate-600 text-white border border-slate-600 text-white"
-              : "border border-gray-300 bg-white hover:bg-gray-100"
+              ? "bg-slate-800 text-white border border-slate-800"
+              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
           }`}
         >
           顧客管理
@@ -329,39 +329,27 @@ const [quantity, setQuantity] =
           onClick={() => setCurrentPage("product")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "product"
-              ? "bg-slate-600 text-white border border-slate-600 text-white"
-              : "border border-gray-300 bg-white hover:bg-gray-100"
+              ? "bg-slate-800 text-white border border-slate-800"
+              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
           }`}
         >
           商品管理
         </button>
+
         <button
           onClick={() => setCurrentPage("checkout")}
           className={`rounded-lg px-5 py-2 transition ${
             currentPage === "checkout"
-              ? "bg-slate-600 text-white border border-slate-600 text-white"
-              : "border border-gray-300 bg-white hover:bg-gray-100"
+              ? "bg-slate-800 text-white border border-slate-800"
+              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
           }`}
         >
           会計
         </button>
-        </div>
-          </div>
-        </div>
-    <div className="max-w-7xl mx-auto px-8 py-8">
-      {currentPage === "home" && (
-        <HomeDashboard
-          todayReservationCount={reservations.length}
-          todaySales={todaySales}
-          monthlySales={monthlySales}
-          customerCount={customers.length}
-          todayReservations={reservations.filter(
-            (reservation) =>
-              reservation.date ===
-              date.toISOString().split("T")[0]
-          )} 
-        />
-      )}
+      </div>
+    </div>
+  </div>
+  <div className="max-w-7xl mx-auto px-8 py-8">
       {currentPage === "customer" && (
         <CustomerManagement
           customers={customers}

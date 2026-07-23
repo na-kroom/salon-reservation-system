@@ -44,6 +44,21 @@ export default function ReservationPage({
   setIsEditing,
 }: ReservationPageProps) {
   const [showCalendar, setShowCalendar] = useState(false);
+  const getRowSpan = (
+    startTime: string,
+    endTime: string
+  ) => {
+    const startHour = Number(startTime.split(":")[0]);
+    const startMinute = Number(startTime.split(":")[1]);
+
+    const endHour = Number(endTime.split(":")[0]);
+    const endMinute = Number(endTime.split(":")[1]);
+
+    const start = startHour * 60 + startMinute;
+    const end = endHour * 60 + endMinute;
+
+    return (end - start) / 30;
+  };
 
   return (
     <>
@@ -120,7 +135,7 @@ export default function ReservationPage({
         <div className="font-bold">Time</div>
         <div className="font-bold text-center">A Lane</div>
         <div className="font-bold text-center">B Lane</div>
-
+      
         {times.map((time) => (
           <React.Fragment key={time}>
             <div className="border p-2">{time}</div>
@@ -139,15 +154,26 @@ export default function ReservationPage({
                 .map((r) => (
                   <div
                     key={r.id}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setSelectedReservation(r);
-                      setIsEditing(true);
+                    className="cursor-pointer rounded bg-blue-500 p-2 text-white"
+                    style={{
+                      height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
                     }}
-                  >
-                    {r.customer}
-                  </div>
-                ))}
+                    onClick={() => {
+                          setSelectedReservation(r);
+                          setIsEditing(true);
+                        }}
+                      >
+                        <div>{r.customer}</div>
+
+                        <div className="text-xs">
+                          {r.startTime}〜{r.endTime}
+                        </div>
+
+                        <div className="text-xs text-white/80">
+                          {r.menu}
+                        </div>
+                      </div>
+                    ))}
             </div>
             <div className="border p-2 h-12">
               {reservations
@@ -161,18 +187,29 @@ export default function ReservationPage({
                       .includes(searchTerm.toLowerCase())
                 )
                 .map((r) => (
-                  <div key={r.id} className="cursor-pointer">
+                  <div
+                    key={r.id}
+                    className="cursor-pointer rounded bg-blue-500 p-2 text-white"
+                    style={{
+                      height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
+                    }}
+                    onClick={() => {
+                      setSelectedReservation(r);
+                      setIsEditing(true);
+                    }}
+                  >
                     <div>{r.customer}</div>
 
                     <div className="text-xs">
                       {r.startTime}〜{r.endTime}
                     </div>
 
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-white/80">
                       {r.menu}
                     </div>
                   </div>
                 ))}
+
             </div>
           </React.Fragment>
         ))}
