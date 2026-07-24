@@ -34,6 +34,8 @@ export default function Home() {
       memo: "",
       product: "",
       quantity: 1,
+      status: "reserved",
+      
     }
   ]);
 
@@ -249,6 +251,8 @@ useEffect(() => {
     product,
 
     quantity,
+
+    status: "reserved",
   });
   setReservations((prev) => [
     ...prev,
@@ -382,7 +386,21 @@ const [quantity, setQuantity] =
           </>
       )}
 
-
+      {currentPage === "home" && (
+        <HomeDashboard
+          todayReservationCount={
+            reservations.filter(
+              (r) => r.date === date.toISOString().split("T")[0]
+            ).length
+          }
+          todaySales={todaySales}
+          monthlySales={monthlySales}
+          customerCount={customers.length}
+          todayReservations={reservations.filter(
+            (r) => r.date === date.toISOString().split("T")[0]
+          )}
+        />
+      )}
 
     {currentPage === "reservation" && (
     <>
@@ -539,6 +557,28 @@ const [quantity, setQuantity] =
       className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
     >
       編集
+    </button>
+    <button
+      onClick={() => {
+        setReservations(
+          reservations.map((r) =>
+            r.id === selectedReservation.id
+              ? {
+                  ...r,
+                  status: "completed",
+                }
+              : r
+          )
+        );
+
+        setSelectedReservation({
+          ...selectedReservation,
+          status: "completed",
+        });
+      }}
+      className="bg-emerald-600 text-white px-4 py-2 rounded mt-2 ml-2"
+    >
+      会計完了
     </button>
     <button
       onClick={() => {

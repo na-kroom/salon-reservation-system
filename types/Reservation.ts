@@ -11,4 +11,6 @@ export type Reservation = {
   memo: string;
   product: string;
   quantity: number;
+
+  status: "reserved" | "completed" | "cancelled";
 };

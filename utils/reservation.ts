@@ -12,6 +12,9 @@ type CreateReservationParams = {
   memo: string;
   product: string;
   quantity: number;
+  
+  status: "reserved" | "completed" | "cancelled";
+
 };
 
 export const createReservation = (
@@ -38,6 +41,8 @@ export const createReservation = (
     product: params.product,
 
     quantity: params.quantity,
+
+    status: params.status,
   };
 
 };

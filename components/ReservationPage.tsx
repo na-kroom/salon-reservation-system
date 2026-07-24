@@ -154,7 +154,11 @@ export default function ReservationPage({
                 .map((r) => (
                   <div
                     key={r.id}
-                    className="cursor-pointer rounded bg-blue-500 p-2 text-white"
+                    className={`cursor-pointer rounded p-2 text-white ${
+                      r.status === "completed"
+                        ? "bg-gray-400"
+                        : "bg-blue-500"
+                    }`}
                     style={{
                       height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
                     }}
@@ -163,15 +167,34 @@ export default function ReservationPage({
                           setIsEditing(true);
                         }}
                       >
-                        <div>{r.customer}</div>
+                      {r.status === "completed" ? (
+                        <>
+                          <div className="font-medium">
+                            ✓ {r.customer}
+                          </div>
 
-                        <div className="text-xs">
-                          {r.startTime}〜{r.endTime}
-                        </div>
+                          <div className="text-xs text-gray-100">
+                            会計済み
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>{r.customer}</div>
 
-                        <div className="text-xs text-white/80">
-                          {r.menu}
-                        </div>
+                          <div className="text-xs">
+                            {r.startTime}〜{r.endTime}
+                          </div>
+
+                          <div className="text-xs text-white/80">
+                            {r.menu}
+                          </div>
+
+                          <div className="text-xs font-semibold">
+                            {r.status === "reserved" && "🟡 予約中"}
+                            {r.status === "cancelled" && "🔴 キャンセル"}
+                          </div>
+                        </>
+                      )}
                       </div>
                     ))}
             </div>
@@ -189,7 +212,11 @@ export default function ReservationPage({
                 .map((r) => (
                   <div
                     key={r.id}
-                    className="cursor-pointer rounded bg-blue-500 p-2 text-white"
+                    className={`cursor-pointer rounded p-2 text-white ${
+                      r.status === "completed"
+                        ? "bg-gray-400"
+                        : "bg-blue-500"
+                    }`}
                     style={{
                       height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
                     }}
@@ -198,15 +225,34 @@ export default function ReservationPage({
                       setIsEditing(true);
                     }}
                   >
-                    <div>{r.customer}</div>
+                  {r.status === "completed" ? (
+                    <>
+                      <div className="font-medium">
+                        ✓ {r.customer}
+                      </div>
 
-                    <div className="text-xs">
-                      {r.startTime}〜{r.endTime}
-                    </div>
+                      <div className="text-xs text-gray-100">
+                        会計済み
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>{r.customer}</div>
 
-                    <div className="text-xs text-white/80">
-                      {r.menu}
-                    </div>
+                      <div className="text-xs">
+                        {r.startTime}〜{r.endTime}
+                      </div>
+
+                      <div className="text-xs text-white/80">
+                        {r.menu}
+                      </div>
+
+                      <div className="text-xs font-semibold">
+                        {r.status === "reserved" && "🟡 予約中"}
+                        {r.status === "cancelled" && "🔴 キャンセル"}
+                      </div>
+                    </>
+                  )}
                   </div>
                 ))}
 
