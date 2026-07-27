@@ -419,9 +419,14 @@ const [quantity, setQuantity] =
     />
     </>
     )}
-    {currentPage === "checkout" && (
-      <Checkout />
-    )}
+
+  {currentPage === "checkout" && (
+    <Checkout
+      reservations={reservations}
+      setReservations={setReservations}
+      products={products}
+    />
+  )}
 
 <ReservationModal
   isOpen={isModalOpen}

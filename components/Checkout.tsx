@@ -1,5 +1,88 @@
+import React, { useState } from "react";
+import type { Reservation } from "@/types/Reservation";
+import type { Product } from "@/types/Product";
 
-export default function Checkout() {
+type CheckoutProps = {
+  reservations: Reservation[];
+  setReservations: React.Dispatch<
+    React.SetStateAction<Reservation[]>
+  >;
+  products: Product[];
+};
+
+export default function Checkout({
+  reservations,
+  setReservations,
+  products,
+}: CheckoutProps) {
+  const [selectedReservationId, setSelectedReservationId] =
+    useState<number | null>(null);
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const todayReservations = reservations.filter(
+    (r) =>
+      r.date === today &&
+      r.status === "reserved"
+  );
+  const selectedReservation =
+    todayReservations.find(
+      (r) => r.id === selectedReservationId
+    ); 
+  const subtotal = selectedReservation?.price ?? 0;
+  const [selectedProductId, setSelectedProductId] =
+    useState<number | null>(null);
+
+  const [checkoutProducts, setCheckoutProducts] =
+    useState<
+      {
+        id: number;
+        name: string;
+        price: number;
+        quantity: number;
+      }[]
+    >([]);
+  const selectedProduct = products.find(
+    (p) => p.id === selectedProductId
+  );
+
+  const productTotal = checkoutProducts.reduce(
+    (sum, product) =>
+      sum + product.price * product.quantity,
+    0
+  );
+  const tax = Math.floor(
+    (subtotal + productTotal) * 0.1
+  );
+
+  const total =
+    subtotal +
+    productTotal +
+    tax;
+
+  const handleCheckout = () => {
+    if (!selectedReservation) {
+      alert("予約を選択してください");
+      return;
+    }
+
+    setReservations((prev) =>
+      prev.map((reservation) =>
+        reservation.id === selectedReservation.id
+          ? {
+              ...reservation,
+              status: "completed",
+            }
+          : reservation
+      )
+    );
+
+    alert("会計が完了しました。");
+
+    setSelectedReservationId(null);
+  };
+
+
   return (
   <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
     <h2 className="mb-6 text-3xl font-bold text-gray-800">
@@ -14,8 +97,27 @@ export default function Checkout() {
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium">予約</label>
-            <select className="w-full rounded-lg border p-2">
-              <option>山田 花子 10:00</option>
+            <select
+              className="w-full rounded-lg border p-2"
+              value={selectedReservationId ?? ""}
+              onChange={(e) =>
+                setSelectedReservationId(Number(e.target.value))
+              }
+            >
+              <option value="">
+                予約を選択してください
+              </option>
+
+              {todayReservations.map((reservation) => (
+                <option
+                  key={reservation.id}
+                  value={reservation.id}
+                >
+                  {reservation.startTime}
+                  {" "}
+                  {reservation.customer}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -23,15 +125,31 @@ export default function Checkout() {
             <label className="mb-1 block text-sm font-medium">施術料金</label>
             <input
               type="number"
-              defaultValue={5000}
-              className="w-full rounded-lg border p-2"
+              value={selectedReservation?.price ?? ""}
+              readOnly
+              className="w-full rounded-lg border p-2 bg-gray-100"
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium">商品</label>
-            <select className="w-full rounded-lg border p-2">
-              <option>N.オイル</option>
+            <select
+              className="w-full rounded-lg border p-2"
+              value={selectedProductId ?? ""}
+              onChange={(e) =>
+                setSelectedProductId(Number(e.target.value))
+              }
+            >
+              <option value="">商品を選択</option>
+
+              {products.map((product) => (
+                <option
+                  key={product.id}
+                  value={product.id}
+                >
+                  {product.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -44,7 +162,41 @@ export default function Checkout() {
             />
           </div>
 
-          <button className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700">
+          <button
+          onClick={() => {
+            if (!selectedProduct) return;
+
+            setCheckoutProducts((prev) => {
+              const existing = prev.find(
+                (p) => p.id === selectedProduct.id
+              );
+
+              if (existing) {
+                return prev.map((p) =>
+                  p.id === selectedProduct.id
+                    ? {
+                        ...p,
+                        quantity: p.quantity + 1,
+                      }
+                    : p
+                );
+              }
+
+              return [
+                ...prev,
+                {
+                  id: selectedProduct.id,
+                  name: selectedProduct.name,
+                  price: selectedProduct.price,
+                  quantity: 1,
+                },
+              ];
+            });
+
+            setSelectedProductId(null);
+          }}
+            className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700"
+          >
             商品を追加
           </button>
         </div>
@@ -55,39 +207,58 @@ export default function Checkout() {
         <h3 className="mb-4 text-xl font-semibold">会計内容</h3>
 
         <div className="mb-6 space-y-2">
-          <div className="flex justify-between">
-            <span>N.オイル ×1</span>
-            <span>¥3,200</span>
+        {checkoutProducts.map((product) => (
+          <div
+            key={product.id}
+            className="flex justify-between"
+          >
+            <span>
+              {product.name} ×{product.quantity}
+            </span>
+
+            <span>
+              ¥{(
+                product.price *
+                product.quantity
+              ).toLocaleString()}
+            </span>
           </div>
+        ))}
         </div>
 
         <hr className="my-4" />
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>施術料金</span>
-            <span>¥5,000</span>
+          <span>施術料金</span>
+          <span>¥{subtotal.toLocaleString()}</span>
           </div>
 
           <div className="flex justify-between">
-            <span>商品合計</span>
-            <span>¥3,200</span>
+          <span>商品合計</span>
+          <span>
+            ¥{productTotal.toLocaleString()}
+          </span>
           </div>
 
           <div className="flex justify-between">
             <span>消費税</span>
-            <span>¥820</span>
+            <span>¥{tax.toLocaleString()}</span>
           </div>
 
           <div className="mt-4 flex justify-between border-t pt-4 text-xl font-bold">
             <span>合計</span>
-            <span>¥9,020</span>
+            <span>¥{total.toLocaleString()}</span>
           </div>
         </div>
 
-        <button className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700">
-          会計完了
-        </button>
+      <button
+        onClick={handleCheckout}
+        disabled={!selectedReservation}
+        className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700 disabled:bg-gray-400"
+      >
+        会計完了
+      </button>
       </div>
     </div>
   </div>
