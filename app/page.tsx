@@ -287,6 +287,7 @@ const [editingCustomerId, setEditingCustomerId] =
 const [quantity, setQuantity] =
   useState(1);
   return (
+
     
 <main className="min-h-screen bg-gray-50">
   <div className="sticky top-0 z-50 bg-gray-50 border-b border-gray-200">
@@ -391,6 +392,13 @@ const [quantity, setQuantity] =
           todayReservationCount={
             reservations.filter(
               (r) => r.date === date.toISOString().split("T")[0]
+            ).length
+          }
+          completedCount={
+            reservations.filter(
+              (r) =>
+                r.date === date.toISOString().split("T")[0] &&
+                r.status === "completed"
             ).length
           }
           todaySales={todaySales}
@@ -563,28 +571,7 @@ const [quantity, setQuantity] =
     >
       編集
     </button>
-    <button
-      onClick={() => {
-        setReservations(
-          reservations.map((r) =>
-            r.id === selectedReservation.id
-              ? {
-                  ...r,
-                  status: "completed",
-                }
-              : r
-          )
-        );
 
-        setSelectedReservation({
-          ...selectedReservation,
-          status: "completed",
-        });
-      }}
-      className="bg-emerald-600 text-white px-4 py-2 rounded mt-2 ml-2"
-    >
-      会計完了
-    </button>
     <button
       onClick={() => {
         if (

@@ -1,14 +1,17 @@
 import type { Reservation } from "@/types/Reservation";
 
-type HomeDashboardProps = {
-  todayReservationCount: number;
-  todaySales: number;
-  monthlySales: number;
-  customerCount: number;
-  todayReservations: Reservation[];
-};
+  type HomeDashboardProps = {
+    todayReservationCount: number;
+    completedCount: number;
+    todaySales: number;
+    monthlySales: number;
+    customerCount: number;
+    todayReservations: Reservation[];
+  };
+
 export default function HomeDashboard({
   todayReservationCount,
+  completedCount,
   todaySales,
   monthlySales,
   customerCount,
@@ -28,6 +31,16 @@ export default function HomeDashboard({
 
           <p className="text-3xl font-bold text-gray-800 font-bold">
             {todayReservationCount}件
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">
+            会計済み
+          </p>
+
+          <p className="text-3xl font-bold text-green-600">
+            {completedCount}件
           </p>
         </div>
 
@@ -71,7 +84,9 @@ export default function HomeDashboard({
             </p>
         ) : (
             <div className="space-y-3">
-            {todayReservations.map((reservation) => (
+            {[...todayReservations]
+                .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                .map((reservation) => (
                 <div
                 key={reservation.id}
                 className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
@@ -86,6 +101,24 @@ export default function HomeDashboard({
 
                 <div className="text-sm text-gray-500">
                     {reservation.menu}
+                </div>
+                <div className="mt-1">
+                  <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                    {reservation.lane}レーン
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <span
+                    className={`rounded-full px-2 py-1 text-xs font-semibold text-white ${
+                      reservation.status === "completed"
+                        ? "bg-green-500"
+                        : "bg-blue-500"
+                    }`}
+                  >
+                    {reservation.status === "completed"
+                      ? "会計済み"
+                      : "予約中"}
+                  </span>
                 </div>
                 </div>
             ))}

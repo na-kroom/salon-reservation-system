@@ -76,8 +76,11 @@ export default function Checkout({
           : reservation
       )
     );
-
     alert("会計が完了しました。");
+
+    setCheckoutProducts([]);
+
+    setSelectedProductId(null);
 
     setSelectedReservationId(null);
   };
@@ -195,7 +198,8 @@ export default function Checkout({
 
             setSelectedProductId(null);
           }}
-            className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700"
+          disabled={!selectedProduct}
+          className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700 disabled:bg-gray-400"
           >
             商品を追加
           </button>
@@ -208,21 +212,77 @@ export default function Checkout({
 
         <div className="mb-6 space-y-2">
         {checkoutProducts.map((product) => (
-          <div
-            key={product.id}
-            className="flex justify-between"
-          >
-            <span>
-              {product.name} ×{product.quantity}
+        <div
+          key={product.id}
+          className="flex items-center justify-between py-2"
+        >
+          <div>
+            <div>{product.name}</div>
+
+            <div className="text-sm text-gray-500">
+              ¥{product.price.toLocaleString()}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() =>
+                setCheckoutProducts((prev) =>
+                  prev.flatMap((p) => {
+                    if (p.id !== product.id) return [p];
+
+                    if (p.quantity === 1) {
+                      return [];
+                    }
+
+                    return [
+                      {
+                        ...p,
+                        quantity: p.quantity - 1,
+                      },
+                    ];
+                  })
+                )
+              }
+              className="h-8 w-8 rounded bg-gray-200"
+            >
+              −
+            </button>
+
+            <span className="w-6 text-center">
+              {product.quantity}
             </span>
 
-            <span>
-              ¥{(
-                product.price *
-                product.quantity
-              ).toLocaleString()}
-            </span>
+            <button
+              onClick={() =>
+                setCheckoutProducts((prev) =>
+                  prev.map((p) =>
+                    p.id === product.id
+                      ? {
+                          ...p,
+                          quantity: p.quantity + 1,
+                        }
+                      : p
+                  )
+                )
+              }
+              className="h-8 w-8 rounded bg-gray-200"
+            >
+              ＋
+            </button>
+
+            <button
+              onClick={() =>
+                setCheckoutProducts((prev) =>
+                  prev.filter((p) => p.id !== product.id)
+                )
+              }
+              className="rounded bg-red-500 px-2 py-1 text-white"
+            >
+              削除
+            </button>
           </div>
+        </div>
         ))}
         </div>
 
