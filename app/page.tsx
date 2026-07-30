@@ -574,6 +574,33 @@ const [quantity, setQuantity] =
 
     <button
       onClick={() => {
+        if (!confirm("この予約をキャンセルしますか？")) {
+          return;
+        }
+
+        setReservations((prev) =>
+          prev.map((reservation) =>
+            reservation.id === selectedReservation.id
+              ? {
+                  ...reservation,
+                  status: "cancelled",
+                }
+              : reservation
+          )
+        );
+
+        setSelectedReservation({
+          ...selectedReservation,
+          status: "cancelled",
+        });
+      }}
+      className="bg-orange-500 text-white px-4 py-2 rounded mt-2 ml-2"
+    >
+      キャンセル
+    </button>
+
+    <button
+      onClick={() => {
         if (
           !confirm("この予約を削除しますか？")
         ) {

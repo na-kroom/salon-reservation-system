@@ -155,9 +155,11 @@ export default function ReservationPage({
                   <div
                     key={r.id}
                     className={`cursor-pointer rounded p-2 text-white ${
-                      r.status === "completed"
-                        ? "bg-gray-400"
-                        : "bg-blue-500"
+                    r.status === "completed"
+                      ? "bg-gray-400"
+                      : r.status === "cancelled"
+                      ? "bg-red-500"
+                      : "bg-blue-500"
                     }`}
                     style={{
                       height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
@@ -213,9 +215,11 @@ export default function ReservationPage({
                   <div
                     key={r.id}
                     className={`cursor-pointer rounded p-2 text-white ${
-                      r.status === "completed"
-                        ? "bg-gray-400"
-                        : "bg-blue-500"
+                    r.status === "completed"
+                      ? "bg-gray-400"
+                      : r.status === "cancelled"
+                      ? "bg-red-500"
+                      : "bg-blue-500"
                     }`}
                     style={{
                       height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,

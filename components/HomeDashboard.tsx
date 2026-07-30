@@ -109,15 +109,19 @@ export default function HomeDashboard({
                 </div>
                 <div className="mt-2">
                   <span
-                    className={`rounded-full px-2 py-1 text-xs font-semibold text-white ${
-                      reservation.status === "completed"
-                        ? "bg-green-500"
-                        : "bg-blue-500"
-                    }`}
+                  className={`rounded-full px-2 py-1 text-xs font-semibold text-white ${
+                    reservation.status === "completed"
+                      ? "bg-green-500"
+                      : reservation.status === "cancelled"
+                      ? "bg-red-500"
+                      : "bg-blue-500"
+                  }`}
                   >
-                    {reservation.status === "completed"
-                      ? "会計済み"
-                      : "予約中"}
+                  {reservation.status === "completed"
+                    ? "会計済み"
+                    : reservation.status === "cancelled"
+                    ? "キャンセル"
+                    : "予約中"}
                   </span>
                 </div>
                 </div>
