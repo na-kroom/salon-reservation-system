@@ -9,6 +9,11 @@ type CustomerManagementProps = {
     React.SetStateAction<string>
   >;
 
+  customerKana: string;
+  setCustomerKana: React.Dispatch<
+    React.SetStateAction<string>
+  >;
+
   customerPhone: string;
   setCustomerPhone: React.Dispatch<
     React.SetStateAction<string>
@@ -35,12 +40,15 @@ type CustomerManagementProps = {
 };
 
     export default function CustomerManagement({
+
     
     
     customers,
     reservations,
     customerName,
     setCustomerName,
+    customerKana,
+    setCustomerKana,
     customerPhone,
     setCustomerPhone,
     customerMemo,
@@ -52,8 +60,12 @@ type CustomerManagementProps = {
     setCustomerSearch,
     }: CustomerManagementProps){
     const handleAddCustomer = () => {
-    if (!customerName || !customerPhone) {
-      alert("顧客名と電話番号を入力してください。");
+      if (
+        !customerName ||
+        !customerKana ||
+        !customerPhone
+      ) {
+      alert("顧客名・フリガナ・電話番号を入力してください。");
       return;
     }
     if (editingCustomerId !== null) {
@@ -63,6 +75,7 @@ type CustomerManagementProps = {
           ? {
               ...customer,
               name: customerName,
+              kana: customerKana,
               phone: customerPhone,
               memo: customerMemo,
             }
@@ -83,6 +96,7 @@ type CustomerManagementProps = {
       {
         id: Date.now(),
         name: customerName,
+        kana: customerKana,
         phone: customerPhone,
         visitCount: 1,
         memo: customerMemo,
@@ -90,6 +104,7 @@ type CustomerManagementProps = {
     ]);
 
     setCustomerName("");
+    setCustomerKana("");
     setCustomerPhone("");
     setCustomerMemo("");
   };
@@ -102,7 +117,7 @@ type CustomerManagementProps = {
         <p>登録人数：{customers.length}人</p>
         <input
           type="text"
-          placeholder="顧客名・電話番号で検索"
+          placeholder="顧客名・フリガナ・電話番号で検索"
           value={customerSearch}
           onChange={(e) =>
             setCustomerSearch(e.target.value)
@@ -117,7 +132,13 @@ type CustomerManagementProps = {
           onChange={(e) => setCustomerName(e.target.value)}
           className="w-full border rounded p-2"
         />
-
+        <input
+          type="text"
+          placeholder="フリガナ"
+          value={customerKana}
+          onChange={(e) => setCustomerKana(e.target.value)}
+          className="w-full border rounded p-2"
+        />
         <input
           type="text"
           placeholder="電話番号"
@@ -154,15 +175,15 @@ type CustomerManagementProps = {
       .filter((customer) => {
         const keyword =
           customerSearch.toLowerCase();
-
-        return (
-          customer.name
-            .toLowerCase()
-            .includes(keyword) ||
-          customer.phone.includes(
-            customerSearch
-          )
-        );
+          return (
+            customer.name
+              .toLowerCase()
+              .includes(keyword) ||
+            customer.kana
+              .toLowerCase()
+              .includes(keyword) ||
+            customer.phone.includes(customerSearch)
+          );
       })
       .map((customer) => (
       <div
@@ -192,6 +213,7 @@ type CustomerManagementProps = {
               setEditingCustomerId(customer.id);
 
               setCustomerName(customer.name);
+              setCustomerKana(customer.kana);
               setCustomerPhone(customer.phone);
               setCustomerMemo(customer.memo);
             }}
@@ -232,6 +254,7 @@ type CustomerManagementProps = {
               ) {
                 setEditingCustomerId(null);
                 setCustomerName("");
+                setCustomerKana("");
                 setCustomerPhone("");
                 setCustomerMemo("");
               }

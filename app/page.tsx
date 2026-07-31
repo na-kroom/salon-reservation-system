@@ -228,6 +228,9 @@ useEffect(() => {
     );
 
     setEditingId(null);
+    setCustomerKeyword("");
+    setCustomerId(null);
+    setCustomer("");
     setIsModalOpen(false);
 
     return;
@@ -266,17 +269,20 @@ const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
 const [customers, setCustomers] =
 useState<Customer[]>([
-  {
-    id: 1,
-    name: "田中",
-    phone: "09012345678",
-    visitCount: 3,
-    memo: "",
-  },
+{
+  id: 1,
+  name: "田中",
+  kana: "タナカ",
+  phone: "09012345678",
+  visitCount: 3,
+  memo: "",
+},
 ]);
 const [customerId, setCustomerId] = useState<number | null>(null);
-
+const [customerKeyword, setCustomerKeyword] =
+  useState("");
 const [customerName, setCustomerName] = useState("");
+const [customerKana, setCustomerKana] = useState("");
 const [customerPhone, setCustomerPhone] = useState("");
 const [customerMemo, setCustomerMemo] = useState("");
 const [customerSearch, setCustomerSearch] =
@@ -360,6 +366,8 @@ const [quantity, setQuantity] =
           customers={customers}
           reservations={reservations}
           customerName={customerName}
+          customerKana={customerKana}
+          setCustomerKana={setCustomerKana}
           setCustomerName={setCustomerName}
           customerPhone={customerPhone}
           setCustomerPhone={setCustomerPhone}
@@ -435,12 +443,14 @@ const [quantity, setQuantity] =
       products={products}
     />
   )}
-
+s
 <ReservationModal
   isOpen={isModalOpen}
 
   customer={customer}
   setCustomer={setCustomer}
+  customerKeyword={customerKeyword}
+  setCustomerKeyword={setCustomerKeyword}
   customerId={customerId}
   setCustomerId={setCustomerId}
   startTime={startTime}

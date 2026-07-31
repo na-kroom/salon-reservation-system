@@ -12,6 +12,13 @@ type Props = {
   setCustomer: React.Dispatch<
     React.SetStateAction<string>
   >;
+
+  customerKeyword: string;
+
+  setCustomerKeyword: React.Dispatch<
+    React.SetStateAction<string>
+  >;
+
   startTime: string;
 
   setStartTime: React.Dispatch<
@@ -70,6 +77,8 @@ export default function ReservationModal({
   isOpen,
   customer,
   setCustomer,
+  customerKeyword,
+  setCustomerKeyword,
   startTime,
   setStartTime,
   times,
@@ -105,35 +114,58 @@ export default function ReservationModal({
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>
+          <input
+            type="text"
+            placeholder="顧客名・フリガナで検索"
+            value={customerKeyword}
+            onChange={(e) =>
+              setCustomerKeyword(e.target.value)
+            }
+            className="w-full border rounded p-2 mb-2"
+          />
 
-          <select
-            value={customerId ?? ""}
-            onChange={(e) => {
-              const selectedId = Number(e.target.value);
+          {customerKeyword !== customer && (
+            <div className="max-h-40 overflow-y-auto rounded border mb-4">
+            {customers
+              .filter((customer) => {
+                const keyword =
+                  customerKeyword.toLowerCase();
 
-              setCustomerId(selectedId);
+                return (
+                  customer.name
+                    .toLowerCase()
+                    .includes(keyword) ||
+                  customer.kana
+                    .toLowerCase()
+                    .includes(keyword)
+                );
+              })
+              .map((customer) => (
+                <button
+                  key={customer.id}
+                  type="button"
+                  onClick={() => {
+                    setCustomerId(customer.id);
+                    setCustomer(customer.name);
+                    setCustomerKeyword(customer.name);
+                  }}
+                  className={`block w-full border-b p-2 text-left hover:bg-blue-50 ${
+                    customerId === customer.id
+                      ? "bg-blue-100"
+                      : ""
+                  }`}
+                >
+                  <div className="font-medium">
+                    {customer.name}
+                  </div>
 
-              const selectedCustomer = customers.find(
-                (c) => c.id === selectedId
-              );
-
-              if (selectedCustomer) {
-                setCustomer(selectedCustomer.name);
-              }
-            }}
-            className="w-full border rounded p-2"
-          >
-            <option value="">顧客を選択してください</option>
-
-            {customers.map((customer) => (
-              <option
-                key={customer.id}
-                value={customer.id}
-              >
-                {customer.name}
-              </option>
-            ))}
-          </select>
+                  <div className="text-sm text-gray-500">
+                    {customer.kana}
+                  </div>
+                </button>
+              ))}
+          </div>
+          )}
 
           <select
             value={startTime}
