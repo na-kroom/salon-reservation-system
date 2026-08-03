@@ -7,6 +7,7 @@ import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
 import SalesSummary from "@/components/SalesSummary";
 import CustomerCard from "@/components/CustomerCard";
+import CustomerModal from "@/components/CustomerModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
 import type { Customer } from "@/types/Customer";
@@ -96,6 +97,8 @@ useEffect(() => {
     );
   const [selectedReservation, setSelectedReservation] =
     useState<Reservation | null>(null);
+  const [isCustomerModalOpen, setIsCustomerModalOpen] =
+    useState(false);
   const monthlySales =
     calculateMonthlySales(
       reservations,
@@ -432,6 +435,7 @@ const [quantity, setQuantity] =
       selectedDate={date.toISOString().split("T")[0]}
       setSelectedReservation={setSelectedReservation}
       setIsEditing={setIsEditing}
+      setIsCustomerModalOpen={setIsCustomerModalOpen}
     />
     </>
     )}
@@ -443,7 +447,7 @@ const [quantity, setQuantity] =
       products={products}
     />
   )}
-s
+
 <ReservationModal
   isOpen={isModalOpen}
 
@@ -481,7 +485,24 @@ s
   customers={customers}
   onClose={() => setIsModalOpen(false)}
 />
+<CustomerModal
+  isOpen={isCustomerModalOpen}
+  onClose={() => setIsCustomerModalOpen(false)}
+  selectedReservation={selectedReservation}
+  setIsEditing={setIsEditing}
+  setSelectedReservation={setSelectedReservation}
+  visitCount={visitCount}
+totalSales={totalSales}
+lastVisit={lastVisit}
 
+setEditingId={setEditingId}
+setCustomerId={setCustomerId}
+setCustomer={setCustomer}
+setMenu={setMenu}
+setPrice={setPrice}
+setMemo={setMemo}
+setIsModalOpen={setIsModalOpen}
+/>
       
 <CustomerCard
   selectedReservation={selectedReservation}

@@ -28,6 +28,9 @@ type ReservationPageProps = {
   setIsEditing: React.Dispatch<
     React.SetStateAction<boolean>
   >;
+  setIsCustomerModalOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;  
 };
 
 export default function ReservationPage({
@@ -42,6 +45,7 @@ export default function ReservationPage({
   customers,
   setSelectedReservation,
   setIsEditing,
+  setIsCustomerModalOpen,
 }: ReservationPageProps) {
   const [showCalendar, setShowCalendar] = useState(false);
   const getRowSpan = (
@@ -164,10 +168,10 @@ export default function ReservationPage({
                     style={{
                       height: `${getRowSpan(r.startTime, r.endTime) * 48}px`,
                     }}
-                    onClick={() => {
-                          setSelectedReservation(r);
-                          setIsEditing(true);
-                        }}
+                      onClick={() => {
+                        setSelectedReservation(r);
+                        setIsCustomerModalOpen(true);
+                      }}
                       >
                       {r.status === "completed" ? (
                         <>
@@ -226,7 +230,7 @@ export default function ReservationPage({
                     }}
                     onClick={() => {
                       setSelectedReservation(r);
-                      setIsEditing(true);
+                      setIsCustomerModalOpen(true);
                     }}
                   >
                   {r.status === "completed" ? (
