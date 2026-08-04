@@ -7,6 +7,7 @@ type Props = {
   visitCount: number;
   totalSales: number;
   lastVisit: string;
+  reservations: Reservation[];
   setIsEditing: React.Dispatch<
     React.SetStateAction<boolean>
     >;
@@ -40,6 +41,9 @@ type Props = {
     setIsModalOpen: React.Dispatch<
     React.SetStateAction<boolean>
     >;
+    setReservations: React.Dispatch<
+      React.SetStateAction<Reservation[]>
+    >;
 };
 
 export default function CustomerModal({
@@ -51,7 +55,16 @@ export default function CustomerModal({
   lastVisit,
   setIsEditing,
   setSelectedReservation,
-}: Props) {
+  setEditingId,
+  setCustomerId,
+  setCustomer,
+  setMenu,
+  setPrice,
+  setMemo,
+  setReservations,
+  reservations,
+  setIsModalOpen
+  }: Props) {
   if (!isOpen || !selectedReservation) return null;
 
   return (
@@ -104,28 +117,134 @@ export default function CustomerModal({
         </div>
         <div className="mt-6 flex gap-2">
         <button
-        onClick={() => {
-            setSelectedReservation(selectedReservation);
-            setIsEditing(true);
+          onClick={() => {
+            if (!selectedReservation) return;
+
+            setEditingId(selectedReservation.id);
+
+            setCustomerId(selectedReservation.customerId);
+            setCustomer(selectedReservation.customer);
+            setMenu(selectedReservation.menu);
+            setPrice(
+              String(selectedReservation.price)
+            );
+            setMemo(selectedReservation.memo);
+
+            setIsModalOpen(true);
             onClose();
-        }}
-        className="rounded bg-blue-500 px-4 py-2 text-white"
+          }}
+          className="rounded bg-blue-500 px-4 py-2 text-white"
         >
-        編集
+          編集
         </button>
         <button
-            className="rounded bg-red-500 px-4 py-2 text-white"
+          onClick={() => {
+            if (!selectedReservation) return;
+
+            if (
+              !confirm("この予約をキャンセルしますか？")
+            ) {
+              return;
+            }
+
+            setReservations((prev) =>
+              prev.map((reservation) =>
+                reservation.id === selectedReservation.id
+                  ? {
+                      ...reservation,
+                      status: "cancelled",
+                    }
+                  : reservation
+              )
+            );
+
+            setSelectedReservation({
+              ...selectedReservation,
+              status: "cancelled",
+            });
+
+            onClose();
+          }}
+          className="rounded bg-orange-500 px-4 py-2 text-white"
         >
-            キャンセル
+          キャンセル
         </button>
 
         <button
-            className="rounded bg-gray-600 px-4 py-2 text-white"
+          onClick={() => {
+            if (!selectedReservation) return;
+
+            if (
+              !confirm("この予約を削除しますか？")
+            ) {
+              return;
+            }
+
+            setReservations((prev) =>
+              prev.filter(
+                (reservation) =>
+                  reservation.id !== selectedReservation.id
+              )
+            );
+
+            setSelectedReservation(null);
+            onClose();
+          }}
+          className="rounded bg-red-500 px-4 py-2 text-white"
         >
-            削除
+          削除
         </button>
         </div>
         </div>
+
+        <div className="mt-6">
+        <h3 className="mb-2 font-bold">
+          購入履歴
+        </h3>
+
+        {reservations
+          .filter(
+            (r) =>
+              r.customer ===
+                selectedReservation.customer &&
+              r.product
+          )
+          .map((r) => (
+            <div
+              key={r.id}
+              className="border-b py-2"
+            >
+              {r.product}
+              （{r.quantity}個）
+            </div>
+          ))}
+      </div>
+      <div className="mt-6">
+        <h3 className="mb-2 font-bold">
+          来店履歴
+        </h3>
+
+        {reservations
+          .filter(
+            (r) =>
+              r.customer ===
+              selectedReservation.customer
+          )
+          .map((r) => (
+            <div
+              key={r.id}
+              className="border-b py-2"
+            >
+              <div>{r.date}</div>
+
+              <div>{r.menu}</div>
+
+              <div>
+                ¥{r.price.toLocaleString()}
+              </div>
+            </div>
+          ))}
+      </div>
         
         <button
           onClick={onClose}
