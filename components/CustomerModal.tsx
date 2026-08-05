@@ -69,10 +69,19 @@ export default function CustomerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-[500px] rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-xl font-bold">
+      <div className="w-[650px] max-h-[85vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+        <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold">
           顧客カルテ
         </h2>
+
+          <button
+            onClick={onClose}
+            className="text-2xl text-gray-500 hover:text-black"
+          >
+            ×
+          </button>
+        </div>
 
         <div className="space-y-3">
         <div>
@@ -115,7 +124,7 @@ export default function CustomerModal({
             </span>
             ¥{selectedReservation.price}
         </div>
-        <div className="mt-6 flex gap-2">
+        <div className="mt-6 flex justify-end gap-2">
         <button
           onClick={() => {
             if (!selectedReservation) return;
@@ -246,12 +255,6 @@ export default function CustomerModal({
           ))}
       </div>
         
-        <button
-          onClick={onClose}
-          className="mt-6 rounded border px-4 py-2"
-        >
-          閉じる
-        </button>
       </div>
     </div>
   );

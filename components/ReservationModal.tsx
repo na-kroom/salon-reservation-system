@@ -178,25 +178,7 @@ export default function ReservationModal({
               </option>
             ))}
           </select>
-          <select
-            value={duration}
-            onChange={(e) =>
-              setDuration(Number(e.target.value))
-            }
-            className="border p-2 w-full mb-4"
-          >
-            {Array.from(
-              { length: 24 },
-              (_, i) => (i + 1) * 10
-            ).map((minutes) => (
-              <option
-                key={minutes}
-                value={minutes}
-              >
-                {minutes}分
-              </option>
-            ))}
-          </select>   
+  
           <select>
             {Array.from(
               { length: 24 },
