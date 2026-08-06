@@ -17,8 +17,10 @@ import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
+import { fetchCustomers } from "@/utils/customerApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
+
 
 export default function Home() {
   const [reservations, setReservations] = useState<Reservation[]>([
@@ -295,7 +297,27 @@ const [editingCustomerId, setEditingCustomerId] =
 
 const [quantity, setQuantity] =
   useState(1);
+
+  useEffect(() => {
+    async function loadCustomers() {
+      try {
+        const data = await fetchCustomers();
+
+        if (data) {
+          setCustomers(data);
+        }
+      } catch (error) {
+        console.error(
+          "顧客データ取得失敗",
+          error
+        );
+      }
+    }
+
+    loadCustomers();
+  }, []);
   return (
+
 
     
 <main className="min-h-screen bg-gray-50">
