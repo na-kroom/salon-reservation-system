@@ -84,6 +84,8 @@ useEffect(() => {
   }
 }, []);
 
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [customer, setCustomer] = useState("");
@@ -273,16 +275,8 @@ useEffect(() => {
 const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
 const [customers, setCustomers] =
-useState<Customer[]>([
-{
-  id: 1,
-  name: "田中",
-  kana: "タナカ",
-  phone: "09012345678",
-  visitCount: 3,
-  memo: "",
-},
-]);
+  useState<Customer[]>([]);
+
 const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
   useState("");
@@ -302,6 +296,8 @@ const [quantity, setQuantity] =
     async function loadCustomers() {
       try {
         const data = await fetchCustomers();
+
+        console.log("Supabaseから取得した顧客:", data);
 
         if (data) {
           setCustomers(data);
