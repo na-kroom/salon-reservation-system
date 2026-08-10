@@ -1,5 +1,6 @@
 import type { Customer } from "@/types/Customer";
 import type { Reservation } from "@/types/Reservation";
+import { createCustomer } from "@/utils/customerApi";
 
 type CustomerManagementProps = {
   customers: Customer[];
@@ -59,7 +60,7 @@ type CustomerManagementProps = {
     customerSearch,
     setCustomerSearch,
     }: CustomerManagementProps){
-    const handleAddCustomer = () => {
+    const handleAddCustomer = async () => {
       if (
         !customerName ||
         !customerKana ||
@@ -91,17 +92,26 @@ type CustomerManagementProps = {
     return;
   }
 
+  try {
+    const newCustomer = await createCustomer({
+      name: customerName,
+      kana: customerKana,
+      phone: customerPhone,
+      memo: customerMemo,
+    });
+
     setCustomers((prev) => [
       ...prev,
-      {
-        id: Date.now(),
-        name: customerName,
-        kana: customerKana,
-        phone: customerPhone,
-        visitCount: 1,
-        memo: customerMemo,
-      },
+      newCustomer,
     ]);
+  } catch (error) {
+    console.error(
+      "顧客登録に失敗しました",
+      error
+    );
+    alert("顧客登録に失敗しました。");
+    return;
+  }
 
     setCustomerName("");
     setCustomerKana("");

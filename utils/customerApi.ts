@@ -11,4 +11,33 @@ export async function fetchCustomers() {
   }
 
   return data;
+} 
+
+export async function createCustomer({
+  name,
+  kana,
+  phone,
+  memo,
+}: {
+  name: string;
+  kana: string;
+  phone: string;
+  memo: string;
+}) {
+  const { data, error } = await supabase
+    .from("customers")
+    .insert({
+      name,
+      kana,
+      phone,
+      memo,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
