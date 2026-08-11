@@ -311,7 +311,7 @@ const [quantity, setQuantity] =
     }
 
     loadCustomers();
-  }, []);
+  }, [])
   return (
 
 
