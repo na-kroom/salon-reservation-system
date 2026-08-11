@@ -1,6 +1,6 @@
 import type { Customer } from "@/types/Customer";
 import type { Reservation } from "@/types/Reservation";
-import { createCustomer } from "@/utils/customerApi";
+import {createCustomer,updateCustomer,} from "@/utils/customerApi";
 
 type CustomerManagementProps = {
   customers: Customer[];
@@ -70,19 +70,32 @@ type CustomerManagementProps = {
       return;
     }
     if (editingCustomerId !== null) {
-    setCustomers((prev) =>
-      prev.map((customer) =>
-        customer.id === editingCustomerId
-          ? {
-              ...customer,
-              name: customerName,
-              kana: customerKana,
-              phone: customerPhone,
-              memo: customerMemo,
-            }
-          : customer
-      )
-    );
+    try {
+      const updatedCustomer = await updateCustomer(
+        editingCustomerId,
+        {
+          name: customerName,
+          kana: customerKana,
+          phone: customerPhone,
+          memo: customerMemo,
+        }
+      );
+
+      setCustomers((prev) =>
+        prev.map((customer) =>
+          customer.id === editingCustomerId
+            ? updatedCustomer
+            : customer
+        )
+      );
+    } catch (error) {
+      console.error(
+        "顧客編集に失敗しました",
+        error
+      );
+      alert("顧客編集に失敗しました。");
+      return;
+    }
 
     setEditingCustomerId(null);
     setCustomerName("");

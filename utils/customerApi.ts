@@ -41,3 +41,35 @@ export async function createCustomer({
 
   return data;
 }
+export async function updateCustomer(
+  id: number,
+  {
+    name,
+    kana,
+    phone,
+    memo,
+  }: {
+    name: string;
+    kana: string;
+    phone: string;
+    memo: string;
+  }
+) {
+  const { data, error } = await supabase
+    .from("customers")
+    .update({
+      name,
+      kana,
+      phone,
+      memo,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
