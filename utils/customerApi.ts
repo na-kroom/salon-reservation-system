@@ -73,3 +73,13 @@ export async function updateCustomer(
 
   return data;
 }
+export async function deleteCustomer(id: number) {
+  const { error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}

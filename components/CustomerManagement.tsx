@@ -1,6 +1,6 @@
 import type { Customer } from "@/types/Customer";
 import type { Reservation } from "@/types/Reservation";
-import {createCustomer,updateCustomer,} from "@/utils/customerApi";
+import {createCustomer,updateCustomer,deleteCustomer,} from "@/utils/customerApi";
 
 type CustomerManagementProps = {
   customers: Customer[];
@@ -246,7 +246,7 @@ type CustomerManagementProps = {
           </button>
 
           <button
-            onClick={() => {
+            onClick={async() => {
               const hasReservation = reservations.some(
                 (reservation) =>
                   reservation.customerId === customer.id
@@ -265,12 +265,23 @@ type CustomerManagementProps = {
               ) {
                 return;
               }
+              try {
+                await deleteCustomer(customer.id);
 
-              setCustomers((prev) =>
-                prev.filter(
-                  (c) => c.id !== customer.id
-                )
-              );
+                setCustomers((prev) =>
+                  prev.filter(
+                    (c) => c.id !== customer.id
+                  )
+                );
+              } catch (error) {
+                console.error(
+                  "顧客削除に失敗しました",
+                  error
+                );
+                alert("顧客削除に失敗しました。");
+                return;
+              }
+             
 
               if (
                 editingCustomerId === customer.id
