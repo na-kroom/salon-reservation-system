@@ -18,6 +18,7 @@ import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
 import { fetchCustomers } from "@/utils/customerApi";
+import { fetchProducts } from "@/utils/productApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
 
@@ -150,15 +151,27 @@ useEffect(() => {
           selectedReservation.customer
       ).length
     : 0;
-
   const [products, setProducts] =
-    useState<Product[]>([
-      {
-        id: 1,
-        name: "N.オイル",
-        price: 3200,
-      },
-    ]);
+  useState<Product[]>([]);
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const data = await fetchProducts();
+
+        if (data) {
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error(
+          "商品データ取得失敗",
+          error
+        );
+      }
+    }
+
+    loadProducts();
+  }, []);
+
   const [selectedProductId, setSelectedProductId] =
     useState("");
 
