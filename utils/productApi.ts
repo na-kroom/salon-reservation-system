@@ -12,3 +12,25 @@ export async function fetchProducts() {
 
   return data;
 }
+export async function createProduct({
+  name,
+  price,
+}: {
+  name: string;
+  price: number;
+}) {
+  const { data, error } = await supabase
+    .from("products")
+    .insert({
+      name,
+      price,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

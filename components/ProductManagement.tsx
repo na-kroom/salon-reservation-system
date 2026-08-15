@@ -1,5 +1,6 @@
 import React from "react";
 import type { Product } from "@/types/Product";
+import { createProduct } from "@/utils/productApi";
 
 type ProductManagementProps = {
   products: Product[];
@@ -34,7 +35,7 @@ export default function ProductManagement({
     editingProductId,
     setEditingProductId,
 }: ProductManagementProps) {
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     if (!productName || !productPrice) {
       alert("商品名と価格を入力してください");
       return;
@@ -58,14 +59,24 @@ export default function ProductManagement({
 
       return;
     }
-    setProducts([
-      ...products,
-      {
-        id: Date.now(),
-        name: productName,
-        price: Number(productPrice),
-      },
+  try {
+    const newProduct = await createProduct({
+      name: productName,
+      price: Number(productPrice),
+    });
+
+    setProducts((prev) => [
+      ...prev,
+      newProduct,
     ]);
+  } catch (error) {
+    console.error(
+      "商品登録に失敗しました",
+      error
+    );
+    alert("商品登録に失敗しました。");
+    return;
+  }
 
     setProductName("");
     setProductPrice("");
