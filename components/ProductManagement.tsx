@@ -1,6 +1,6 @@
 import React from "react";
 import type { Product } from "@/types/Product";
-import {createProduct,updateProduct,} from "@/utils/productApi";
+import {createProduct,updateProduct,deleteProduct,} from "@/utils/productApi";
 
 type ProductManagementProps = {
   products: Product[];
@@ -95,8 +95,21 @@ export default function ProductManagement({
     setProductPrice("");
   };
 
-  const handleDeleteProduct = (id: number) => {
-    setProducts(products.filter((p) => p.id !== id));
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      await deleteProduct(id);
+
+      setProducts((prev) =>
+        prev.filter((product) => product.id !== id)
+      );
+    } catch (error) {
+      console.error(
+        "商品削除に失敗しました",
+        error
+      );
+      alert("商品削除に失敗しました。");
+      return;
+    }
   };
 
   return (
