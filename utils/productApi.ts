@@ -34,3 +34,29 @@ export async function createProduct({
 
   return data;
 }
+export async function updateProduct(
+  id: number,
+  {
+    name,
+    price,
+  }: {
+    name: string;
+    price: number;
+  }
+) {
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      name,
+      price,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

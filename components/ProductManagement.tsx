@@ -1,6 +1,6 @@
 import React from "react";
 import type { Product } from "@/types/Product";
-import { createProduct } from "@/utils/productApi";
+import {createProduct,updateProduct,} from "@/utils/productApi";
 
 type ProductManagementProps = {
   products: Product[];
@@ -41,17 +41,30 @@ export default function ProductManagement({
       return;
     }
     if (editingProductId !== null) {
-      setProducts(
-        products.map((product) =>
+    try {
+      const updatedProduct = await updateProduct(
+        editingProductId,
+        {
+          name: productName,
+          price: Number(productPrice),
+        }
+      );
+
+      setProducts((prev) =>
+        prev.map((product) =>
           product.id === editingProductId
-            ? {
-                ...product,
-                name: productName,
-                price: Number(productPrice),
-              }
+            ? updatedProduct
             : product
         )
       );
+    } catch (error) {
+      console.error(
+        "商品編集に失敗しました",
+        error
+      );
+      alert("商品編集に失敗しました。");
+      return;
+    }
 
       setEditingProductId(null);
       setProductName("");
