@@ -21,27 +21,11 @@ import { fetchCustomers } from "@/utils/customerApi";
 import { fetchProducts } from "@/utils/productApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
-
+import { fetchReservations } from "@/utils/reservationApi";
 
 export default function Home() {
-  const [reservations, setReservations] = useState<Reservation[]>([
-    {
-      id: 1,
-      lane: "A",
-      customerId: 1,
-      customer: "田中",
-      date: "2026-06-08",
-      startTime:"11:00",
-      endTime:"12:00",
-      menu: "カット",
-      price: 5000,
-      memo: "",
-      product: "",
-      quantity: 1,
-      status: "reserved",
-      
-    }
-  ]);
+  const [reservations, setReservations] =
+  useState<Reservation[]>([]);
 
   
   const times = [
@@ -83,6 +67,24 @@ useEffect(() => {
       error
     );
   }
+}, []);
+useEffect(() => {
+  async function loadReservationsFromSupabase() {
+    try {
+      const data = await fetchReservations();
+      console.log("Supabaseから取得した予約:", data);
+      if (data) {
+        setReservations(data);
+      }
+    } catch (error) {
+      console.error(
+        "予約データ取得失敗",
+        error
+      );
+    }
+  }
+
+  loadReservationsFromSupabase();
 }, []);
 
 
@@ -463,7 +465,13 @@ const [quantity, setQuantity] =
       customers={customers}
       times={times}
       reservations={reservations}
-      selectedDate={date.toISOString().split("T")[0]}
+      selectedDate={
+        `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}-${String(
+          date.getDate()
+        ).padStart(2, "0")}`
+      }
       setSelectedReservation={setSelectedReservation}
       setIsEditing={setIsEditing}
       setIsCustomerModalOpen={setIsCustomerModalOpen}
