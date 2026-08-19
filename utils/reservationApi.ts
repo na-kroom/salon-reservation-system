@@ -26,3 +26,56 @@ export async function fetchReservations() {
     status: reservation.status,
   }));
 }
+export async function createReservation(reservation: {
+  lane: string;
+  customerId: number;
+  customer: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  menu: string;
+  price: number;
+  memo: string;
+  product: string;
+  quantity: number;
+  status: string;
+}) {
+  const { data, error } = await supabase
+    .from("reservations")
+    .insert({
+      lane: reservation.lane,
+      customer_id: reservation.customerId,
+      customer: reservation.customer,
+      date: reservation.date,
+      start_time: reservation.startTime,
+      end_time: reservation.endTime,
+      menu: reservation.menu,
+      price: reservation.price,
+      memo: reservation.memo,
+      product: reservation.product,
+      quantity: reservation.quantity,
+      status: reservation.status,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    lane: data.lane,
+    customerId: data.customer_id,
+    customer: data.customer,
+    date: data.date,
+    startTime: data.start_time.slice(0, 5),
+    endTime: data.end_time.slice(0, 5),
+    menu: data.menu,
+    price: data.price,
+    memo: data.memo ?? "",
+    product: data.product ?? "",
+    quantity: data.quantity,
+    status: data.status,
+  };
+}

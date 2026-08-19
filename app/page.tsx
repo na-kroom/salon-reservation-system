@@ -17,6 +17,7 @@ import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
+import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
 import { fetchCustomers } from "@/utils/customerApi";
 import { fetchProducts } from "@/utils/productApi";
 import HomeDashboard from "@/components/HomeDashboard";
@@ -190,9 +191,9 @@ useEffect(() => {
       duration
     );
 
+ｓ
 
-
-  const handleReservationSubmit = () => {
+  const handleReservationSubmit = async() => {
     if (!customer) {
       alert("顧客を選択してください");
       return;
@@ -257,34 +258,49 @@ useEffect(() => {
 
     return;
   }
-  const newReservation = createReservation({
-    customerId: customerId ?? 0,
-    customer,
+  try {
+    const newReservation =
+      await createReservationToSupabase({
+        customerId: customerId ?? 0,
+        customer,
 
-    lane,
-    date: date.toISOString().split("T")[0],
+        lane,
+        date: `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}-${String(
+          date.getDate()
+        ).padStart(2, "0")}`,
 
-    startTime,
-    endTime,
+        startTime,
+        endTime,
 
-    menu,
+        menu,
 
-    price: Number(price) || 0,
+        price: Number(price) || 0,
 
-    memo,
+        memo,
 
-    product,
+        product,
 
-    quantity,
+        quantity,
 
-    status: "reserved",
-  });
-  setReservations((prev) => [
-    ...prev,
-    newReservation,
-  ]);
+        status: "reserved",
+      });
 
-  setIsModalOpen(false);
+    setReservations((prev) => [
+      ...prev,
+      newReservation,
+    ]);
+
+    setIsModalOpen(false);
+  } catch (error) {
+    console.error(
+      "予約登録に失敗しました",
+      error
+    );
+    alert("予約登録に失敗しました。");
+    return;
+  }
 };
 
 const [editingProductId, setEditingProductId] = useState<number | null>(null);

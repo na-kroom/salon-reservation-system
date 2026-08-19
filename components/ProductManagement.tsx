@@ -109,7 +109,7 @@ export default function ProductManagement({
       );
       alert("商品削除に失敗しました。");
       return;
-    }
+    }``
   };
 
   return (
