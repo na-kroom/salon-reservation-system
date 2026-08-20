@@ -8,7 +8,7 @@ export async function fetchReservations() {
 
   if (error) {
     throw error;
-  }
+  }s
 
   return data.map((reservation) => ({
     id: reservation.id,
@@ -135,4 +135,14 @@ export async function updateReservation(
     quantity: data.quantity,
     status: data.status,
   };
+}
+export async function deleteReservation(id: number) {
+  const { error } = await supabase
+    .from("reservations")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
 }

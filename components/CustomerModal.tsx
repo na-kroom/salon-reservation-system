@@ -1,4 +1,5 @@
 import type { Reservation } from "@/types/Reservation";
+import { deleteReservation } from "@/utils/reservationApi";
 
 type Props = {
   isOpen: boolean;
@@ -147,33 +148,38 @@ export default function CustomerModal({
           編集
         </button>
         <button
-          onClick={() => {
-            if (!selectedReservation) return;
+        onClick={async () => {
+          if (!selectedReservation) return;
 
-            if (
-              !confirm("この予約をキャンセルしますか？")
-            ) {
-              return;
-            }
+          if (
+            !confirm("この予約を削除しますか？")
+          ) {
+            return;
+          }
+
+          try {
+            await deleteReservation(
+              selectedReservation.id
+            );
 
             setReservations((prev) =>
-              prev.map((reservation) =>
-                reservation.id === selectedReservation.id
-                  ? {
-                      ...reservation,
-                      status: "cancelled",
-                    }
-                  : reservation
+              prev.filter(
+                (reservation) =>
+                  reservation.id !== selectedReservation.id
               )
             );
 
-            setSelectedReservation({
-              ...selectedReservation,
-              status: "cancelled",
-            });
-
+            setSelectedReservation(null);
             onClose();
-          }}
+          } catch (error) {
+            console.error(
+              "予約削除に失敗しました",
+              error
+            );
+            alert("予約削除に失敗しました。");
+            return;
+          }
+        }}
           className="rounded bg-orange-500 px-4 py-2 text-white"
         >
           キャンセル
