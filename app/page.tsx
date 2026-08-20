@@ -23,7 +23,7 @@ import { fetchProducts } from "@/utils/productApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
 import { fetchReservations } from "@/utils/reservationApi";
-
+import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
 export default function Home() {
   const [reservations, setReservations] =
   useState<Reservation[]>([]);
@@ -191,7 +191,7 @@ useEffect(() => {
       duration
     );
 
-ｓ
+
 
   const handleReservationSubmit = async() => {
     if (!customer) {
@@ -230,25 +230,45 @@ useEffect(() => {
     return;
   }
   if (editingId !== null) {
-    setReservations((prev) =>
-      prev.map((reservation) =>
-        reservation.id === editingId
-          ? updateReservation(reservation, {
-              customerId: customerId ?? reservation.customerId,
-              customer,
-              lane,
-              date: date.toISOString().split("T")[0],
-              startTime,
-              endTime,
-              menu,
-              price: Number(price) || 0,
-              memo,
-              product,
-              quantity,
-            })
-          : reservation
-      )
-    );
+    try {
+      const updatedReservation =
+        await updateReservationToSupabase(
+          editingId,
+          {
+            customerId: customerId ?? 0,
+            customer,
+            lane,
+            date: `${date.getFullYear()}-${String(
+              date.getMonth() + 1
+            ).padStart(2, "0")}-${String(
+              date.getDate()
+            ).padStart(2, "0")}`,
+            startTime,
+            endTime,
+            menu,
+            price: Number(price) || 0,
+            memo,
+            product,
+            quantity,
+            status: "reserved",
+          }
+        );
+
+      setReservations((prev) =>
+        prev.map((reservation) =>
+          reservation.id === editingId
+            ? updatedReservation
+            : reservation
+        )
+      );
+    } catch (error) {
+      console.error(
+        "予約編集に失敗しました",
+        error
+      );
+      alert("予約編集に失敗しました。");
+      return;
+    }
 
     setEditingId(null);
     setCustomerKeyword("");
