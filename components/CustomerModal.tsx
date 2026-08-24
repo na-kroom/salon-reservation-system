@@ -186,14 +186,19 @@ export default function CustomerModal({
         </button>
 
         <button
-          onClick={() => {
-            if (!selectedReservation) return;
+        onClick={async () => {
+          if (!selectedReservation) return;
 
-            if (
-              !confirm("この予約を削除しますか？")
-            ) {
-              return;
-            }
+          if (
+            !confirm("この予約を削除しますか？")
+          ) {
+            return;
+          }
+
+          try {
+            await deleteReservation(
+              selectedReservation.id
+            );
 
             setReservations((prev) =>
               prev.filter(
@@ -204,7 +209,15 @@ export default function CustomerModal({
 
             setSelectedReservation(null);
             onClose();
-          }}
+          } catch (error) {
+            console.error(
+              "予約削除に失敗しました",
+              error
+            );
+            alert("予約削除に失敗しました。");
+            return;
+          }
+        }}
           className="rounded bg-red-500 px-4 py-2 text-white"
         >
           削除

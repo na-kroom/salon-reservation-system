@@ -15,7 +15,6 @@ import CustomerManagement from "@/components/CustomerManagement";
 import {calculateEndTime,timeToMinutes,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
-import {saveReservations,loadReservations,} from "@/utils/storage";
 import {createReservation,updateReservation,} from "@/utils/reservation";
 import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
 import { fetchCustomers } from "@/utils/customerApi";
@@ -51,24 +50,6 @@ export default function Home() {
   ];
 
 
-useEffect(() => {
-  saveReservations(reservations);
-}, [reservations]);
-useEffect(() => {
-  try {
-    const savedReservations =
-      loadReservations();
-
-    if (savedReservations) {
-      setReservations(savedReservations);
-    }
-  } catch (error) {
-    console.error(
-      "予約データの読み込み失敗",
-      error
-    );
-  }
-}, []);
 useEffect(() => {
   async function loadReservationsFromSupabase() {
     try {
