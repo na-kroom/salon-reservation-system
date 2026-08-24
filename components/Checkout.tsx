@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
+import { completeReservation } from "@/utils/reservationApi";
 
 type CheckoutProps = {
   reservations: Reservation[];
@@ -60,30 +61,41 @@ export default function Checkout({
     productTotal +
     tax;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!selectedReservation) {
       alert("予約を選択してください");
       return;
     }
 
-    setReservations((prev) =>
-      prev.map((reservation) =>
-        reservation.id === selectedReservation.id
-          ? {
-              ...reservation,
-              status: "completed",
-            }
-          : reservation
-      )
-    );
+    try {
+      const completedReservation =
+        await completeReservation(
+          selectedReservation.id
+        );
+
+      setReservations((prev) =>
+        prev.map((reservation) =>
+          reservation.id === selectedReservation.id
+            ? completedReservation
+            : reservation
+        )
+      );
+    } catch (error) {
+      console.error(
+        "会計処理に失敗しました",
+        error
+      );
+      alert("会計処理に失敗しました。");
+      return;
+    }
+
     alert("会計が完了しました。");
 
     setCheckoutProducts([]);
-
     setSelectedProductId(null);
-
     setSelectedReservationId(null);
   };
+
 
 
   return (
