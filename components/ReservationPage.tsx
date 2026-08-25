@@ -24,10 +24,6 @@ type ReservationPageProps = {
   setSelectedReservation: React.Dispatch<
     React.SetStateAction<Reservation | null>
   >;
-
-  setIsEditing: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
   setIsCustomerModalOpen: React.Dispatch<
     React.SetStateAction<boolean>
   >;  
@@ -44,7 +40,6 @@ export default function ReservationPage({
   selectedDate,
   customers,
   setSelectedReservation,
-  setIsEditing,
   setIsCustomerModalOpen,
 }: ReservationPageProps) {
   const [showCalendar, setShowCalendar] = useState(false);

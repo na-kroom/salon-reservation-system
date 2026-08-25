@@ -9,12 +9,9 @@ type Props = {
   totalSales: number;
   lastVisit: string;
   reservations: Reservation[];
-  setIsEditing: React.Dispatch<
-    React.SetStateAction<boolean>
-    >;
     setSelectedReservation: React.Dispatch<
     React.SetStateAction<Reservation | null>
-    >;
+    >
     setEditingId: React.Dispatch<
     React.SetStateAction<number | null>
     >;
@@ -54,7 +51,6 @@ export default function CustomerModal({
   visitCount,
   totalSales,
   lastVisit,
-  setIsEditing,
   setSelectedReservation,
   setEditingId,
   setCustomerId,

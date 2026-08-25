@@ -5,8 +5,6 @@ import React, { useState, useEffect } from "react";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
-import SalesSummary from "@/components/SalesSummary";
-import CustomerCard from "@/components/CustomerCard";
 import CustomerModal from "@/components/CustomerModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
@@ -15,7 +13,6 @@ import CustomerManagement from "@/components/CustomerManagement";
 import {calculateEndTime,timeToMinutes,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
-import {createReservation,updateReservation,} from "@/utils/reservation";
 import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
 import { fetchCustomers } from "@/utils/customerApi";
 import { fetchProducts } from "@/utils/productApi";
@@ -94,8 +91,7 @@ useEffect(() => {
       date
     );
 
-  const [isEditing, setIsEditing] =
-  useState(false);
+
   const [searchTerm, setSearchTerm] =
   useState("");
   const [editingId, setEditingId] =
@@ -128,13 +124,6 @@ useEffect(() => {
     )
   : "-";
 
-  const customerCount = selectedReservation
-    ? reservations.filter(
-        (r) =>
-          r.customer ===
-          selectedReservation.customer
-      ).length
-    : 0;
   const [products, setProducts] =
   useState<Product[]>([]);
   useEffect(() => {
@@ -490,7 +479,6 @@ const [quantity, setQuantity] =
         ).padStart(2, "0")}`
       }
       setSelectedReservation={setSelectedReservation}
-      setIsEditing={setIsEditing}
       setIsCustomerModalOpen={setIsCustomerModalOpen}
     />
     </>
@@ -545,12 +533,10 @@ const [quantity, setQuantity] =
   isOpen={isCustomerModalOpen}
   onClose={() => setIsCustomerModalOpen(false)}
   selectedReservation={selectedReservation}
-  setIsEditing={setIsEditing}
   setSelectedReservation={setSelectedReservation}
   visitCount={visitCount}
   totalSales={totalSales}
   lastVisit={lastVisit}
-
   setEditingId={setEditingId}
   setCustomerId={setCustomerId}
   setCustomer={setCustomer}
