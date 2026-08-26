@@ -4,14 +4,13 @@
 import React, { useState, useEffect } from "react";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
-import type { Product } from "@/types/Product";
 import CustomerModal from "@/components/CustomerModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
 import { useCustomers } from "@/hooks/useCustomers";
 import CustomerManagement from "@/components/CustomerManagement";
 import { useProducts } from "@/hooks/useProducts";
-import {calculateEndTime,timeToMinutes,} from "@/utils/time";
+import {calculateEndTime,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
@@ -19,6 +18,7 @@ import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
 import { useReservations } from "@/hooks/useReservations";
 import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
+import { isReservationOverlap } from "@/utils/reservationValidation";
 export default function Home() {
   const {
     reservations,
@@ -134,32 +134,21 @@ export default function Home() {
       return;
     }
 
+    const selectedDate = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}-${String(
+      date.getDate()
+    ).padStart(2, "0")}`;
 
-  const newStart = timeToMinutes(startTime);
-  const newEnd = timeToMinutes(endTime);
-
-  const isDuplicate = reservations.some((reservation) => {
-    if (
-      reservation.date !== date.toISOString().split("T")[0] ||
-      reservation.lane !== lane
-    ) {
-      return false;
-    }
-
-    const reservationStart = timeToMinutes(
-      reservation.startTime
-    );
-
-    const reservationEnd = timeToMinutes(
-      reservation.endTime
-    );
-
-    return (
-      newStart < reservationEnd &&
-      newEnd > reservationStart
-    );
-  }); 
-
+    const isDuplicate = isReservationOverlap({
+      reservations,
+      date: selectedDate,
+      lane,
+      startTime,
+      endTime,
+      excludeReservationId:
+        editingId ?? undefined,
+    });
   if (isDuplicate) {
     alert("この時間・レーンには既に予約があります。");
     return;
