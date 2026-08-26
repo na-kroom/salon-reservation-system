@@ -8,21 +8,22 @@ import type { Product } from "@/types/Product";
 import CustomerModal from "@/components/CustomerModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
-import type { Customer } from "@/types/Customer";
+import { useCustomers } from "@/hooks/useCustomers";
 import CustomerManagement from "@/components/CustomerManagement";
+import { useProducts } from "@/hooks/useProducts";
 import {calculateEndTime,timeToMinutes,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
 import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
 import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
-import { fetchCustomers } from "@/utils/customerApi";
-import { fetchProducts } from "@/utils/productApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
-import { fetchReservations } from "@/utils/reservationApi";
+import { useReservations } from "@/hooks/useReservations";
 import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
 export default function Home() {
-  const [reservations, setReservations] =
-  useState<Reservation[]>([]);
+  const {
+    reservations,
+    setReservations,
+  } = useReservations();
 
   
   const times = [
@@ -45,27 +46,6 @@ export default function Home() {
     "18:00",
     "18:30",
   ];
-
-
-useEffect(() => {
-  async function loadReservationsFromSupabase() {
-    try {
-      const data = await fetchReservations();
-      console.log("Supabaseから取得した予約:", data);
-      if (data) {
-        setReservations(data);
-      }
-    } catch (error) {
-      console.error(
-        "予約データ取得失敗",
-        error
-      );
-    }
-  }
-
-  loadReservationsFromSupabase();
-}, []);
-
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,26 +104,11 @@ useEffect(() => {
     )
   : "-";
 
-  const [products, setProducts] =
-  useState<Product[]>([]);
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const data = await fetchProducts();
+  const {
+    products,
+    setProducts,
+  } = useProducts();
 
-        if (data) {
-          setProducts(data);
-        }
-      } catch (error) {
-        console.error(
-          "商品データ取得失敗",
-          error
-        );
-      }
-    }
-
-    loadProducts();
-  }, []);
 
   const [selectedProductId, setSelectedProductId] =
     useState("");
@@ -295,8 +260,10 @@ useEffect(() => {
 
 const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
-const [customers, setCustomers] =
-  useState<Customer[]>([]);
+const {
+  customers,
+  setCustomers,
+} = useCustomers();
 
 const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
@@ -313,26 +280,6 @@ const [editingCustomerId, setEditingCustomerId] =
 const [quantity, setQuantity] =
   useState(1);
 
-  useEffect(() => {
-    async function loadCustomers() {
-      try {
-        const data = await fetchCustomers();
-
-        console.log("Supabaseから取得した顧客:", data);
-
-        if (data) {
-          setCustomers(data);
-        }
-      } catch (error) {
-        console.error(
-          "顧客データ取得失敗",
-          error
-        );
-      }
-    }
-
-    loadCustomers();
-  }, [])
   return (
 
 
