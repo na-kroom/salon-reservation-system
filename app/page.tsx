@@ -1,7 +1,7 @@
 "use client";
 
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
 import CustomerModal from "@/components/CustomerModal";
@@ -19,6 +19,7 @@ import Checkout from "@/components/Checkout";
 import { useReservations } from "@/hooks/useReservations";
 import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
 import { isReservationOverlap } from "@/utils/reservationValidation";
+import { formatLocalDate } from "@/utils/date";
 export default function Home() {
   const {
     reservations,
@@ -134,11 +135,7 @@ export default function Home() {
       return;
     }
 
-    const selectedDate = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}-${String(
-      date.getDate()
-    ).padStart(2, "0")}`;
+    const selectedDate = formatLocalDate(date);
 
     const isDuplicate = isReservationOverlap({
       reservations,
@@ -162,11 +159,7 @@ export default function Home() {
             customerId: customerId ?? 0,
             customer,
             lane,
-            date: `${date.getFullYear()}-${String(
-              date.getMonth() + 1
-            ).padStart(2, "0")}-${String(
-              date.getDate()
-            ).padStart(2, "0")}`,
+            date: formatLocalDate(date),
             startTime,
             endTime,
             menu,
@@ -209,11 +202,7 @@ export default function Home() {
         customer,
 
         lane,
-        date: `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}-${String(
-          date.getDate()
-        ).padStart(2, "0")}`,
+        date: formatLocalDate(date),
 
         startTime,
         endTime,
@@ -377,13 +366,13 @@ const [quantity, setQuantity] =
         <HomeDashboard
           todayReservationCount={
             reservations.filter(
-              (r) => r.date === date.toISOString().split("T")[0]
+              (r) => r.date === formatLocalDate(date)
             ).length
           }
           completedCount={
             reservations.filter(
               (r) =>
-                r.date === date.toISOString().split("T")[0] &&
+                r.date === formatLocalDate(date) &&
                 r.status === "completed"
             ).length
           }
@@ -391,7 +380,7 @@ const [quantity, setQuantity] =
           monthlySales={monthlySales}
           customerCount={customers.length}
           todayReservations={reservations.filter(
-            (r) => r.date === date.toISOString().split("T")[0]
+            (r) => r.date === formatLocalDate(date)
           )}
         />
       )}
@@ -407,13 +396,7 @@ const [quantity, setQuantity] =
       customers={customers}
       times={times}
       reservations={reservations}
-      selectedDate={
-        `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}-${String(
-          date.getDate()
-        ).padStart(2, "0")}`
-      }
+      selectedDate={formatLocalDate(date)}
       setSelectedReservation={setSelectedReservation}
       setIsCustomerModalOpen={setIsCustomerModalOpen}
     />

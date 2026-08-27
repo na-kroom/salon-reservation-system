@@ -1,6 +1,8 @@
 import { supabase } from "./supabase";
+import type { Reservation } from "@/types/Reservation";
 
-export async function fetchReservations() {
+
+export async function fetchReservations(): Promise<Reservation[]> {
   const { data, error } = await supabase
     .from("reservations")
     .select("*")
@@ -26,20 +28,9 @@ export async function fetchReservations() {
     status: reservation.status,
   }));
 }
-export async function createReservation(reservation: {
-  lane: string;
-  customerId: number;
-  customer: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  menu: string;
-  price: number;
-  memo: string;
-  product: string;
-  quantity: number;
-  status: string;
-}) {
+  export async function createReservation(
+    reservation: Omit<Reservation, "id">
+  ): Promise<Reservation> {
   const { data, error } = await supabase
     .from("reservations")
     .insert({
@@ -79,23 +70,10 @@ export async function createReservation(reservation: {
     status: data.status,
   };
 }
-export async function updateReservation(
-  id: number,
-  reservation: {
-    lane: string;
-    customerId: number;
-    customer: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    menu: string;
-    price: number;
-    memo: string;
-    product: string;
-    quantity: number;
-    status: string;
-  }
-) {
+  export async function updateReservation(
+    id: number,
+    reservation: Omit<Reservation, "id">
+  ): Promise<Reservation> {
   const { data, error } = await supabase
     .from("reservations")
     .update({
@@ -146,7 +124,9 @@ export async function deleteReservation(id: number) {
     throw error;
   }
 }
-export async function completeReservation(id: number) {
+export async function completeReservation(
+  id: number
+): Promise<Reservation> {
   const { data, error } = await supabase
     .from("reservations")
     .update({
