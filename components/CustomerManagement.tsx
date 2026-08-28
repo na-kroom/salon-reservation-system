@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Customer } from "@/types/Customer";
 import type { Reservation } from "@/types/Reservation";
 import {createCustomer,updateCustomer,deleteCustomer,} from "@/utils/customerApi";
@@ -5,61 +6,26 @@ import {createCustomer,updateCustomer,deleteCustomer,} from "@/utils/customerApi
 type CustomerManagementProps = {
   customers: Customer[];
   reservations: Reservation[];
-  customerName: string;
-  setCustomerName: React.Dispatch<
-    React.SetStateAction<string>
-  >;
 
-  customerKana: string;
-  setCustomerKana: React.Dispatch<
-    React.SetStateAction<string>
-  >;
-
-  customerPhone: string;
-  setCustomerPhone: React.Dispatch<
-    React.SetStateAction<string>
-  >;
-
-  customerMemo: string;
-  setCustomerMemo: React.Dispatch<
-    React.SetStateAction<string>
-  >;
 
   setCustomers: React.Dispatch<
     React.SetStateAction<Customer[]>
   >;
-  editingCustomerId: number | null;
-
-  setEditingCustomerId: React.Dispatch<
-    React.SetStateAction<number | null>
-  >;
-  customerSearch: string;
-
-  setCustomerSearch: React.Dispatch<
-    React.SetStateAction<string>
-  >;
+ 
 };
 
     export default function CustomerManagement({
-
-    
-    
     customers,
     reservations,
-    customerName,
-    setCustomerName,
-    customerKana,
-    setCustomerKana,
-    customerPhone,
-    setCustomerPhone,
-    customerMemo,
-    setCustomerMemo,
     setCustomers,
-    editingCustomerId,
-    setEditingCustomerId,
-    customerSearch,
-    setCustomerSearch,
     }: CustomerManagementProps){
+    const [customerName, setCustomerName] = useState("");
+    const [customerKana, setCustomerKana] = useState("");
+    const [customerPhone, setCustomerPhone] = useState("");
+    const [customerMemo, setCustomerMemo] = useState("");
+    const [customerSearch, setCustomerSearch] = useState("");
+    const [editingCustomerId, setEditingCustomerId] =
+    useState<number | null>(null);
     const handleAddCustomer = async () => {
       if (
         !customerName ||

@@ -150,26 +150,27 @@ export default function Home() {
     alert("この時間・レーンには既に予約があります。");
     return;
   }
+    const reservationData: Omit<Reservation, "id"> = {
+    customerId: customerId ?? 0,
+    customer,
+    lane,
+    date: selectedDate,
+    startTime,
+    endTime,
+    menu,
+    price: Number(price) || 0,
+    memo,
+    product,
+    quantity,
+    status: "reserved",
+  };
   if (editingId !== null) {
     try {
       const updatedReservation =
-        await updateReservationToSupabase(
-          editingId,
-          {
-            customerId: customerId ?? 0,
-            customer,
-            lane,
-            date: formatLocalDate(date),
-            startTime,
-            endTime,
-            menu,
-            price: Number(price) || 0,
-            memo,
-            product,
-            quantity,
-            status: "reserved",
-          }
-        );
+      await updateReservationToSupabase(
+        editingId,
+        reservationData
+      );
 
       setReservations((prev) =>
         prev.map((reservation) =>
@@ -197,28 +198,9 @@ export default function Home() {
   }
   try {
     const newReservation =
-      await createReservationToSupabase({
-        customerId: customerId ?? 0,
-        customer,
-
-        lane,
-        date: formatLocalDate(date),
-
-        startTime,
-        endTime,
-
-        menu,
-
-        price: Number(price) || 0,
-
-        memo,
-
-        product,
-
-        quantity,
-
-        status: "reserved",
-      });
+      await createReservationToSupabase(
+      reservationData
+      );
 
     setReservations((prev) => [
       ...prev,
@@ -246,7 +228,6 @@ const {
 const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
   useState("");
-const [customerName, setCustomerName] = useState("");
 const [customerKana, setCustomerKana] = useState("");
 const [customerPhone, setCustomerPhone] = useState("");
 const [customerMemo, setCustomerMemo] = useState("");
@@ -332,19 +313,7 @@ const [quantity, setQuantity] =
         <CustomerManagement
           customers={customers}
           reservations={reservations}
-          customerName={customerName}
-          customerKana={customerKana}
-          setCustomerKana={setCustomerKana}
-          setCustomerName={setCustomerName}
-          customerPhone={customerPhone}
-          setCustomerPhone={setCustomerPhone}
-          customerMemo={customerMemo}
-          setCustomerMemo={setCustomerMemo}
           setCustomers={setCustomers}
-          editingCustomerId={editingCustomerId}
-          setEditingCustomerId={setEditingCustomerId}
-          customerSearch={customerSearch}
-          setCustomerSearch={setCustomerSearch}
         />
       )}
       {currentPage === "product" && (
