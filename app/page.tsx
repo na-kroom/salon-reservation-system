@@ -72,9 +72,6 @@ export default function Home() {
       date
     );
 
-
-  const [searchTerm, setSearchTerm] =
-  useState("");
   const [editingId, setEditingId] =
     useState<number | null>(null);
   const [product, setProduct] =
@@ -85,11 +82,7 @@ export default function Home() {
         selectedReservation.customer
       )
     : 0;
-  const [productName, setProductName] =
-    useState("");
 
-  const [productPrice, setProductPrice] =
-    useState("");
 
     const totalSales = selectedReservation
   ? getTotalSales(
@@ -109,8 +102,6 @@ export default function Home() {
     products,
     setProducts,
   } = useProducts();
-
-
   const [selectedProductId, setSelectedProductId] =
     useState("");
 
@@ -161,7 +152,6 @@ export default function Home() {
     price: Number(price) || 0,
     memo,
     product,
-    quantity,
     status: "reserved",
   };
   if (editingId !== null) {
@@ -189,7 +179,6 @@ export default function Home() {
     }
 
     setEditingId(null);
-    setCustomerKeyword("");
     setCustomerId(null);
     setCustomer("");
     setIsModalOpen(false);
@@ -218,7 +207,6 @@ export default function Home() {
   }
 };
 
-const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
 const {
   customers,
@@ -228,16 +216,9 @@ const {
 const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
   useState("");
-const [customerKana, setCustomerKana] = useState("");
-const [customerPhone, setCustomerPhone] = useState("");
-const [customerMemo, setCustomerMemo] = useState("");
-const [customerSearch, setCustomerSearch] =
-  useState("");
-const [editingCustomerId, setEditingCustomerId] =
-  useState<number | null>(null);
 
-const [quantity, setQuantity] =
-  useState(1);
+
+
 
   return (
 
@@ -320,13 +301,7 @@ const [quantity, setQuantity] =
         <>
         <ProductManagement
           products={products}
-          productName={productName}
-          setProductName={setProductName}
-          productPrice={productPrice}
-          setProductPrice={setProductPrice}
           setProducts={setProducts}
-          editingProductId={editingProductId}
-          setEditingProductId={setEditingProductId}
         />
           </>
       )}
@@ -360,8 +335,7 @@ const [quantity, setQuantity] =
       date={date}
       setDate={setDate}
       setIsModalOpen={setIsModalOpen}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
+
       customers={customers}
       times={times}
       reservations={reservations}
@@ -385,8 +359,7 @@ const [quantity, setQuantity] =
 
   customer={customer}
   setCustomer={setCustomer}
-  customerKeyword={customerKeyword}
-  setCustomerKeyword={setCustomerKeyword}
+
   customerId={customerId}
   setCustomerId={setCustomerId}
   startTime={startTime}
@@ -405,15 +378,11 @@ const [quantity, setQuantity] =
   setPrice={setPrice}
   onSubmit={handleReservationSubmit}
   products={products}
-
   selectedProductId={selectedProductId}
   setSelectedProductId={setSelectedProductId}
-
   product={product}
   setProduct={setProduct}
 
-  quantity={quantity}
-  setQuantity={setQuantity}
   customers={customers}
   onClose={() => setIsModalOpen(false)}
 />

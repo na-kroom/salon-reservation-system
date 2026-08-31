@@ -1,40 +1,22 @@
-import React from "react";
+import { useState } from "react";
 import type { Product } from "@/types/Product";
 import {createProduct,updateProduct,deleteProduct,} from "@/utils/productApi";
 
 type ProductManagementProps = {
   products: Product[];
-
-  productName: string;
-  setProductName: React.Dispatch<
-    React.SetStateAction<string>
-  >;
-
-  productPrice: string;
-  setProductPrice: React.Dispatch<
-    React.SetStateAction<string>
-  >;
-
   setProducts: React.Dispatch<
     React.SetStateAction<Product[]>
   >;
-  editingProductId: number | null;
-
-    setEditingProductId: React.Dispatch<
-    React.SetStateAction<number | null>
-    >;
 };
 
 export default function ProductManagement({
     products,
-    productName,
-    setProductName,
-    productPrice,
-    setProductPrice,
-    setProducts,
-    editingProductId,
-    setEditingProductId,
+    setProducts
 }: ProductManagementProps) {
+  const [productName, setProductName] = useState("");
+  const [productPrice, setProductPrice] = useState("");
+  const [editingProductId, setEditingProductId] =
+  useState<number | null>(null);
   const handleAddProduct = async () => {
     if (!productName || !productPrice) {
       alert("商品名と価格を入力してください");

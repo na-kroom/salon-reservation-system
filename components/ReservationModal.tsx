@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import type { Product } from "@/types/Product";
 import type { Customer } from "@/types/Customer";
 type Props = {
@@ -13,11 +14,6 @@ type Props = {
     React.SetStateAction<string>
   >;
 
-  customerKeyword: string;
-
-  setCustomerKeyword: React.Dispatch<
-    React.SetStateAction<string>
-  >;
 
   startTime: string;
 
@@ -64,10 +60,6 @@ setProduct: React.Dispatch<
   React.SetStateAction<string>
 >;
 
-quantity: number;
-setQuantity: React.Dispatch<
-  React.SetStateAction<number>
->;
 
 
 onClose: () => void;
@@ -77,8 +69,6 @@ export default function ReservationModal({
   isOpen,
   customer,
   setCustomer,
-  customerKeyword,
-  setCustomerKeyword,
   startTime,
   setStartTime,
   times,
@@ -86,8 +76,7 @@ export default function ReservationModal({
   setLane,
   menu,
   setMenu,
-  duration,
-  setDuration,
+
   endTime,
   memo,
   setMemo,
@@ -99,13 +88,14 @@ export default function ReservationModal({
   setSelectedProductId,
   product,
   setProduct,
-  quantity,
-  setQuantity,  
   customers,
   customerId,
   setCustomerId,
   onClose
 }: Props) {
+  const [customerKeyword, setCustomerKeyword] =
+  useState("");
+  const [quantity, setQuantity] = useState(1);
   if (!isOpen) return null;
 
   return (

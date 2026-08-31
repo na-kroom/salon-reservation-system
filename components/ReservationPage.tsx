@@ -11,10 +11,6 @@ type ReservationPageProps = {
     React.SetStateAction<boolean>
   >;
 
-  searchTerm: string;
-  setSearchTerm: React.Dispatch<
-    React.SetStateAction<string>
-  >;
 
   times: string[];
   reservations: Reservation[];
@@ -33,16 +29,16 @@ export default function ReservationPage({
   date,
   setDate,
   setIsModalOpen,
-  searchTerm,
-  setSearchTerm,
+
   times,
   reservations,
   selectedDate,
-  customers,
+ 
   setSelectedReservation,
   setIsCustomerModalOpen,
 }: ReservationPageProps) {
   const [showCalendar, setShowCalendar] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const getRowSpan = (
     startTime: string,
     endTime: string

@@ -10,7 +10,7 @@ export type Reservation = {
   price: number;
   memo: string;
   product: string;
-  quantity: number;
+
 
   status: "reserved" | "completed" | "cancelled";
 };
