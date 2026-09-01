@@ -24,7 +24,6 @@ export async function fetchReservations(): Promise<Reservation[]> {
     price: reservation.price,
     memo: reservation.memo ?? "",
     product: reservation.product ?? "",
-    quantity: reservation.quantity,
     status: reservation.status,
   }));
 }
@@ -44,7 +43,7 @@ export async function fetchReservations(): Promise<Reservation[]> {
       price: reservation.price,
       memo: reservation.memo,
       product: reservation.product,
-      quantity: reservation.quantity,
+  
       status: reservation.status,
     })
     .select()
@@ -66,7 +65,6 @@ export async function fetchReservations(): Promise<Reservation[]> {
     price: data.price,
     memo: data.memo ?? "",
     product: data.product ?? "",
-    quantity: data.quantity,
     status: data.status,
   };
 }
@@ -87,7 +85,6 @@ export async function fetchReservations(): Promise<Reservation[]> {
       price: reservation.price,
       memo: reservation.memo,
       product: reservation.product,
-      quantity: reservation.quantity,
       status: reservation.status,
     })
     .eq("id", id)
@@ -110,7 +107,6 @@ export async function fetchReservations(): Promise<Reservation[]> {
     price: data.price,
     memo: data.memo ?? "",
     product: data.product ?? "",
-    quantity: data.quantity,
     status: data.status,
   };
 }
@@ -152,7 +148,7 @@ export async function completeReservation(
     price: data.price,
     memo: data.memo ?? "",
     product: data.product ?? "",
-    quantity: data.quantity,
+
     status: data.status,
   };
 }

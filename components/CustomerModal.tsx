@@ -239,7 +239,6 @@ export default function CustomerModal({
               className="border-b py-2"
             >
               {r.product}
-              （{r.quantity}個）
             </div>
           ))}
       </div>
