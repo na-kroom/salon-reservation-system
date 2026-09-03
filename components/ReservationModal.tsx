@@ -60,8 +60,6 @@ setProduct: React.Dispatch<
   React.SetStateAction<string>
 >;
 
-
-
 onClose: () => void;
 };
 
@@ -91,6 +89,8 @@ export default function ReservationModal({
   customers,
   customerId,
   setCustomerId,
+  duration,
+  setDuration,
   onClose
 }: Props) {
   const [customerKeyword, setCustomerKeyword] =
@@ -169,7 +169,13 @@ export default function ReservationModal({
             ))}
           </select>
   
-          <select>
+          <select
+            value={duration}
+            onChange={(e) =>
+              setDuration(Number(e.target.value))
+            }
+            className="border p-2 w-full mb-3"
+          >
             {Array.from(
               { length: 24 },
               (_, i) => (i + 1) * 10

@@ -79,47 +79,155 @@ export default function CustomerModal({
             ×
           </button>
         </div>
+      <div className="space-y-6">
 
-        <div className="space-y-3">
-        <div>
-            <span className="font-semibold">
-            顧客名：
+        {/* 今回の予約 */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-slate-900">
+              予約詳細
+            </h3>
+
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                selectedReservation.status === "completed"
+                  ? "bg-slate-200 text-slate-600"
+                  : selectedReservation.status === "cancelled"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {selectedReservation.status === "completed"
+                ? "会計済み"
+                : selectedReservation.status === "cancelled"
+                ? "キャンセル"
+                : "予約中"}
             </span>
-            {selectedReservation.customer}
-        </div>
-        <div>
-        <span className="font-semibold">
-            来店回数：
-        </span>
-        {visitCount}回
+          </div>
+
+          {/* 顧客名 */}
+          <div className="mb-5">
+            <div className="text-xs text-slate-500">
+              顧客名
+            </div>
+
+            <div className="mt-1 text-xl font-bold text-slate-900">
+              {selectedReservation.customer}
+            </div>
+          </div>
+
+          {/* 予約情報 */}
+          <div className="grid grid-cols-2 gap-4">
+
+            <div>
+              <div className="text-xs text-slate-500">
+                時間
+              </div>
+
+              <div className="mt-1 font-medium text-slate-900">
+                {selectedReservation.startTime} -{" "}
+                {selectedReservation.endTime}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500">
+                レーン
+              </div>
+
+              <div className="mt-1 font-medium text-slate-900">
+                {selectedReservation.lane}レーン
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500">
+                メニュー
+              </div>
+
+              <div className="mt-1 font-medium text-slate-900">
+                {selectedReservation.menu}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500">
+                料金
+              </div>
+
+              <div className="mt-1 font-medium text-slate-900">
+                ¥{selectedReservation.price.toLocaleString()}
+              </div>
+            </div>
+
+          </div>
+
+          {/* メモ */}
+          {selectedReservation.memo && (
+            <div className="mt-5 border-t border-slate-200 pt-4">
+              <div className="text-xs text-slate-500">
+                メモ
+              </div>
+
+              <div className="mt-1 text-sm text-slate-700">
+                {selectedReservation.memo}
+              </div>
+            </div>
+          )}
+
+          {/* 商品 */}
+          {selectedReservation.product && (
+            <div className="mt-5 border-t border-slate-200 pt-4">
+              <div className="text-xs text-slate-500">
+                商品
+              </div>
+
+              <div className="mt-1 text-sm font-medium text-slate-700">
+                {selectedReservation.product}
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* 顧客情報 */}
         <div>
-        <span className="font-semibold">
-            累計売上：
-        </span>
-        ¥{totalSales.toLocaleString()}
-        </div>
+          <h3 className="mb-3 text-base font-semibold text-slate-900">
+            顧客情報
+          </h3>
 
-        <div>
-        <span className="font-semibold">
-            前回来店日：
-        </span>
-        {lastVisit}
-        </div>
+          <div className="grid grid-cols-3 gap-3">
 
-        <div>
-            <span className="font-semibold">
-            メニュー：
-            </span>
-            {selectedReservation.menu}
-        </div>
+            <div className="rounded-lg border border-slate-200 bg-white p-3">
+              <div className="text-xs text-slate-500">
+                来店回数
+              </div>
 
-        <div>
-            <span className="font-semibold">
-            料金：
-            </span>
-            ¥{selectedReservation.price}
+              <div className="mt-1 text-lg font-semibold text-slate-900">
+                {visitCount}回
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-3">
+              <div className="text-xs text-slate-500">
+                累計売上
+              </div>
+
+              <div className="mt-1 text-lg font-semibold text-slate-900">
+                ¥{totalSales.toLocaleString()}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-3">
+              <div className="text-xs text-slate-500">
+                前回来店
+              </div>
+
+              <div className="mt-1 text-sm font-semibold text-slate-900">
+                {lastVisit}
+              </div>
+            </div>
+
+          </div>
         </div>
         <div className="mt-6 flex justify-end gap-2">
         <button
@@ -248,24 +356,37 @@ export default function CustomerModal({
         </h3>
 
         {reservations
-          .filter(
+       .filter(
             (r) =>
               r.customer ===
               selectedReservation.customer
           )
+          .sort(
+            (a, b) =>
+              new Date(b.date).getTime() -
+              new Date(a.date).getTime()
+          )
           .map((r) => (
-            <div
-              key={r.id}
-              className="border-b py-2"
-            >
-              <div>{r.date}</div>
-
-              <div>{r.menu}</div>
-
+          <div
+            key={r.id}
+            className="border-b border-slate-200 py-3"
+          >
+            <div className="flex items-center justify-between">
               <div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {r.date}
+                </div>
+
+                <div className="mt-1 text-sm text-slate-600">
+                  {r.menu}
+                </div>
+              </div>
+
+              <div className="text-sm font-semibold text-slate-900">
                 ¥{r.price.toLocaleString()}
               </div>
             </div>
+          </div>
           ))}
       </div>
         

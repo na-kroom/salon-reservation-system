@@ -246,12 +246,12 @@ export default function ReservationPage({
             <React.Fragment key={time}>
 
               {/* 時間 */}
-              <div className="min-w-0 flex h-12 items-start border-b border-slate-200 bg-slate-50 px-4 pt-3 text-sm font-medium text-slate-600">
+              <div className="flex h-12 items-start border-b border-slate-200 bg-slate-50 px-4 pt-3 text-sm font-medium text-slate-600">
                 {time}
               </div>
 
               {/* Aレーン */}
-              <div className="relative min-w-0 h-12 border-b border-l border-slate-200 bg-white p-1.5">
+              <div className="relative h-12 border-b border-l border-slate-200 bg-white">
                 {reservations
                   .filter(
                     (r) =>
@@ -265,76 +265,73 @@ export default function ReservationPage({
                   .map((r) => (
                     <div
                       key={r.id}
-                      className={`min-w-0 w-full cursor-pointer rounded-xl border border-l-4 p-3 text-slate-800 shadow-sm transition hover:shadow-md ${
-                        r.status === "completed"
-                          ? "border-slate-200 border-l-slate-400 bg-slate-100"
-                          : r.status === "cancelled"
-                          ? "border-red-200 border-l-red-400 bg-red-50"
-                          : "border-blue-200 border-l-blue-500 bg-blue-50"
+                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:shadow-md ${
+                      r.status === "completed"
+                        ? "border-slate-200 border-l-slate-400 bg-slate-50"
+                        : r.status === "cancelled"
+                        ? "border-red-200 border-l-red-400 bg-red-50"
+                        : "border-blue-200 border-l-blue-500 bg-blue-50"
                       }`}
                       style={{
                         height: `${getRowSpan(
                           r.startTime,
                           r.endTime
-                        ) * 48}px`,
+                        ) * 48 - 8}px`,
                       }}
                       onClick={() => {
                         setSelectedReservation(r);
                         setIsCustomerModalOpen(true);
                       }}
                     >
-                      {/* 会計済み */}
-                      {r.status === "completed" ? (
-                        <>
-                          <div className="text-base font-semibold tracking-tight text-slate-700">
-                            ✓ {r.customer}
-                          </div>
-
-                          <div className="mt-2 inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                            会計済み
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {/* 顧客名 */}
-                          <div className="text-base font-semibold tracking-tight text-slate-900">
-                            {r.customer}
-                          </div>
-
-                          {/* 時間 */}
-                          <div className="mt-1 text-sm text-slate-500">
-                            {r.startTime} - {r.endTime}
-                          </div>
-
-                          {/* メニュー */}
-                          <div className="mt-1 text-xs text-slate-600">
-                            {r.menu}
-                          </div>
-
-                          {/* ステータス */}
-                          <div className="mt-2 flex justify-end">
-                            <span
-                              className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                                r.status === "cancelled"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-blue-100 text-blue-700"
-                              }`}
-                            >
-                              {r.status === "reserved" &&
-                                "予約中"}
-
-                              {r.status === "cancelled" &&
-                                "キャンセル"}
-                            </span>
-                          </div>
-                        </>
-                      )}
+                    {r.status === "completed" ? (
+                      <>
+                        <div className="truncate text-sm font-semibold text-slate-700">
+                          ✓ {r.customer}
+                        </div>
+                        <div className="mt-1 truncate text-xs text-slate-500">
+                          {r.startTime} - {r.endTime}
+                        </div>
+                      </>
+                    ) : getRowSpan(r.startTime, r.endTime) === 1 ? (
+                      <>
+                        <div className="truncate text-sm font-semibold text-slate-900">
+                          {r.customer}
+                        </div>
+                        <div className="mt-1 truncate text-xs text-slate-500">
+                          {r.startTime} - {r.endTime}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="truncate text-sm font-semibold text-slate-900">
+                          {r.customer}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">
+                          {r.startTime} - {r.endTime}
+                        </div>
+                        <div className="mt-1 truncate text-xs text-slate-600">
+                          {r.menu}
+                        </div>
+                        <div className="mt-2 flex justify-end">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                              r.status === "cancelled"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {r.status === "reserved" && "予約中"}
+                            {r.status === "cancelled" && "キャンセル"}
+                          </span>
+                        </div>
+                      </>
+                    )}
                     </div>
                   ))}
               </div>
 
               {/* Bレーン */}
-              <div className="relative min-w-0 h-12 border-b border-l border-slate-200 bg-white p-1.5">
+              <div className="relative h-12 border-b border-l border-slate-200 bg-white">
                 {reservations
                   .filter(
                     (r) =>
@@ -348,70 +345,67 @@ export default function ReservationPage({
                   .map((r) => (
                     <div
                       key={r.id}
-                      className={`min-w-0 w-full cursor-pointer rounded-xl border border-l-4 p-3 text-slate-800 shadow-sm transition hover:shadow-md ${
-                        r.status === "completed"
-                          ? "border-slate-200 border-l-slate-400 bg-slate-100"
-                          : r.status === "cancelled"
-                          ? "border-red-200 border-l-red-400 bg-red-50"
-                          : "border-blue-200 border-l-blue-500 bg-blue-50"
+                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:shadow-md ${
+                      r.status === "completed"
+                        ? "border-slate-200 border-l-slate-400 bg-slate-50"
+                        : r.status === "cancelled"
+                        ? "border-red-200 border-l-red-400 bg-red-50"
+                        : "border-blue-200 border-l-blue-500 bg-blue-50"
                       }`}
                       style={{
                         height: `${getRowSpan(
                           r.startTime,
                           r.endTime
-                        ) * 48}px`,
+                        ) * 48 - 8}px`,
                       }}
                       onClick={() => {
                         setSelectedReservation(r);
                         setIsCustomerModalOpen(true);
                       }}
                     >
-                      {/* 会計済み */}
                       {r.status === "completed" ? (
-                        <>
-                          <div className="text-base font-semibold tracking-tight text-slate-700">
-                            ✓ {r.customer}
-                          </div>
-
-                          <div className="mt-2 inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                            会計済み
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {/* 顧客名 */}
-                          <div className="text-base font-semibold tracking-tight text-slate-900">
-                            {r.customer}
-                          </div>
-
-                          {/* 時間 */}
-                          <div className="mt-1 text-sm text-slate-500">
-                            {r.startTime} - {r.endTime}
-                          </div>
-
-                          {/* メニュー */}
-                          <div className="mt-1 text-xs text-slate-600">
-                            {r.menu}
-                          </div>
-
-                          {/* ステータス */}
-                          <div className="mt-2 flex justify-end">
-                            <span
-                              className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                                r.status === "cancelled"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-blue-100 text-blue-700"
-                              }`}
-                            >
-                              {r.status === "reserved" &&
-                                "予約中"}
-
-                              {r.status === "cancelled" &&
-                                "キャンセル"}
-                            </span>
-                          </div>
-                        </>
-                      )}
+                          <>
+                            <div className="truncate text-sm font-semibold text-slate-700">
+                              ✓ {r.customer}
+                            </div>
+                            <div className="mt-1 truncate text-xs text-slate-500">
+                              {r.startTime} - {r.endTime}
+                            </div>
+                          </>
+                        ) : getRowSpan(r.startTime, r.endTime) === 1 ? (
+                          <>
+                            <div className="truncate text-sm font-semibold text-slate-900">
+                              {r.customer}
+                            </div>
+                            <div className="mt-1 truncate text-xs text-slate-500">
+                              {r.startTime} - {r.endTime}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="truncate text-sm font-semibold text-slate-900">
+                              {r.customer}
+                            </div>
+                            <div className="mt-1 text-xs font-medium text-slate-500">
+                              {r.startTime} - {r.endTime}
+                            </div>
+                            <div className="mt-1 truncate text-xs text-slate-600">
+                              {r.menu}
+                            </div>
+                            <div className="mt-2 flex justify-end">
+                              <span
+                                className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                                  r.status === "cancelled"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}
+                              >
+                                {r.status === "reserved" && "予約中"}
+                                {r.status === "cancelled" && "キャンセル"}
+                              </span>
+                            </div>
+                          </>
+                        )}
                     </div>
                   ))}
               </div>
