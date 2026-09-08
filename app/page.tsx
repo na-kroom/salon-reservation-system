@@ -127,9 +127,13 @@ export default function Home() {
     }
 
     const selectedDate = formatLocalDate(date);
+    
+    const activeReservations = reservations.filter(
+      (r) => r.status !== "cancelled"
+    );
 
     const isDuplicate = isReservationOverlap({
-      reservations,
+      reservations: activeReservations,
       date: selectedDate,
       lane,
       startTime,
@@ -137,6 +141,7 @@ export default function Home() {
       excludeReservationId:
         editingId ?? undefined,
     });
+
   if (isDuplicate) {
     alert("この時間・レーンには既に予約があります。");
     return;

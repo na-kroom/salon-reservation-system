@@ -19,7 +19,7 @@ export default function Checkout({
   const [selectedReservationId, setSelectedReservationId] =
     useState<number | null>(null);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("sv-SE");
 
   const todayReservations = reservations.filter(
     (r) =>

@@ -1,5 +1,5 @@
 import type { Reservation } from "@/types/Reservation";
-import { deleteReservation } from "@/utils/reservationApi";
+import { deleteReservation, updateReservation } from "@/utils/reservationApi";
 
 type Props = {
   isOpen: boolean;
@@ -256,32 +256,36 @@ export default function CustomerModal({
           if (!selectedReservation) return;
 
           if (
-            !confirm("この予約を削除しますか？")
+            !confirm("この予約をキャンセルしますか？")
           ) {
             return;
           }
 
           try {
-            await deleteReservation(
-              selectedReservation.id
-            );
+            const cancelledReservation =
+              await updateReservation(
+                selectedReservation.id,
+                {
+                  ...selectedReservation,
+                  status: "cancelled",
+                }
+              );
 
             setReservations((prev) =>
-              prev.filter(
-                (reservation) =>
-                  reservation.id !== selectedReservation.id
+              prev.map((reservation) =>
+                reservation.id === selectedReservation.id
+                  ? cancelledReservation
+                  : reservation
               )
             );
 
-            setSelectedReservation(null);
-            onClose();
+            setSelectedReservation(cancelledReservation);
           } catch (error) {
             console.error(
-              "予約削除に失敗しました",
+              "予約キャンセルに失敗しました",
               error
             );
-            alert("予約削除に失敗しました。");
-            return;
+            alert("予約キャンセルに失敗しました。");
           }
         }}
           className="rounded bg-orange-500 px-4 py-2 text-white"
