@@ -99,8 +99,8 @@ export default function ReservationModal({
   if (!isOpen) return null;
 
   return (
-<div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg w-96">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+        <div className="w-full max-w-lg rounded-2xl bg-white p-7 shadow-2xl">
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>

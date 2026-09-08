@@ -265,11 +265,11 @@ export default function ReservationPage({
                   .map((r) => (
                     <div
                       key={r.id}
-                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:shadow-md ${
+                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                       r.status === "completed"
                         ? "border-slate-200 border-l-slate-400 bg-slate-50"
                         : r.status === "cancelled"
-                        ? "border-red-200 border-l-red-400 bg-red-50"
+                        ? "border-slate-200 border-l-red-400 bg-slate-50 opacity-60"
                         : "border-blue-200 border-l-blue-500 bg-blue-50"
                       }`}
                       style={{
@@ -345,12 +345,12 @@ export default function ReservationPage({
                   .map((r) => (
                     <div
                       key={r.id}
-                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:shadow-md ${
-                      r.status === "completed"
-                        ? "border-slate-200 border-l-slate-400 bg-slate-50"
-                        : r.status === "cancelled"
-                        ? "border-red-200 border-l-red-400 bg-red-50"
-                        : "border-blue-200 border-l-blue-500 bg-blue-50"
+                      className={`absolute left-1 right-1 top-1 z-10 cursor-pointer overflow-hidden rounded-xl border border-l-4 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                        r.status === "completed"
+                          ? "border-slate-200 border-l-slate-400 bg-slate-50"
+                          : r.status === "cancelled"
+                          ? "border-slate-200 border-l-red-400 bg-slate-50 opacity-60"
+                          : "border-blue-200 border-l-blue-500 bg-blue-50"
                       }`}
                       style={{
                         height: `${getRowSpan(
