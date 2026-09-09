@@ -100,10 +100,13 @@ export default function ReservationModal({
 
   return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-        <div className="w-full max-w-lg rounded-2xl bg-white p-7 shadow-2xl">
+        <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl bg-white p-7 shadow-2xl">
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            顧客
+          </label>
           <input
             type="text"
             placeholder="顧客名・フリガナで検索"
@@ -156,11 +159,13 @@ export default function ReservationModal({
               ))}
           </div>
           )}
-
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            開始時間
+          </label>
           <select
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="border p-2 w-full mb-3"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
           >
             {times.map((t) => (
               <option key={t} value={t}>
@@ -168,13 +173,15 @@ export default function ReservationModal({
               </option>
             ))}
           </select>
-  
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            施術時間
+          </label>
           <select
             value={duration}
             onChange={(e) =>
               setDuration(Number(e.target.value))
             }
-            className="border p-2 w-full mb-3"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-3"
           >
             {Array.from(
               { length: 24 },
@@ -188,22 +195,32 @@ export default function ReservationModal({
               </option>
             ))}
           </select>
-          <div className="mb-4">
-            終了予定: {endTime}
+          <div className="mb-4 rounded-lg bg-slate-50 px-3 py-2">
+            <span className="text-sm font-medium text-slate-500">
+              終了予定
+            </span>
+            <span className="ml-3 text-sm font-semibold text-slate-800">
+              {endTime}
+            </span>
           </div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            レーン
+          </label>
           <select
             value={lane}
             onChange={(e) => setLane(e.target.value)}
-            className="border p-2 w-full mb-4"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-4"
           >
             <option value="A">Aレーン</option>
             <option value="B">Bレーン</option>
           </select>
-
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            メニュー
+          </label>
           <select
             value={menu}
             onChange={(e) => setMenu(e.target.value)}
-            className="border p-2 w-full mb-4"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-4"
           >
             <option value="カット">カット</option>
             <option value="カラー">カラー</option>
@@ -212,6 +229,9 @@ export default function ReservationModal({
             </option>
             <option value="パーマ">パーマ</option>
           </select>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              施術料金
+            </label>
             <input
               type="number"
               value={price}
@@ -222,14 +242,20 @@ export default function ReservationModal({
                 selectedProductId !== "" &&
                 selectedProductId !== "other"
               }
-              className="border p-2 w-full mb-4"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-4"
             />
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              メモ
+            </label>
             <textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               placeholder="メモ"
-              className="border p-2 w-full mb-4"
+              className="w-full min-h-[110px] resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-4"
             />
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            商品
+          </label>
           <select
             value={selectedProductId}
             onChange={(e) => {
@@ -255,7 +281,7 @@ export default function ReservationModal({
                 );
               }
             }}
-            className="border p-2 w-full mb-2"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-2"
           >
             <option value="">
               商品なし
@@ -276,6 +302,9 @@ export default function ReservationModal({
           </select>
           {selectedProductId === "other" && (
             <>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                商品名
+              </label>
               <input
                 type="text"
                 placeholder="商品名"
@@ -283,9 +312,11 @@ export default function ReservationModal({
                 onChange={(e) =>
                   setProduct(e.target.value)
                 }
-                className="border p-2 w-full mb-2"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-2"
               />
-
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                商品価格
+              </label>
               <input
                 type="number"
                 placeholder="商品価格"
@@ -293,11 +324,13 @@ export default function ReservationModal({
                 onChange={(e) =>
                   setPrice(e.target.value)
                 }
-                className="border p-2 w-full mb-2"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-2"
               />
             </>
           )}
-
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            数量
+          </label>
           <input
             type="number"
             min="1"
@@ -305,22 +338,23 @@ export default function ReservationModal({
             onChange={(e) =>
               setQuantity(Number(e.target.value))
             }
-            className="border p-2 w-full mb-2"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-2"
           />
-          <button
-            onClick={onSubmit}
-            className="bg-black text-white px-4 py-2 rounded mr-2"
-          >
-            登録
-          </button>
-
-
+        <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
-            className="border px-3 py-1 rounded"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
             閉じる
           </button>
+
+          <button
+            onClick={onSubmit}
+            className="rounded-xl bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-900"
+          >
+            登録
+          </button>
+        </div>  
         </div>
       </div>
    

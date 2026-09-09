@@ -113,7 +113,7 @@ export default function Checkout({
           <div>
             <label className="mb-1 block text-sm font-medium">予約</label>
             <select
-              className="w-full rounded-lg border p-2"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               value={selectedReservationId ?? ""}
               onChange={(e) =>
                 setSelectedReservationId(Number(e.target.value))
@@ -142,14 +142,14 @@ export default function Checkout({
               type="number"
               value={selectedReservation?.price ?? ""}
               readOnly
-              className="w-full rounded-lg border p-2 bg-gray-100"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 outline-none"
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium">商品</label>
             <select
-              className="w-full rounded-lg border p-2"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               value={selectedProductId ?? ""}
               onChange={(e) =>
                 setSelectedProductId(Number(e.target.value))
@@ -173,7 +173,7 @@ export default function Checkout({
             <input
               type="number"
               defaultValue={1}
-              className="w-full rounded-lg border p-2"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -211,7 +211,7 @@ export default function Checkout({
             setSelectedProductId(null);
           }}
           disabled={!selectedProduct}
-          className="w-full rounded-lg bg-emerald-600 py-2 text-white hover:bg-emerald-700 disabled:bg-gray-400"
+          className="w-full rounded-xl bg-blue-700 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:bg-gray-400"
           >
             商品を追加
           </button>
@@ -327,7 +327,7 @@ export default function Checkout({
       <button
         onClick={handleCheckout}
         disabled={!selectedReservation}
-        className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700 disabled:bg-gray-400"
+        className="mt-6 w-full rounded-xl bg-blue-700 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:bg-gray-300 disabled:text-gray-500"
       >
         会計完了
       </button>
