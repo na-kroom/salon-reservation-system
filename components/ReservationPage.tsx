@@ -70,35 +70,34 @@ export default function ReservationPage({
       </div>
 
       {/* 操作エリア */}
-      <div className="mb-5 flex items-center justify-between gap-4">
+      <div className="mb-5">
+        {/* 日付操作 */}
+        <div className="flex items-center justify-center gap-3">
+          {/* 今日 */}
+          <button
+            onClick={() => setDate(new Date())}
+            className="
+              rounded-xl
+              border border-slate-200
+              bg-white
+              px-4 py-2.5
+              text-sm font-medium
+              text-slate-700
+              shadow-sm
+              transition
+              hover:border-blue-300
+              hover:bg-blue-50
+              hover:text-blue-700
+            "
+          >
+            今日
+          </button>
 
-        {/* 予約追加 */}
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="
-            rounded-xl
-            bg-blue-700
-            px-5 py-3
-            text-sm font-semibold
-            text-white
-            shadow-sm
-            transition
-            hover:bg-blue-800
-            focus:outline-none
-            focus:ring-2
-            focus:ring-blue-300
-          "
-        >
-          ＋ 予約を追加
-        </button>
-
-        {/* 日付切り替え */}
-        <div className="flex items-center gap-3">
-
+          {/* 前の日 */}
           <button
             aria-label="前の日へ"
             className="
-              flex h-11 w-11
+              flex h-10 w-10
               items-center justify-center
               rounded-xl
               border border-slate-200
@@ -119,6 +118,7 @@ export default function ReservationPage({
             ‹
           </button>
 
+          {/* 日付 */}
           <div className="min-w-[220px] text-center">
             <div className="text-lg font-semibold tracking-wide text-slate-900">
               {date.toLocaleDateString("ja-JP", {
@@ -130,10 +130,11 @@ export default function ReservationPage({
             </div>
           </div>
 
+          {/* 次の日 */}
           <button
             aria-label="次の日へ"
             className="
-              flex h-11 w-11
+              flex h-10 w-10
               items-center justify-center
               rounded-xl
               border border-slate-200
@@ -153,40 +154,60 @@ export default function ReservationPage({
           >
             ›
           </button>
-        </div>
 
-        {/* カレンダー */}
-        <div className="relative">
+          {/* カレンダー */}
+          <div className="relative">
+            <button
+              onClick={() => setShowCalendar(!showCalendar)}
+              className="
+                rounded-xl
+                border border-slate-200
+                bg-white
+                px-5 py-2.5
+                text-sm font-medium
+                text-slate-700
+                shadow-sm
+                transition
+                hover:border-blue-300
+                hover:bg-blue-50
+                hover:text-blue-700
+              "
+            >
+              <span className="mr-2">▣</span>
+              カレンダー
+            </button>
+
+            {showCalendar && (
+              <div className="absolute right-0 top-14 z-50 w-[340px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+                <ReservationCalendar
+                  date={date}
+                  setDate={setDate}
+                  reservations={reservations}
+                  onClose={() => setShowCalendar(false)}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* 予約追加 */}
           <button
-            onClick={() => setShowCalendar(!showCalendar)}
+            onClick={() => setIsModalOpen(true)}
             className="
               rounded-xl
-              border border-slate-200
-              bg-white
+              bg-blue-700
               px-5 py-3
-              text-sm font-medium
-              text-slate-700
+              text-sm font-semibold
+              text-white
               shadow-sm
               transition
-              hover:border-blue-300
-              hover:bg-blue-50
-              hover:text-blue-700
+              hover:bg-blue-800
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-300
             "
           >
-            <span className="mr-2">▣</span>
-            カレンダー
+            ＋ 予約を追加
           </button>
-
-          {showCalendar && (
-            <div className="absolute right-0 top-14 z-50 w-[340px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-              <ReservationCalendar
-                date={date}
-                setDate={setDate}
-                reservations={reservations}
-                onClose={() => setShowCalendar(false)}
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -247,7 +268,7 @@ export default function ReservationPage({
             <React.Fragment key={time}>
 
               {/* 時間 */}
-              <div className="flex h-12 items-start border-b border-slate-200 bg-slate-50 px-4 pt-3 text-sm font-medium text-slate-600">
+              <div className="flex h-12 items-start border-b border-slate-200 bg-slate-50 px-4 pt-3 text-sm font-semibold text-slate-700">
                 {time}
               </div>
 
@@ -284,49 +305,56 @@ export default function ReservationPage({
                         setIsCustomerModalOpen(true);
                       }}
                     >
-                    {r.status === "completed" ? (
-                      <>
+                  {r.status === "completed" ? (
+                    <>
+                      <div className="flex items-center justify-between gap-2">
                         <div className="truncate text-sm font-semibold text-slate-700">
                           ✓ {r.customer}
                         </div>
-                        <div className="mt-1 truncate text-xs text-slate-500">
-                          {r.startTime} - {r.endTime}
-                        </div>
-                      </>
-                    ) : getRowSpan(r.startTime, r.endTime) === 1 ? (
-                      <>
-                        <div className="truncate text-sm font-semibold text-slate-900">
+
+                        <span className="shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                          完了
+                        </span>
+                      </div>
+
+                      <div className="mt-1 text-xs text-slate-500">
+                        {r.startTime} - {r.endTime}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 truncate text-sm font-bold text-slate-900">
                           {r.customer}
                         </div>
-                        <div className="mt-1 truncate text-xs text-slate-500">
-                          {r.startTime} - {r.endTime}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="truncate text-sm font-semibold text-slate-900">
-                          {r.customer}
-                        </div>
-                        <div className="mt-1 text-xs font-medium text-slate-500">
-                          {r.startTime} - {r.endTime}
-                        </div>
-                        <div className="mt-1 truncate text-xs text-slate-600">
-                          {r.menu}
-                        </div>
-                        <div className="mt-2 flex justify-end">
-                          <span
-                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                              r.status === "cancelled"
-                                ? "bg-slate-200 text-slate-600"
-                                : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {r.status === "reserved" && "予約中"}
-                            {r.status === "cancelled" && "キャンセル"}
-                          </span>
-                        </div>
-                      </>
-                    )}
+
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            r.status === "cancelled"
+                              ? "bg-slate-200 text-slate-600"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          {r.status === "reserved" && "予約中"}
+                          {r.status === "cancelled" && "キャンセル"}
+                        </span>
+                      </div>
+
+                      <div className="mt-2 text-xs font-medium text-slate-500">
+                        {r.startTime} - {r.endTime}
+                      </div>
+
+                      {getRowSpan(r.startTime, r.endTime) > 1 && (
+                        <>
+                          <div className="mt-1 truncate text-xs text-slate-600">
+                            {r.menu}
+                          </div>
+
+                        
+                        </>
+                      )}
+                    </>
+                  )}
                     </div>
                   ))}
               </div>
@@ -364,49 +392,56 @@ export default function ReservationPage({
                         setIsCustomerModalOpen(true);
                       }}
                     >
-                      {r.status === "completed" ? (
-                          <>
-                            <div className="truncate text-sm font-semibold text-slate-700">
-                              ✓ {r.customer}
-                            </div>
-                            <div className="mt-1 truncate text-xs text-slate-500">
-                              {r.startTime} - {r.endTime}
-                            </div>
-                          </>
-                        ) : getRowSpan(r.startTime, r.endTime) === 1 ? (
-                          <>
-                            <div className="truncate text-sm font-semibold text-slate-900">
-                              {r.customer}
-                            </div>
-                            <div className="mt-1 truncate text-xs text-slate-500">
-                              {r.startTime} - {r.endTime}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="truncate text-sm font-semibold text-slate-900">
-                              {r.customer}
-                            </div>
-                            <div className="mt-1 text-xs font-medium text-slate-500">
-                              {r.startTime} - {r.endTime}
-                            </div>
-                            <div className="mt-1 truncate text-xs text-slate-600">
-                              {r.menu}
-                            </div>
-                            <div className="mt-2 flex justify-end">
-                              <span
-                                className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                                  r.status === "cancelled"
-                                    ? "bg-slate-200 text-slate-600"
-                                    : "bg-blue-100 text-blue-700"
-                                }`}
-                              >
-                                {r.status === "reserved" && "予約中"}
-                                {r.status === "cancelled" && "キャンセル"}
-                              </span>
-                            </div>
-                          </>
-                        )}
+                  {r.status === "completed" ? (
+                    <>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="truncate text-sm font-semibold text-slate-700">
+                          ✓ {r.customer}
+                        </div>
+
+                        <span className="shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                          完了
+                        </span>
+                      </div>
+
+                      <div className="mt-1 text-xs text-slate-500">
+                        {r.startTime} - {r.endTime}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 truncate text-sm font-bold text-slate-900">
+                          {r.customer}
+                        </div>
+
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            r.status === "cancelled"
+                              ? "bg-slate-200 text-slate-600"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          {r.status === "reserved" && "予約中"}
+                          {r.status === "cancelled" && "キャンセル"}
+                        </span>
+                      </div>
+
+                      <div className="mt-2 text-xs font-medium text-slate-500">
+                        {r.startTime} - {r.endTime}
+                      </div>
+
+                      {getRowSpan(r.startTime, r.endTime) > 1 && (
+                        <>
+                          <div className="mt-1 truncate text-xs text-slate-600">
+                            {r.menu}
+                          </div>
+
+                        
+                        </>
+                      )}
+                    </>
+                  )}
                     </div>
                   ))}
               </div>
@@ -414,7 +449,7 @@ export default function ReservationPage({
             </React.Fragment>
           ))}
         </div>
-      </div>
+        </div>
     </>
   );
 }
