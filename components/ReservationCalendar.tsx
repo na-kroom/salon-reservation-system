@@ -3,12 +3,16 @@ import { useState } from "react";
 type Props = {
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
+  reservations: {
+    date: string;
+  }[];
   onClose?: () => void;
 };
 
 export default function ReservationCalendar({
   date,
   setDate,
+  reservations,
   onClose,
 }: Props) {
   const [currentMonth, setCurrentMonth] = useState(date);
@@ -81,19 +85,44 @@ export default function ReservationCalendar({
               />
             );
           }
+  const dayDate = new Date(year, month, day);
 
-          return (
-            <button
-              key={index}
-              onClick={() => {
-                setDate(new Date(year, month, day));
-                onClose?.();
-              }}
-              className="aspect-square rounded-md border border-gray-200 bg-white text-sm hover:border-blue-400 hover:bg-blue-50"
-            >
-              {day}
-            </button>
-          );
+  const dayString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const hasReservation = reservations.some(
+    (reservation) => reservation.date === dayString
+  );
+
+  const isSelected =
+    date.getFullYear() === year &&
+    date.getMonth() === month &&
+    date.getDate() === day;    
+       
+  return (
+    <button
+      key={index}
+      onClick={() => {
+        setDate(dayDate);
+        onClose?.();
+      }}
+      className={`relative aspect-square rounded-md border text-sm transition
+        ${
+          isSelected
+            ? "border-blue-600 bg-blue-600 text-white"
+            : hasReservation
+            ? "border-blue-200 bg-blue-50 text-blue-900"
+            : "border-gray-200 bg-white text-slate-700"
+        }
+        hover:border-blue-400 hover:bg-blue-50
+      `}
+    >
+      {day}
+
+      {hasReservation && !isSelected && (
+        <span className="absolute bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-blue-600" />
+      )}
+    </button>
+  );        
         })}
       </div>
     </div>

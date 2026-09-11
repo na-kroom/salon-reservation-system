@@ -182,6 +182,7 @@ export default function ReservationPage({
               <ReservationCalendar
                 date={date}
                 setDate={setDate}
+                reservations={reservations}
                 onClose={() => setShowCalendar(false)}
               />
             </div>
@@ -316,7 +317,7 @@ export default function ReservationPage({
                           <span
                             className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                               r.status === "cancelled"
-                                ? "bg-red-100 text-red-700"
+                                ? "bg-slate-200 text-slate-600"
                                 : "bg-blue-100 text-blue-700"
                             }`}
                           >
@@ -396,7 +397,7 @@ export default function ReservationPage({
                               <span
                                 className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                                   r.status === "cancelled"
-                                    ? "bg-red-100 text-red-700"
+                                    ? "bg-slate-200 text-slate-600"
                                     : "bg-blue-100 text-blue-700"
                                 }`}
                               >

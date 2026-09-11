@@ -95,6 +95,7 @@ export default function ReservationModal({
 }: Props) {
   const [customerKeyword, setCustomerKeyword] =
   useState("");
+  console.log("予約登録 顧客一覧:", customers);
   const [quantity, setQuantity] = useState(1);
   if (!isOpen) return null;
 
@@ -107,18 +108,65 @@ export default function ReservationModal({
           <label className="mb-1 block text-sm font-medium text-slate-700">
             顧客
           </label>
-          <input
-            type="text"
-            placeholder="顧客名・フリガナで検索"
-            value={customerKeyword}
-            onChange={(e) =>
-              setCustomerKeyword(e.target.value)
-            }
-            className="w-full border rounded p-2 mb-2"
-          />
 
-          {customerKeyword !== customer && (
-            <div className="max-h-40 overflow-y-auto rounded border mb-4">
+          <div className="relative mb-4">
+            <input
+              type="text"
+              placeholder="顧客名・フリガナで検索"
+              value={customerKeyword}
+              onChange={(e) => {
+                setCustomerKeyword(e.target.value);
+                setCustomer("");
+                setCustomerId(null);
+              }}
+              className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+            {customerKeyword && (
+              <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+                {customers
+                  .filter((customer) => {
+                    const keyword = customerKeyword
+                      .toLowerCase()
+                      .trim();
+
+                    return (
+                      customer.name
+                        .toLowerCase()
+                        .includes(keyword) ||
+                      (customer.kana ?? "")
+                        .toLowerCase()
+                        .includes(keyword)
+                    );
+                  })
+                  .map((customer) => (
+                    <button
+                      key={customer.id}
+                      type="button"
+                      onClick={() => {
+                        setCustomerId(customer.id);
+                        setCustomer(customer.name);
+                        setCustomerKeyword(customer.name);
+                      }}
+                      className={`block w-full border-b border-slate-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-blue-50 ${
+                        customerId === customer.id
+                          ? "bg-blue-50"
+                          : ""
+                      }`}
+                    >
+                      <div className="text-sm font-semibold text-slate-900">
+                        {customer.name}
+                      </div>
+
+                      <div className="mt-1 text-xs text-slate-500">
+                        {customer.kana}
+                      </div>
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
+          <div className="max-h-40 overflow-y-auto rounded border mb-4">
             {customers
               .filter((customer) => {
                 const keyword =
@@ -128,7 +176,7 @@ export default function ReservationModal({
                   customer.name
                     .toLowerCase()
                     .includes(keyword) ||
-                  customer.kana
+                  (customer.kana ?? "")
                     .toLowerCase()
                     .includes(keyword)
                 );
@@ -158,7 +206,7 @@ export default function ReservationModal({
                 </button>
               ))}
           </div>
-          )}
+          
           <label className="mb-1 block text-sm font-medium text-slate-700">
             開始時間
           </label>
