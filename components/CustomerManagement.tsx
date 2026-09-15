@@ -97,176 +97,234 @@ type CustomerManagementProps = {
     setCustomerPhone("");
     setCustomerMemo("");
   };
-    return (
-        <div className="border p-4 rounded">
-        <h2 className="text-xl font-bold mb-4">
-            顧客管理
-        </h2>
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      {/* 顧客登録 */}
+      <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+        顧客登録
+      </h2>
 
-        <p>登録人数：{customers.length}人</p>
-        <input
-          type="text"
-          placeholder="顧客名・フリガナ・電話番号で検索"
-          value={customerSearch}
-          onChange={(e) =>
-            setCustomerSearch(e.target.value)
-          }
-          className="w-full border rounded p-2 mt-4 mb-4"
-        />
-        <div className="mt-4 space-y-3">
+      <p className="mt-1 text-sm text-slate-500">
+        顧客情報を登録・編集できます
+      </p>
+
+      <div className="mt-6 space-y-3">
         <input
           type="text"
           placeholder="顧客名"
           value={customerName}
           onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full border rounded p-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
         />
+
         <input
           type="text"
           placeholder="フリガナ"
           value={customerKana}
           onChange={(e) => setCustomerKana(e.target.value)}
-          className="w-full border rounded p-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
         />
+
         <input
           type="text"
           placeholder="電話番号"
           value={customerPhone}
           onChange={(e) => setCustomerPhone(e.target.value)}
-          className="w-full border rounded p-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
         />
 
         <textarea
           placeholder="メモ"
           value={customerMemo}
           onChange={(e) => setCustomerMemo(e.target.value)}
-          className="w-full border rounded p-2"
           rows={3}
+          className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
         />
 
-      <button
-        onClick={handleAddCustomer}
-        className="bg-black text-white px-4 py-2 rounded"
-      >
-        {editingCustomerId === null
-          ? "顧客登録"
-          : "保存"}
-      </button>
+        <button
+          onClick={handleAddCustomer}
+          className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
+        >
+          {editingCustomerId === null ? "顧客登録" : "保存"}
+        </button>
       </div>
-      <hr className="my-6" />
 
-<h3 className="text-lg font-bold mb-3">
-  顧客一覧
-</h3>
+      <hr className="my-8 border-slate-200" />
 
-  <div className="space-y-3">
-    {customers
-      .filter((customer) => {
-        const keyword =
-          customerSearch.toLowerCase();
-          return (
-            customer.name
-              .toLowerCase()
-              .includes(keyword) ||
-            customer.kana
-              .toLowerCase()
-              .includes(keyword) ||
-            customer.phone.includes(customerSearch)
-          );
-      })
-      .map((customer) => (
-      <div
-        key={customer.id}
-        className="border rounded p-3"
-      >
-        <div className="font-semibold">
-          {customer.name}
-        </div>
+      {/* 顧客検索 */}
+      <div>
+        <h3 className="text-lg font-semibold text-slate-900">
+          顧客検索
+        </h3>
 
-        <div className="text-sm text-gray-600">
-          📞 {customer.phone}
-        </div>
+        <p className="mt-1 text-sm text-slate-500">
+          顧客名・フリガナ・電話番号から検索できます
+        </p>
 
-        <div className="text-sm">
-          来店回数：{customer.visitCount}回
-        </div>
+        <input
+          type="text"
+          placeholder="顧客名・フリガナ・電話番号で検索"
+          value={customerSearch}
+          onChange={(e) => setCustomerSearch(e.target.value)}
+          className="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+        />
+      </div>
 
-        {customer.memo && (
-          <div className="mt-2 text-sm">
-            メモ：{customer.memo}
-          </div>
-        )}
-        <div className="mt-3 flex gap-2">
-          <button
-            onClick={() => {
-              setEditingCustomerId(customer.id);
+      {/* 検索結果 */}
+      {customerSearch.trim() !== "" && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-slate-900">
+            検索結果
+          </h3>
 
-              setCustomerName(customer.name);
-              setCustomerKana(customer.kana);
-              setCustomerPhone(customer.phone);
-              setCustomerMemo(customer.memo);
-            }}
-            className="bg-blue-500 text-white px-3 py-1 rounded"
-          >
-            編集
-          </button>
+          <div className="mt-4 space-y-3">
+            {customers
+              .filter((customer) => {
+                const keyword = customerSearch
+                  .toLowerCase()
+                  .trim();
 
-          <button
-            onClick={async() => {
-              const hasReservation = reservations.some(
-                (reservation) =>
-                  reservation.customerId === customer.id
+                return (
+                  customer.name
+                    .toLowerCase()
+                    .includes(keyword) ||
+                  customer.kana
+                    .toLowerCase()
+                    .includes(keyword) ||
+                  customer.phone.includes(customerSearch)
+                );
+              })
+              .map((customer) => (
+                <div
+                  key={customer.id}
+                  className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-base font-semibold text-slate-900">
+                        {customer.name}
+                      </div>
+
+                      <div className="mt-1 text-sm text-slate-500">
+                        {customer.kana}
+                      </div>
+
+                      <div className="mt-2 text-sm text-slate-600">
+                        📞 {customer.phone}
+                      </div>
+
+                      <div className="mt-1 text-sm text-slate-600">
+                        来店回数：{customer.visitCount}回
+                      </div>
+
+                      {customer.memo && (
+                        <div className="mt-2 text-sm text-slate-600">
+                          メモ：{customer.memo}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingCustomerId(customer.id);
+                          setCustomerName(customer.name);
+                          setCustomerKana(customer.kana);
+                          setCustomerPhone(customer.phone);
+                          setCustomerMemo(customer.memo);
+                        }}
+                        className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                      >
+                        編集
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          const hasReservation =
+                            reservations.some(
+                              (reservation) =>
+                                reservation.customerId ===
+                                customer.id
+                            );
+
+                          if (hasReservation) {
+                            alert(
+                              "予約履歴があるため削除できません。"
+                            );
+                            return;
+                          }
+
+                          if (
+                            !confirm(
+                              `${customer.name}さんを削除しますか？`
+                            )
+                          ) {
+                            return;
+                          }
+
+                          try {
+                            await deleteCustomer(
+                              customer.id
+                            );
+
+                            setCustomers((prev) =>
+                              prev.filter(
+                                (c) => c.id !== customer.id
+                              )
+                            );
+                          } catch (error) {
+                            console.error(
+                              "顧客削除に失敗しました",
+                              error
+                            );
+                            alert(
+                              "顧客削除に失敗しました。"
+                            );
+                            return;
+                          }
+
+                          if (
+                            editingCustomerId ===
+                            customer.id
+                          ) {
+                            setEditingCustomerId(null);
+                            setCustomerName("");
+                            setCustomerKana("");
+                            setCustomerPhone("");
+                            setCustomerMemo("");
+                          }
+                        }}
+                        className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
+                      >
+                        削除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            {customers.filter((customer) => {
+              const keyword = customerSearch
+                .toLowerCase()
+                .trim();
+
+              return (
+                customer.name
+                  .toLowerCase()
+                  .includes(keyword) ||
+                customer.kana
+                  .toLowerCase()
+                  .includes(keyword) ||
+                customer.phone.includes(customerSearch)
               );
-
-              if (hasReservation) {
-                alert(
-                  "予約履歴があるため削除できません。"
-                );
-                return;
-              }
-              if (
-                !confirm(
-                  `${customer.name}さんを削除しますか？`
-                )
-              ) {
-                return;
-              }
-              try {
-                await deleteCustomer(customer.id);
-
-                setCustomers((prev) =>
-                  prev.filter(
-                    (c) => c.id !== customer.id
-                  )
-                );
-              } catch (error) {
-                console.error(
-                  "顧客削除に失敗しました",
-                  error
-                );
-                alert("顧客削除に失敗しました。");
-                return;
-              }
-             
-
-              if (
-                editingCustomerId === customer.id
-              ) {
-                setEditingCustomerId(null);
-                setCustomerName("");
-                setCustomerKana("");
-                setCustomerPhone("");
-                setCustomerMemo("");
-              }
-            }}
-            className="bg-red-500 text-white px-3 py-1 rounded"
-          >
-            削除
-          </button>
+            }).length === 0 && (
+              <p className="rounded-xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                該当する顧客が見つかりません
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-        </div>
-    );
+      )}
+    </div>
+  );
 }

@@ -101,7 +101,16 @@ export default function ReservationModal({
 
   return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-        <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl bg-white p-7 shadow-2xl">
+        <div className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl bg-white p-7 shadow-2xl">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="閉じる"
+            className="absolute right-5 top-5 text-2xl leading-none text-slate-400 transition hover:text-slate-700"
+          >
+            ×
+          </button>
+
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>

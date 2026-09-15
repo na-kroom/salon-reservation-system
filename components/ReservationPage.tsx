@@ -38,7 +38,6 @@ export default function ReservationPage({
   setIsCustomerModalOpen,
 }: ReservationPageProps) {
   const [showCalendar, setShowCalendar] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const getRowSpan = (
     startTime: string,
@@ -72,7 +71,7 @@ export default function ReservationPage({
       {/* 操作エリア */}
       <div className="mb-5">
         {/* 日付操作 */}
-        <div className="flex items-center justify-center gap-3">
+        <div className="relative flex items-center justify-center gap-3">
           {/* 今日 */}
           <button
             onClick={() => setDate(new Date())}
@@ -193,6 +192,8 @@ export default function ReservationPage({
           <button
             onClick={() => setIsModalOpen(true)}
             className="
+              absolute
+              right-0
               rounded-xl
               bg-blue-700
               px-5 py-3
@@ -211,36 +212,7 @@ export default function ReservationPage({
         </div>
       </div>
 
-      {/* 顧客検索 */}
-      <div className="relative mb-6">
-        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-slate-400">
-          ⌕
-        </span>
-
-        <input
-          type="text"
-          placeholder="顧客名で検索"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="
-            w-full
-            rounded-xl
-            border border-slate-200
-            bg-white
-            py-3.5 pl-11 pr-4
-            text-sm
-            text-slate-800
-            shadow-sm
-            outline-none
-            transition
-            placeholder:text-slate-400
-            focus:border-blue-400
-            focus:ring-2
-            focus:ring-blue-100
-          "
-        />
-      </div>
-
+    
       {/* タイムテーブル */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div
@@ -279,10 +251,8 @@ export default function ReservationPage({
                     (r) =>
                       r.startTime === time &&
                       r.lane === "A" &&
-                      r.date === selectedDate &&
-                      r.customer
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
+                      r.date === selectedDate 
+                     
                   )
                   .map((r) => (
                     <div
@@ -366,10 +336,7 @@ export default function ReservationPage({
                     (r) =>
                       r.startTime === time &&
                       r.lane === "B" &&
-                      r.date === selectedDate &&
-                      r.customer
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
+                      r.date === selectedDate
                   )
                   .map((r) => (
                     <div
