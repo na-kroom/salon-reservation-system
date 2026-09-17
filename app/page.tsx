@@ -2,6 +2,7 @@
 
 
 import { useState } from "react";
+import { supabase } from "@/utils/supabase";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
 import CustomerModal from "@/components/CustomerModal";
@@ -48,7 +49,10 @@ export default function Home() {
     "18:30",
   ];
 
-
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [customer, setCustomer] = useState("");
@@ -290,6 +294,12 @@ const [customerKeyword, setCustomerKeyword] =
           }`}
         >
           会計
+        </button>
+        <button
+          onClick={handleLogout}
+          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-red-50 hover:border-red-300"
+        >
+          ログアウト
         </button>
       </div>
     </div>

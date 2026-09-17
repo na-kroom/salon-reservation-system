@@ -1,6 +1,29 @@
 "use client";
 
+import { useState } from "react";
+import { supabase } from "@/utils/supabase";
+
+
 export default function LoginPage() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const handleLogin = async () => {
+    setError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+
+    if (error) {
+        console.log("ログインエラー:", error);
+        setError(error.message);
+        return;
+    }
+
+    window.location.href = "/";
+    };
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
@@ -21,6 +44,8 @@ export default function LoginPage() {
             <input
               type="email"
               placeholder="メールアドレスを入力"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -30,14 +55,21 @@ export default function LoginPage() {
               パスワード
             </label>
             <input
-              type="password"
-              placeholder="パスワードを入力"
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            type="password"
+            placeholder="パスワードを入力"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
-
+            {error && (
+            <p className="text-sm text-red-500">
+                {error}
+            </p>
+            )}
           <button
             type="button"
+            onClick={handleLogin}
             className="w-full rounded-xl bg-slate-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-900"
           >
             ログイン
