@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
@@ -22,6 +22,18 @@ import {updateReservation as updateReservationToSupabase,} from "@/utils/reserva
 import { isReservationOverlap } from "@/utils/reservationValidation";
 import { formatLocalDate } from "@/utils/date";
 export default function Home() {
+  useEffect(() => {
+  const checkUser = async () => {
+  const { data } = await supabase.auth.getUser();
+
+      if (!data.user) {
+        window.location.href = "/login";
+      }
+    };
+
+    checkUser();
+  }, []);
+
   const {
     reservations,
     setReservations,
