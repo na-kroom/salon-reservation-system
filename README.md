@@ -14,7 +14,8 @@
 
 https://salon-reservation-system-phi.vercel.app
 
-※ スタッフ向けシステムのため、ログインには登録済みのアカウントが必要です。
+ﾃﾞﾓ用メールアドレス　demo@salon-demo.example
+パスワード　１２３４５６
 
 ## 主な機能
 
