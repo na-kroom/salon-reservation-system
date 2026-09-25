@@ -14,8 +14,8 @@
 
 https://salon-reservation-system-phi.vercel.app
 
-ﾃﾞﾓ用メールアドレス　demo@salon-demo.example
-パスワード　１２３４５６
+-デモ用メールアドレス　demo@salon-demo.example
+-パスワード　１２３４５６
 
 ## 主な機能
 
