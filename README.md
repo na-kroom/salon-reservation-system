@@ -1,38 +1,90 @@
-# Salon Reservation System
+# 美容室管理システム
 
-## Overview
+## 概要
 
-Salon Reservation System is a management application designed for small owner-operated hair salons.
+小規模な美容室・個人サロンでの業務を想定した、スタッフ向けの管理システムです。
 
-This system allows salon owners to manage reservations and customer information through a simple internal dashboard.
+予約管理だけでなく、顧客管理・商品管理・会計・売上確認までを一つのシステムで管理できるように開発しています。
 
-## Features
+就職活動用のポートフォリオとして、実際の業務で使用することを想定し、データベース・認証・本番環境へのデプロイまで含めて開発しています。
 
-* Administrator authentication
-* Daily reservation management
-* Customer management
-* Reservation conflict detection
-* Soft delete support
-* Service duration calculation
-* Memo management
+## デモ
 
-## Tech Stack
+本番環境：
 
-### Frontend
+https://salon-reservation-system-phi.vercel.app
 
-* Next.js
-* TypeScript
-* Tailwind CSS
+※ スタッフ向けシステムのため、ログインには登録済みのアカウントが必要です。
 
-### Backend
+## 主な機能
 
-* Supabase
+### 予約管理
 
-### Database
+- 予約の登録・編集・削除
+- 日付ごとの予約確認
+- 予約時間・施術内容・料金・メモの管理
+- A/Bレーンによる予約管理
+- 予約の重複チェック
+- 予約ステータスの管理
 
-* PostgreSQL
+### 顧客管理
 
-### Deployment
+- 顧客の登録・編集・削除
+- 顧客情報の検索
+- 顧客の予約履歴確認
+- 来店履歴・売上情報の確認
 
-* Vercel
+### 商品管理
 
+- 商品の登録・編集・削除
+- 商品検索
+- 予約時の商品登録
+
+### 会計
+
+- 施術料金・商品料金の管理
+- 会計処理
+- 会計済みステータスへの更新
+- 日別・月別売上の集計
+
+### ダッシュボード
+
+- 今日の予約件数
+- 完了件数
+- 今日の売上
+- 月間売上
+- 顧客数
+- 今日の予約一覧
+
+### 認証・セキュリティ
+
+- Supabase Authによるスタッフログイン
+- 未ログイン状態で管理画面へアクセスした場合のログイン画面へのリダイレクト
+- ログアウト機能
+- Supabase Row Level Security（RLS）による認証済みユーザー向けデータアクセス制御
+
+## 使用技術
+
+| 技術 | 用途 |
+| --- | --- |
+| Next.js | Webアプリケーション開発 |
+| React | UI構築 |
+| TypeScript | 型安全な開発 |
+| Tailwind CSS | UI・レイアウト |
+| Supabase | 認証・データベース |
+| PostgreSQL | データ管理 |
+| Git / GitHub | ソースコード管理 |
+| Vercel | 本番環境へのデプロイ |
+
+## システム構成
+
+```text
+ユーザー
+   ↓
+Vercel
+   ↓
+Next.js / React
+   ↓
+Supabase Auth ── スタッフ認証
+   ↓
+PostgreSQL ── 予約・顧客・商品データ
