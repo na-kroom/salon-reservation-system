@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { getCurrentShopId } from "./shop";
 
 export async function fetchProducts() {
   const { data, error } = await supabase
@@ -12,6 +13,7 @@ export async function fetchProducts() {
 
   return data;
 }
+
 export async function createProduct({
   name,
   price,
@@ -19,9 +21,12 @@ export async function createProduct({
   name: string;
   price: number;
 }) {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("products")
     .insert({
+      shop_id: shopId,
       name,
       price,
     })
@@ -34,6 +39,7 @@ export async function createProduct({
 
   return data;
 }
+
 export async function updateProduct(
   id: number,
   {
@@ -60,6 +66,7 @@ export async function updateProduct(
 
   return data;
 }
+
 export async function deleteProduct(id: number) {
   const { error } = await supabase
     .from("products")

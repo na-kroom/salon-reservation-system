@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import type { Reservation } from "@/types/Reservation";
-
+import { getCurrentShopId } from "./shop";
 
 export async function fetchReservations(): Promise<Reservation[]> {
   const { data, error } = await supabase
@@ -27,12 +27,16 @@ export async function fetchReservations(): Promise<Reservation[]> {
     status: reservation.status,
   }));
 }
-  export async function createReservation(
-    reservation: Omit<Reservation, "id">
-  ): Promise<Reservation> {
+
+export async function createReservation(
+  reservation: Omit<Reservation, "id">
+): Promise<Reservation> {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("reservations")
     .insert({
+      shop_id: shopId,
       lane: reservation.lane,
       customer_id: reservation.customerId,
       customer: reservation.customer,
@@ -43,7 +47,6 @@ export async function fetchReservations(): Promise<Reservation[]> {
       price: reservation.price,
       memo: reservation.memo,
       product: reservation.product,
-  
       status: reservation.status,
     })
     .select()
@@ -68,10 +71,11 @@ export async function fetchReservations(): Promise<Reservation[]> {
     status: data.status,
   };
 }
-  export async function updateReservation(
-    id: number,
-    reservation: Omit<Reservation, "id">
-  ): Promise<Reservation> {
+
+export async function updateReservation(
+  id: number,
+  reservation: Omit<Reservation, "id">
+): Promise<Reservation> {
   const { data, error } = await supabase
     .from("reservations")
     .update({
@@ -110,6 +114,7 @@ export async function fetchReservations(): Promise<Reservation[]> {
     status: data.status,
   };
 }
+
 export async function deleteReservation(id: number) {
   const { error } = await supabase
     .from("reservations")
@@ -120,6 +125,7 @@ export async function deleteReservation(id: number) {
     throw error;
   }
 }
+
 export async function completeReservation(
   id: number
 ): Promise<Reservation> {
@@ -148,7 +154,6 @@ export async function completeReservation(
     price: data.price,
     memo: data.memo ?? "",
     product: data.product ?? "",
-
     status: data.status,
   };
 }

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { getCurrentShopId } from "./shop";
 
 export async function fetchCustomers() {
   const { data, error } = await supabase
@@ -11,7 +12,7 @@ export async function fetchCustomers() {
   }
 
   return data;
-} 
+}
 
 export async function createCustomer({
   name,
@@ -24,9 +25,12 @@ export async function createCustomer({
   phone: string;
   memo: string;
 }) {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("customers")
     .insert({
+      shop_id: shopId,
       name,
       kana,
       phone,
@@ -41,6 +45,7 @@ export async function createCustomer({
 
   return data;
 }
+
 export async function updateCustomer(
   id: number,
   {
@@ -73,6 +78,7 @@ export async function updateCustomer(
 
   return data;
 }
+
 export async function deleteCustomer(id: number) {
   const { error } = await supabase
     .from("customers")
