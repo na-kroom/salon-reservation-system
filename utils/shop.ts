@@ -6,12 +6,8 @@ export async function getCurrentShopId(): Promise<number> {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
-    throw userError;
-  }
-
-  if (!user) {
-    throw new Error("ログインユーザーが見つかりません。");
+  if (userError || !user) {
+    throw new Error("ユーザー情報を取得できませんでした");
   }
 
   const { data, error } = await supabase
@@ -20,8 +16,8 @@ export async function getCurrentShopId(): Promise<number> {
     .eq("user_id", user.id)
     .single();
 
-  if (error) {
-    throw error;
+  if (error || !data) {
+    throw new Error("所属店舗を取得できませんでした");
   }
 
   return data.shop_id;

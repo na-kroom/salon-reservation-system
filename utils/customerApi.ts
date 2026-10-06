@@ -2,9 +2,12 @@ import { supabase } from "./supabase";
 import { getCurrentShopId } from "./shop";
 
 export async function fetchCustomers() {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("customers")
     .select("*")
+    .eq("shop_id", shopId)
     .order("id");
 
   if (error) {
@@ -60,6 +63,8 @@ export async function updateCustomer(
     memo: string;
   }
 ) {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("customers")
     .update({
@@ -69,6 +74,7 @@ export async function updateCustomer(
       memo,
     })
     .eq("id", id)
+    .eq("shop_id", shopId)
     .select()
     .single();
 
@@ -80,10 +86,13 @@ export async function updateCustomer(
 }
 
 export async function deleteCustomer(id: number) {
+  const shopId = await getCurrentShopId();
+
   const { error } = await supabase
     .from("customers")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("shop_id", shopId);
 
   if (error) {
     throw error;

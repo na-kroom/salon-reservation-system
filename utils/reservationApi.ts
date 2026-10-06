@@ -3,11 +3,13 @@ import type { Reservation } from "@/types/Reservation";
 import { getCurrentShopId } from "./shop";
 
 export async function fetchReservations(): Promise<Reservation[]> {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("reservations")
     .select("*")
+    .eq("shop_id", shopId)
     .order("id");
-
   if (error) {
     throw error;
   }
@@ -71,11 +73,12 @@ export async function createReservation(
     status: data.status,
   };
 }
-
 export async function updateReservation(
   id: number,
   reservation: Omit<Reservation, "id">
 ): Promise<Reservation> {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("reservations")
     .update({
@@ -92,6 +95,7 @@ export async function updateReservation(
       status: reservation.status,
     })
     .eq("id", id)
+    .eq("shop_id", shopId)
     .select()
     .single();
 
@@ -116,25 +120,30 @@ export async function updateReservation(
 }
 
 export async function deleteReservation(id: number) {
+  const shopId = await getCurrentShopId();
+
   const { error } = await supabase
     .from("reservations")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("shop_id", shopId);
 
   if (error) {
     throw error;
   }
 }
-
 export async function completeReservation(
   id: number
 ): Promise<Reservation> {
+  const shopId = await getCurrentShopId();
+
   const { data, error } = await supabase
     .from("reservations")
     .update({
       status: "completed",
     })
     .eq("id", id)
+    .eq("shop_id", shopId)
     .select()
     .single();
 
