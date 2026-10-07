@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
-import { completeReservation } from "@/utils/reservationApi";
+import {completeReservation,updateReservation,} from "@/utils/reservationApi";
 
 type CheckoutProps = {
   reservations: Reservation[];
@@ -18,6 +18,8 @@ export default function Checkout({
 }: CheckoutProps) {
   const [selectedReservationId, setSelectedReservationId] =
     useState<number | null>(null);
+  const [editingPrice, setEditingPrice] = useState("");
+  const [checkoutCompleted, setCheckoutCompleted] = useState(false);
 
   const today = new Date().toLocaleDateString("sv-SE");
 
@@ -30,7 +32,7 @@ export default function Checkout({
     todayReservations.find(
       (r) => r.id === selectedReservationId
     ); 
-  const subtotal = selectedReservation?.price ?? 0;
+  const subtotal = Number(editingPrice) || 0;
   const [selectedProductId, setSelectedProductId] =
     useState<number | null>(null);
 
@@ -68,9 +70,18 @@ export default function Checkout({
     }
 
     try {
+      const updatedReservation =
+        await updateReservation(
+          selectedReservation.id,
+          {
+            ...selectedReservation,
+            price: Number(editingPrice) || 0,
+          }
+        );
+
       const completedReservation =
         await completeReservation(
-          selectedReservation.id
+          updatedReservation.id
         );
 
       setReservations((prev) =>
@@ -90,7 +101,8 @@ export default function Checkout({
     }
 
     alert("会計が完了しました。");
-
+    setCheckoutCompleted(true);
+    setEditingPrice("");
     setCheckoutProducts([]);
     setSelectedProductId(null);
     setSelectedReservationId(null);
@@ -103,7 +115,13 @@ export default function Checkout({
     <h2 className="mb-6 text-2xl font-semibold tracking-tight text-slate-900">
       会計
     </h2>
-
+    {checkoutCompleted && (
+      <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+        <p className="text-sm font-semibold text-green-700">
+          会計が完了しました。
+        </p>
+      </div>
+    )}
     <div className="grid gap-6 lg:grid-cols-2">
       {/* 左側 */}
       <div className="rounded-xl border border-slate-200 bg-white p-5">
@@ -116,9 +134,21 @@ export default function Checkout({
             <select
               className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               value={selectedReservationId ?? ""}
-              onChange={(e) =>
-                setSelectedReservationId(Number(e.target.value))
-              }
+              onChange={(e) => {
+                const id = Number(e.target.value);
+
+                setSelectedReservationId(id);
+
+                const reservation = todayReservations.find(
+                  (r) => r.id === id
+                );
+
+                setEditingPrice(
+                  reservation ? String(reservation.price) : ""
+                );
+
+                setCheckoutCompleted(false);
+              }}
             >
               <option value="" disabled>
                 予約を選択してください
@@ -137,12 +167,12 @@ export default function Checkout({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">施術料金</label>
-          <input
-            type="number"
-            value={selectedReservation?.price ?? ""}
-            readOnly
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 outline-none"
-          />
+            <input
+              type="number"
+              value={editingPrice}
+              onChange={(e) => setEditingPrice(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
+            />
           </div>
 
           <div>
