@@ -221,7 +221,7 @@ type CustomerManagementProps = {
                       </div>
 
                       <div className="mt-1 text-sm text-slate-600">
-                        来店回数：{customer.visitCount}回
+                        来店回数：{getCustomerVisitCount(customer.id)}回
                       </div>
 
                       {customer.memo && (
