@@ -23,6 +23,13 @@ type CustomerManagementProps = {
     const [customerKana, setCustomerKana] = useState("");
     const [customerPhone, setCustomerPhone] = useState("");
     const [customerMemo, setCustomerMemo] = useState("");
+    const getCustomerVisitCount = (customerId: number) => {
+      return reservations.filter(
+        (reservation) =>
+          reservation.customerId === customerId &&
+          reservation.status === "completed"
+      ).length;
+    };
     const [customerSearch, setCustomerSearch] = useState("");
     const [editingCustomerId, setEditingCustomerId] =
     useState<number | null>(null);
