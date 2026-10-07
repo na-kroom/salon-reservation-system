@@ -93,10 +93,11 @@ export default function Home() {
   const [product, setProduct] =
     useState("");
   const visitCount = selectedReservation
-    ? getVisitCount(
-        reservations,
-        selectedReservation.customer
-      )
+    ? reservations.filter(
+        (r) =>
+          r.customer === selectedReservation.customer &&
+          r.status === "completed"
+      ).length
     : 0;
 
 
