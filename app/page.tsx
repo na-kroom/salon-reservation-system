@@ -21,6 +21,7 @@ import { useReservations } from "@/hooks/useReservations";
 import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
 import { isReservationOverlap } from "@/utils/reservationValidation";
 import { formatLocalDate } from "@/utils/date";
+import { getCurrentShop } from "@/utils/shop";
 export default function Home() {
   useEffect(() => {
   const checkUser = async () => {
@@ -39,7 +40,27 @@ export default function Home() {
     setReservations,
   } = useReservations();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [shopName, setShopName] = useState("");
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopAddress, setShopAddress] = useState("");
+  useEffect(() => {
+    const loadShop = async () => {
+      try {
+        const shop = await getCurrentShop();
   
+
+        setShopName(shop.name);
+        setShopPhone(shop.phone);
+        setShopAddress(shop.address);
+      } catch (error) {
+        console.error("店舗情報の取得に失敗しました", error);
+      }
+    };
+
+    loadShop();
+  }, []);
+
   const times = [
     "10:00",
     "10:30",
@@ -123,11 +144,10 @@ export default function Home() {
     useState("");
 
   const [currentPage, setCurrentPage] = useState<
-    "home" | "reservation" | "customer" | "product" | "checkout"
+    "home" | "reservation" | "customer" | "product" | "checkout" | "profile"
   >("home");
-
-  const [duration, setDuration] =
-    useState(60);
+    const [duration, setDuration] =
+      useState(60);
 
   const endTime =
     calculateEndTime(
@@ -308,12 +328,36 @@ const [customerKeyword, setCustomerKeyword] =
         >
           会計
         </button>
-        <button
-          onClick={handleLogout}
-          className="rounded-lg border border-gray-300 bg-white px-5 py-2 transition hover:bg-red-50 hover:border-red-300"
-        >
-          ログアウト
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white text-xl text-slate-700 transition hover:bg-slate-100"
+            aria-label="メニュー"
+          >
+            ☰
+          </button>
+
+          {isMenuOpen && (
+            <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+              <button
+              onClick={() => {
+                setCurrentPage("profile");
+                setIsMenuOpen(false);
+              }}
+                className="w-full rounded-lg px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-100"
+              >
+                プロフィール
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="w-full rounded-lg px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50"
+              >
+                ログアウト
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   </div>
@@ -381,7 +425,74 @@ const [customerKeyword, setCustomerKeyword] =
       products={products}
     />
   )}
+  {currentPage === "profile" && (
+    <div className="mx-auto max-w-3xl">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-slate-900">
+          プロフィール
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          店舗情報を確認・編集できます。
+        </p>
+      </div>
 
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-900">
+          店舗情報
+        </h3>
+
+        <div className="mt-6 space-y-5">
+          <div>
+            <label className="text-sm font-medium text-slate-700">
+              店舗名
+            </label>
+
+          <input
+            type="text"
+            value={shopName}
+            onChange={(e) => setShopName(e.target.value)}
+            className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+          />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-slate-700">
+              電話番号
+            </label>
+          <input
+            type="text"
+            value={shopPhone}
+            onChange={(e) => setShopPhone(e.target.value)}
+            placeholder="電話番号を入力"
+            className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+          />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-slate-700">
+              住所
+            </label>
+
+          
+            <input
+              type="text"
+              value={shopAddress}
+              onChange={(e) => setShopAddress(e.target.value)}
+              placeholder="住所を入力"
+              className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+            />
+          </div>
+
+          <button
+            type="button"
+            className="rounded-lg bg-slate-800 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
+          >
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
 <ReservationModal
   isOpen={isModalOpen}
 

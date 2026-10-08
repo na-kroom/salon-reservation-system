@@ -314,7 +314,7 @@ export default function ReservationModal({
             商品
           </label>
           <select
-            value={selectedProductId}
+            value={selectedProductId ?? ""}
             onChange={(e) => {
               const value = e.target.value;
 

@@ -22,3 +22,25 @@ export async function getCurrentShopId(): Promise<number> {
 
   return data.shop_id;
 }
+export async function getCurrentShop() {
+  const shopId = await getCurrentShopId();
+
+  const { data, error } = await supabase
+    .from("shops")
+    .select("*")
+    .eq("id", shopId)
+    .single();
+
+  if (error || !data) {
+    console.error("店舗情報取得エラー:", error);
+    throw new Error("店舗情報を取得できませんでした");
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    phone: data.phone ?? "",
+    address: data.address ?? "",
+    created_at: data.created_at,
+  };
+}
