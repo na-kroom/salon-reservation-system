@@ -13,7 +13,7 @@ import CustomerManagement from "@/components/CustomerManagement";
 import { useProducts } from "@/hooks/useProducts";
 import {calculateEndTime,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
-import {getVisitCount,getTotalSales,getLastVisit,} from "@/utils/customer";
+import {getTotalSales,getLastVisit,} from "@/utils/customer";
 import {createReservation as createReservationToSupabase,} from "@/utils/reservationApi";
 import HomeDashboard from "@/components/HomeDashboard";
 import Checkout from "@/components/Checkout";
@@ -21,7 +21,7 @@ import { useReservations } from "@/hooks/useReservations";
 import {updateReservation as updateReservationToSupabase,} from "@/utils/reservationApi";
 import { isReservationOverlap } from "@/utils/reservationValidation";
 import { formatLocalDate } from "@/utils/date";
-import { getCurrentShop } from "@/utils/shop";
+import { getCurrentShop, getCurrentShopId } from "@/utils/shop";
 export default function Home() {
   useEffect(() => {
   const checkUser = async () => {
@@ -60,7 +60,35 @@ export default function Home() {
 
     loadShop();
   }, []);
+  const handleSaveProfile = async () => {
+    try {
+      const shopId = await getCurrentShopId();
 
+      const { data, error } = await supabase
+        .from("shops")
+        .update({
+          name: shopName,
+          phone: shopPhone,
+          address: shopAddress,
+        })
+        .eq("id", shopId)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error("店舗情報を更新できませんでした");
+      }
+
+      alert("店舗情報を保存しました");
+    } catch (error) {
+      console.error("店舗情報の保存に失敗しました:", error);
+      alert("店舗情報の保存に失敗しました。コンソールを確認してください。");
+    }
+  };
   const times = [
     "10:00",
     "10:30",
@@ -482,9 +510,9 @@ const [customerKeyword, setCustomerKeyword] =
               className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
             />
           </div>
-
           <button
             type="button"
+            onClick={handleSaveProfile}
             className="rounded-lg bg-slate-800 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
           >
             保存
