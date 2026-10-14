@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Reservation } from "@/types/Reservation";
+import { normalizeCustomerName } from "@/utils/customerFormat";
 
   type HomeDashboardProps = {
     todayReservationCount: number;
@@ -121,7 +122,7 @@ export default function HomeDashboard({
                         }`}
                       />
                       <span className="flex-1 text-sm font-medium text-slate-800">
-                        {reservation.customer}
+                        {normalizeCustomerName(reservation.customer)}
                       </span>
                       <span className="text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-blue-500">
                         ›
@@ -137,7 +138,7 @@ export default function HomeDashboard({
                         <p>
                           <span className="mr-4 text-slate-500">お客様</span>
                           <span className="font-medium text-slate-900">
-                            {reservation.customer}
+                            {normalizeCustomerName(reservation.customer)}
                           </span>
                         </p>
 

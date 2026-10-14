@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import type { Reservation } from "@/types/Reservation";
 import type { Product } from "@/types/Product";
 import {completeReservation,updateReservation,} from "@/utils/reservationApi";
-
+import { normalizeCustomerName } from "@/utils/customerFormat";
 type CheckoutProps = {
   reservations: Reservation[];
   setReservations: React.Dispatch<
@@ -159,7 +159,7 @@ export default function Checkout({
                   key={reservation.id}
                   value={reservation.id}
                 >
-                  {reservation.startTime}　{reservation.customer}　（{reservation.lane}レーン）
+                  {reservation.startTime}　{normalizeCustomerName(reservation.customer)}　（{reservation.lane}レーン）
                 </option>
               ))}
             </select>

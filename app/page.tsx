@@ -22,6 +22,7 @@ import {updateReservation as updateReservationToSupabase,} from "@/utils/reserva
 import { isReservationOverlap } from "@/utils/reservationValidation";
 import { formatLocalDate } from "@/utils/date";
 import { getCurrentShop, getCurrentShopId } from "@/utils/shop";
+import {normalizeCustomerName,normalizePhoneNumber,} from "@/utils/customerFormat";
 export default function Home() {
   useEffect(() => {
   const checkUser = async () => {
