@@ -57,17 +57,6 @@ export default function ReservationPage({
 
   return (
     <>
-      {/* 予約管理ヘッダー */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-          予約管理
-        </h2>
-
-        <p className="mt-1 text-sm text-slate-500">
-          予約状況を確認・管理できます
-        </p>
-      </div>
-
       {/* 操作エリア */}
       <div className="mb-5">
         {/* 日付操作 */}
