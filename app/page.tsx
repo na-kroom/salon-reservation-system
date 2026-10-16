@@ -8,6 +8,7 @@ import type { Reservation } from "@/types/Reservation";
 import CustomerModal from "@/components/CustomerModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
+import type { Customer } from "@/types/Customer";
 import { useCustomers } from "@/hooks/useCustomers";
 import CustomerManagement from "@/components/CustomerManagement";
 import { useProducts } from "@/hooks/useProducts";
@@ -288,7 +289,13 @@ const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
   useState("");
 
-
+const handleReserveWithCustomer = (selectedCustomer: Customer) => {
+  setCustomer(selectedCustomer.name);
+  setCustomerId(selectedCustomer.id);
+  setDate(new Date());
+  setStartTime("10:00");
+  setIsModalOpen(true);
+};
 
 
   return (
@@ -396,7 +403,8 @@ const [customerKeyword, setCustomerKeyword] =
           customers={customers}
           reservations={reservations}
           setCustomers={setCustomers}
-        />
+          onReserve={handleReserveWithCustomer}
+        /> 
       )}
       {currentPage === "product" && (
         <>

@@ -56,12 +56,14 @@ type CustomerManagementProps = {
   customers: Customer[];
   reservations: Reservation[];
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
+  onReserve: (customer: Customer) => void;
 };
 
 export default function CustomerManagement({
   customers,
   reservations,
   setCustomers,
+  onReserve,
 }: CustomerManagementProps) {
   const customerFormRef = useRef<HTMLDivElement>(null);
   const [customerName, setCustomerName] = useState("");
@@ -71,6 +73,7 @@ export default function CustomerManagement({
   const [customerSearch, setCustomerSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"list" | "register">("list");
   const [selectedKanaGroup, setSelectedKanaGroup] = useState("すべて");
+  const [showCustomerList, setShowCustomerList] = useState(false);
   const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null);
 
   const resetForm = () => {
@@ -313,11 +316,32 @@ export default function CustomerManagement({
           />
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {["すべて", ...Object.keys(kanaGroups), "他"].map((group) => (
+            <button
+              type="button"
+              onClick={() => {
+                if (showCustomerList) {
+                  setShowCustomerList(false);
+                } else {
+                  setSelectedKanaGroup("すべて");
+                  setShowCustomerList(true);
+                }
+              }}
+              className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                showCustomerList
+                  ? "border-slate-800 bg-slate-800 text-white"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              {showCustomerList ? "一覧を閉じる" : "一覧"}
+            </button>
+            {[...Object.keys(kanaGroups), "他"].map((group) => (
               <button
                 key={group}
                 type="button"
-                onClick={() => setSelectedKanaGroup(group)}
+                onClick={() => {
+                  setSelectedKanaGroup(group);
+                  setShowCustomerList(true);
+                }}
                 className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
                   selectedKanaGroup === group
                     ? "border-slate-800 bg-slate-800 text-white"
@@ -329,7 +353,7 @@ export default function CustomerManagement({
             ))}
           </div>
 
-          <div className="mt-6 space-y-3">
+          {showCustomerList && <div className="mt-6 space-y-3">
             {filteredCustomers.map((customer) => (
               <div
                 key={customer.id}
@@ -358,6 +382,13 @@ export default function CustomerManagement({
                   <div className="flex shrink-0 gap-2">
                     <button
                       type="button"
+                      onClick={() => onReserve(customer)}
+                      className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                    >
+                      この顧客で予約
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => startEditingCustomer(customer)}
                       className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                     >
@@ -380,6 +411,7 @@ export default function CustomerManagement({
               </p>
             )}
           </div>
+          }
         </div>
       )}
     </div>
