@@ -288,7 +288,6 @@ const {
 const [customerId, setCustomerId] = useState<number | null>(null);
 const [customerKeyword, setCustomerKeyword] =
   useState("");
-
 const handleReserveWithCustomer = (selectedCustomer: Customer) => {
   setCustomer(selectedCustomer.name);
   setCustomerId(selectedCustomer.id);
@@ -296,7 +295,6 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
   setStartTime("10:00");
   setIsModalOpen(true);
 };
-
 
   return (
 
@@ -558,7 +556,8 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
   setSelectedProductId={setSelectedProductId}
   product={product}
   setProduct={setProduct}
-
+  date={date}
+  setDate={setDate}
   customers={customers}
   onClose={() => setIsModalOpen(false)}
 />

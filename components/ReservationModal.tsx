@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { Product } from "@/types/Product";
 import type { Customer } from "@/types/Customer";
 type Props = {
   isOpen: boolean;
   customer: string;
   customerId: number | null;
-
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
   setCustomerId: React.Dispatch<
     React.SetStateAction<number | null>
   >;
@@ -91,15 +92,22 @@ export default function ReservationModal({
   setCustomerId,
   duration,
   setDuration,
+  date,
+  setDate,
   onClose
 }: Props) {
-  const [customerKeyword, setCustomerKeyword] =
-  useState("");
-  console.log("予約登録 顧客一覧:", customers);
+const [customerKeyword, setCustomerKeyword] = useState(customer);
 const [showCustomerSuggestions, setShowCustomerSuggestions] =
   useState(false);
-  const [quantity, setQuantity] = useState(1);
-  if (!isOpen) return null;
+const [quantity, setQuantity] = useState(1);
+
+useEffect(() => {
+  if (isOpen) {
+    setCustomerKeyword(customer);
+  }
+}, [customer, isOpen]);
+
+if (!isOpen) return null;
 
   return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
@@ -116,6 +124,21 @@ const [showCustomerSuggestions, setShowCustomerSuggestions] =
           <h2 className="text-xl font-bold mb-4">
             予約登録
           </h2>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            予約日
+          </label>
+
+          <input
+            type="date"
+            value={`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`}
+            onChange={(e) => {
+              if (!e.target.value) return;
+
+              const [year, month, day] = e.target.value.split("-").map(Number);
+              setDate(new Date(year, month - 1, day));
+            }}
+            className="mb-4 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800"
+          />
           <label className="mb-1 block text-sm font-medium text-slate-700">
             顧客
           </label>
