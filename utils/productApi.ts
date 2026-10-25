@@ -1,7 +1,8 @@
 import { supabase } from "./supabase";
 import { getCurrentShopId } from "./shop";
+import type { Product, ProductCategory } from "@/types/Product";
 
-export async function fetchProducts() {
+export async function fetchProducts(): Promise<Product[]> {
   const shopId = await getCurrentShopId();
 
   const { data, error } = await supabase
@@ -14,16 +15,21 @@ export async function fetchProducts() {
     throw error;
   }
 
-  return data;
+  return (data ?? []).map((product) => ({
+    ...product,
+    category: product.category ?? "その他",
+  })) as Product[];
 }
 
 export async function createProduct({
   name,
   price,
+  category,
 }: {
   name: string;
   price: number;
-}) {
+  category: ProductCategory;
+}): Promise<Product> {
   const shopId = await getCurrentShopId();
 
   const { data, error } = await supabase
@@ -32,6 +38,7 @@ export async function createProduct({
       shop_id: shopId,
       name,
       price,
+      category,
     })
     .select()
     .single();
@@ -40,7 +47,7 @@ export async function createProduct({
     throw error;
   }
 
-  return data;
+  return data as Product;
 }
 
 export async function updateProduct(
@@ -48,11 +55,13 @@ export async function updateProduct(
   {
     name,
     price,
+    category,
   }: {
     name: string;
     price: number;
+    category: ProductCategory;
   }
-) {
+): Promise<Product> {
   const shopId = await getCurrentShopId();
 
   const { data, error } = await supabase
@@ -60,6 +69,7 @@ export async function updateProduct(
     .update({
       name,
       price,
+      category,
     })
     .eq("id", id)
     .eq("shop_id", shopId)
@@ -70,7 +80,7 @@ export async function updateProduct(
     throw error;
   }
 
-  return data;
+  return data as Product;
 }
 
 export async function deleteProduct(id: number) {
