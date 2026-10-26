@@ -229,7 +229,7 @@ export default function CustomerManagement({
         <button
           type="button"
           onClick={() => setActiveTab("list")}
-          className={`rounded-t-xl border px-6 py-3 text-sm font-semibold transition ${
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
             activeTab === "list"
               ? "border-slate-300 border-b-white bg-white text-slate-900"
               : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -246,7 +246,7 @@ export default function CustomerManagement({
             }
             setActiveTab("register");
           }}
-          className={`rounded-t-xl border px-6 py-3 text-sm font-semibold transition ${
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
             activeTab === "register"
               ? "border-slate-300 border-b-white bg-white text-slate-900"
               : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -257,7 +257,7 @@ export default function CustomerManagement({
       </div>
 
       {/* タブの下側だけを白いカードで囲む */}
-      <div className="rounded-b-2xl border border-t-0 border-slate-200 bg-white p-6 shadow-sm">
+      <div className="min-h-[300px] rounded-b-2xl rounded-tr-2xl border border-slate-200 border-t-0 bg-white p-6 shadow-sm">
         {activeTab === "register" && (
           <div ref={customerFormRef} className="space-y-3">
             {editingCustomerId !== null && (
@@ -307,7 +307,7 @@ export default function CustomerManagement({
               <button
                 type="button"
                 onClick={handleAddCustomer}
-                className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
+                className="rounded-xl bg-slate-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
               >
                 {editingCustomerId === null ? "顧客登録" : "変更を保存"}
               </button>
@@ -330,11 +330,7 @@ export default function CustomerManagement({
 
         {activeTab === "list" && (
           <div>
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <p className="text-sm text-slate-500">
-                顧客名・フリガナ・電話番号から検索できます
-              </p>
-
+            <div className="mb-3 flex justify-end">
               <span className="shrink-0 text-sm text-slate-500">
                 全 {filteredCustomers.length} 件
               </span>
@@ -392,7 +388,7 @@ export default function CustomerManagement({
                 {filteredCustomers.map((customer) => (
                   <div
                     key={customer.id}
-                    className="rounded-xl border border-slate-200 bg-white p-4"
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                   >
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                       <div className="min-w-0">

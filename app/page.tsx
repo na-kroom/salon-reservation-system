@@ -422,23 +422,24 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
       {currentPage === "home" && (
         <HomeDashboard
           todayReservationCount={
-            reservations.filter(
-              (r) => r.date === formatLocalDate(date)
-            ).length
+            reservations.filter((r) => r.date === formatLocalDate(new Date())).length
           }
           completedCount={
             reservations.filter(
-              (r) =>
-                r.date === formatLocalDate(date) &&
-                r.status === "completed"
+              (r) => r.date === formatLocalDate(new Date()) && r.status === "completed"
             ).length
           }
-          todaySales={todaySales}
-          monthlySales={monthlySales}
+          todaySales={calculateTodaySales(reservations, new Date())}
+          monthlySales={calculateMonthlySales(reservations, new Date())}
           customerCount={customers.length}
           todayReservations={reservations.filter(
-            (r) => r.date === formatLocalDate(date)
+            (r) => r.date === formatLocalDate(new Date())
           )}
+          reservations={reservations}
+          onOpenReservations={(selectedDate) => {
+            setDate(selectedDate);
+            setCurrentPage("reservation");
+          }}
         />
       )}
 

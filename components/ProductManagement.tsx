@@ -187,11 +187,11 @@ export default function ProductManagement({
   return (
     <div>
       {/* タブ */}
-      <div className="flex gap-2 border-b border-slate-200">
+      <div className="flex items-end gap-2 border-b border-slate-200">
         <button
           type="button"
           onClick={() => setActiveTab("list")}
-          className={`rounded-t-2xl border px-7 py-4 text-sm font-semibold transition ${
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
             activeTab === "list"
               ? "border-slate-200 border-b-white bg-white text-slate-900"
               : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -203,7 +203,7 @@ export default function ProductManagement({
         <button
           type="button"
           onClick={handleOpenRegister}
-          className={`rounded-t-2xl border px-7 py-4 text-sm font-semibold transition ${
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
             activeTab === "register"
               ? "border-slate-200 border-b-white bg-white text-slate-900"
               : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -213,19 +213,12 @@ export default function ProductManagement({
         </button>
       </div>
 
-      <div className="min-h-[300px] rounded-b-2xl rounded-tr-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="min-h-[300px] rounded-b-2xl rounded-tr-2xl border border-slate-200 border-t-0 bg-white p-6 shadow-sm">
         {/* 商品一覧タブ */}
         {activeTab === "list" && (
           <div>
             {/* 商品検索 */}
-            <div className="mt-6">
-              <label
-                htmlFor="product-search"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
-                商品検索
-              </label>
-
+            <div className="mt-0">
               <input
                 id="product-search"
                 type="text"
@@ -246,7 +239,7 @@ export default function ProductManagement({
                   onClick={() =>
                     handleSelectCategory("すべて")
                   }
-                  className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium ${
                     showProductList &&
                     selectedCategory === "すべて"
                       ? "border-slate-800 bg-slate-800 text-white"
@@ -263,7 +256,7 @@ export default function ProductManagement({
                     onClick={() =>
                       handleSelectCategory(category)
                     }
-                    className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium ${
                       showProductList &&
                       selectedCategory === category
                         ? "border-slate-800 bg-slate-800 text-white"
@@ -281,7 +274,7 @@ export default function ProductManagement({
                   {filteredProducts.map((product) => (
                     <div
                       key={product.id}
-                      className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="min-w-0">
@@ -304,7 +297,7 @@ export default function ProductManagement({
                             onClick={() =>
                               handleEditProduct(product)
                             }
-                            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                           >
                             編集
                           </button>
@@ -343,7 +336,7 @@ export default function ProductManagement({
         {/* 商品登録・編集タブ */}
         {activeTab === "register" && (
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-slate-900">
               {editingProductId === null
                 ? "商品登録"
                 : "商品編集"}
