@@ -217,14 +217,6 @@ export default function ProductManagement({
         {/* 商品一覧タブ */}
         {activeTab === "list" && (
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              商品一覧
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              商品を分類別に確認・管理できます
-            </p>
-
             {/* 商品検索 */}
             <div className="mt-6">
               <label
@@ -356,10 +348,6 @@ export default function ProductManagement({
                 ? "商品登録"
                 : "商品編集"}
             </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              商品名・価格・分類を設定できます
-            </p>
 
             <div className="mt-6 space-y-4">
               {/* 商品名 */}

@@ -115,7 +115,7 @@ export default function HomeDashboard({
                       <span
                         className={`h-2.5 w-2.5 shrink-0 rounded-full ${
                           reservation.status === "completed"
-                            ? "bg-green-500"
+                            ? "bg-gray-400"
                             : reservation.status === "cancelled"
                             ? "bg-red-500"
                             : "bg-blue-500"

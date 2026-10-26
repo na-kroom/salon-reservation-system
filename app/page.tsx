@@ -384,7 +384,13 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
               </button>
 
               <button
-                onClick={handleLogout}
+               onClick={() => {
+                  const confirmed = window.confirm("ログアウトしてもよろしいですか？");
+
+                  if (confirmed) {
+                    handleLogout();
+                  }
+                }}
                 className="w-full rounded-lg px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50"
               >
                 ログアウト
@@ -462,14 +468,6 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
   )}
   {currentPage === "profile" && (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">
-          プロフィール
-        </h2>
-        <p className="mt-1 text-sm text-slate-500">
-          店舗情報を確認・編集できます。
-        </p>
-      </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-900">

@@ -111,10 +111,7 @@ export default function Checkout({
 
 
   return (
-  <div className="rounded-2xl border border-slate-200 bg-white p-6">
-    <h2 className="mb-6 text-2xl font-semibold tracking-tight text-slate-900">
-      会計
-    </h2>
+    <div className="mx-auto max-w-3xl">
     {checkoutCompleted && (
       <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
         <p className="text-sm font-semibold text-green-700">
