@@ -66,8 +66,8 @@ export default function CustomerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-[650px] max-h-[85vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="flex max-h-[85vh] w-[650px] flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-4">
         <h2 className="text-xl font-bold">
           顧客カルテ
         </h2>
@@ -79,13 +79,14 @@ export default function CustomerModal({
             ×
           </button>
         </div>
-      <div className="space-y-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <div className="space-y-6">
 
         {/* 今回の予約 */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <h3 className="text-base font-semibold text-slate-900">
-              予約詳細
+            予約詳細
             </h3>
 
             <span
@@ -341,16 +342,25 @@ export default function CustomerModal({
         {reservations
           .filter(
             (r) =>
-              r.customer ===
-                selectedReservation.customer &&
-              r.product
+              r.customer === selectedReservation.customer &&
+              Boolean(r.product)
           )
           .map((r) => (
             <div
               key={r.id}
-              className="border-b py-2"
+              className="flex items-center justify-between border-b border-slate-200 py-3"
             >
-              {r.product}
+              <div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {r.product}
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
+                  {r.date}
+                </div>
+              </div>
+              <div className="text-sm font-medium text-slate-700">
+                ¥{r.price.toLocaleString()}
+              </div>
             </div>
           ))}
       </div>
@@ -395,6 +405,7 @@ export default function CustomerModal({
       </div>
         
       </div>
+    </div>
     </div>
   );
 }
