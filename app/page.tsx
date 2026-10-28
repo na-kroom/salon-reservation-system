@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
@@ -24,6 +24,18 @@ import { isReservationOverlap } from "@/utils/reservationValidation";
 import { formatLocalDate } from "@/utils/date";
 import { getCurrentShop, getCurrentShopId } from "@/utils/shop";
 import {normalizeCustomerName,normalizePhoneNumber,} from "@/utils/customerFormat";
+import {
+  LayoutDashboard,
+  CalendarDays,
+  UsersRound,
+  UserRound,
+  Package,
+  ChartNoAxesColumnIncreasing,
+  Settings,
+  Scissors,
+  ChevronDown,
+} from "lucide-react";
+
 export default function Home() {
   useEffect(() => {
   const checkUser = async () => {
@@ -43,6 +55,47 @@ export default function Home() {
   } = useReservations();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen && !isSettingsOpen) return;
+
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(target)
+      ) {
+        setIsMenuOpen(false);
+      }
+
+      if (
+        settingsMenuRef.current &&
+        !settingsMenuRef.current.contains(target)
+      ) {
+        setIsSettingsOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        setIsSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMenuOpen, isSettingsOpen]);
   const [shopName, setShopName] = useState("");
   const [shopPhone, setShopPhone] = useState("");
   const [shopAddress, setShopAddress] = useState("");
@@ -299,108 +352,223 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
   return (
 
 
-    
-<main className="min-h-screen bg-gray-50">
-  <div className="sticky top-0 z-50 bg-gray-50 border-b border-gray-200">
-    <div className="max-w-7xl mx-auto flex items-center justify-between py-5 px-8">
-      <h1 className="mb-8 text-4xl font-bold text-gray-800">
-        Salon Manager
-      </h1>
+  <main className="min-h-screen bg-gray-50">
+  {/* ヘッダー */}
+  <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
+    <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between gap-6 px-6">
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => setCurrentPage("home")}
-          className={`rounded-lg px-5 py-2 transition ${
-            currentPage === "home"
-              ? "bg-slate-800 text-white border border-slate-800"
-              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
-          }`}
-        >
-          ホーム
-        </button>
+      {/* ロゴ */}
+      <button
+        type="button"
+        onClick={() => setCurrentPage("home")}
+        className="flex shrink-0 items-center gap-3 text-left"
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+          <Scissors size={24} strokeWidth={1.7} />
+        </div>
 
-        <button
-          onClick={() => setCurrentPage("reservation")}
-          className={`rounded-lg px-5 py-2 transition ${
-            currentPage === "reservation"
-              ? "bg-slate-800 text-white border border-slate-800"
-              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
-          }`}
-        >
-          予約
-        </button>
+        <div>
+          <div className="text-lg font-bold tracking-tight text-slate-800">
+            {shopName || "店舗名"}
+          </div>
+          <div className="mt-0.5 text-[10px] tracking-wide text-slate-500">
+            美容室管理システム
+          </div>
+        </div>
+      </button>
 
-        <button
-          onClick={() => setCurrentPage("customer")}
-          className={`rounded-lg px-5 py-2 transition ${
-            currentPage === "customer"
-              ? "bg-slate-800 text-white border border-slate-800"
-              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
-          }`}
-        >
-          顧客管理
-        </button>
-
-        <button
-          onClick={() => setCurrentPage("product")}
-          className={`rounded-lg px-5 py-2 transition ${
-            currentPage === "product"
-              ? "bg-slate-800 text-white border border-slate-800"
-              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
-          }`}
-        >
-          商品管理
-        </button>
-
-        <button
-          onClick={() => setCurrentPage("checkout")}
-          className={`rounded-lg px-5 py-2 transition ${
-            currentPage === "checkout"
-              ? "bg-slate-800 text-white border border-slate-800"
-              : "border border-gray-300 bg-white hover:bg-slate-100 hover:border-slate-300"
-          }`}
-        >
-          会計
-        </button>
-        <div className="relative">
+      {/* ナビゲーション */}
+      <nav className="flex items-center gap-1">
+        {[
+          {
+            id: "home",
+            label: "ダッシュボード",
+            Icon: LayoutDashboard,
+          },
+          {
+            id: "reservation",
+            label: "予約管理",
+            Icon: CalendarDays,
+          },
+          {
+            id: "customer",
+            label: "顧客管理",
+            Icon: UsersRound,
+          },
+          {
+            id: "product",
+            label: "商品管理",
+            Icon: Package,
+          },
+          {
+            id: "checkout",
+            label: "会計",
+            Icon: ChartNoAxesColumnIncreasing,
+          },
+        ].map(({ id, label, Icon }) => (
           <button
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white text-xl text-slate-700 transition hover:bg-slate-100"
-            aria-label="メニュー"
+            key={id}
+            type="button"
+            onClick={() =>
+              setCurrentPage(
+                id as
+                  | "home"
+                  | "reservation"
+                  | "customer"
+                  | "product"
+                  | "checkout"
+              )
+            }
+            className={`relative flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
+              currentPage === id
+                ? "bg-slate-100/80 text-slate-900 after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:rounded-full after:bg-slate-700"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+            }`}
           >
-            ☰
+            <Icon size={18} strokeWidth={1.8} />
+            {label}
           </button>
+        ))}
+      </nav>
+      <div className="flex shrink-0 items-center gap-1">
+      {/* ユーザーアイコンとメニュー */}
+      <div ref={userMenuRef} className="relative shrink-0">
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          className="flex items-center gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50"
+          aria-label="ユーザーメニュー"
+          aria-expanded={isMenuOpen}
+        >
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+          <UserRound size={20} strokeWidth={1.7} />
+        </span>
 
-          {isMenuOpen && (
-            <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
-              <button
+          <span className="whitespace-nowrap text-sm font-medium text-slate-700">
+            {shopName || "店舗名"}
+          </span>
+
+          <ChevronDown
+            size={15}
+            className="text-slate-400"
+            strokeWidth={1.8}
+          />
+        </button>
+
+        {isMenuOpen && (
+          <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+            <button
+              type="button"
               onClick={() => {
                 setCurrentPage("profile");
                 setIsMenuOpen(false);
               }}
-                className="w-full rounded-lg px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-100"
-              >
-                プロフィール
-              </button>
+              className="w-full rounded-lg px-4 py-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              店舗情報
+            </button>
 
-              <button
-               onClick={() => {
-                  const confirmed = window.confirm("ログアウトしてもよろしいですか？");
+            <button
+              type="button"
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "ログアウトしてもよろしいですか？"
+                );
 
-                  if (confirmed) {
-                    handleLogout();
-                  }
-                }}
-                className="w-full rounded-lg px-4 py-3 text-left text-sm text-red-600 transition hover:bg-red-50"
-              >
-                ログアウト
-              </button>
+                if (confirmed) {
+                  handleLogout();
+                }
+              }}
+              className="w-full rounded-lg px-4 py-3 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50"
+            >
+              ログアウト
+            </button>
+          </div>
+        )}
+      </div>
+      {/* 設定メニュー */}
+      <div ref={settingsMenuRef} className="relative">
+        <button
+          type="button"
+          onClick={() => {
+            setIsSettingsOpen((prev) => !prev);
+            setIsMenuOpen(false);
+          }}
+          className={`ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all duration-200 active:scale-[0.98] ${
+            isSettingsOpen
+              ? "bg-slate-100 text-slate-900 ring-1 ring-slate-200"
+              : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+          }`}
+          aria-label="設定"
+          aria-expanded={isSettingsOpen}
+          title="設定"
+        >
+          <Settings size={19} strokeWidth={1.8} />
+        </button>
+
+        {isSettingsOpen && (
+          <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+            <div className="px-3 py-2 text-xs font-semibold tracking-wide text-slate-400">
+              店舗・アプリ設定
             </div>
-          )}
-        </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentPage("profile");
+                setIsSettingsOpen(false);
+                setIsMenuOpen(false);
+              }}
+              className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              店舗情報
+            </button>
+
+            {[
+              "営業時間",
+              "定休日",
+              "ダークモード",
+              "予約設定",
+              "表示設定",
+            ].map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => {
+                  setIsSettingsOpen(false);
+                }}
+                className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                {label}
+              </button>
+            ))}
+
+            <div className="my-2 border-t border-slate-100" />
+
+            <button
+              type="button"
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "ログアウトしてもよろしいですか？"
+                );
+
+                if (confirmed) {
+                  handleLogout();
+                }
+
+                setIsSettingsOpen(false);
+              }}
+              className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50"
+            >
+              ログアウト
+            </button>
+          </div>
+        )}
+      </div>
       </div>
     </div>
-  </div>
+  </header>
+
   <div className="max-w-7xl mx-auto px-8 py-8">
       {currentPage === "customer" && (
         <CustomerManagement
