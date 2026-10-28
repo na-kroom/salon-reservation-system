@@ -34,6 +34,8 @@ import {
   Settings,
   Scissors,
   ChevronDown,
+  Store,
+  Save,
 } from "lucide-react";
 
 export default function Home() {
@@ -635,66 +637,102 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
       products={products}
     />
   )}
+
   {currentPage === "profile" && (
     <div className="mx-auto max-w-3xl">
+      {/* ページ見出し */}
+      <div className="mb-6 flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+          <Store size={23} strokeWidth={1.7} />
+        </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900">
-          店舗情報
-        </h3>
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            店舗情報
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            店舗の基本情報を管理できます。
+          </p>
+        </div>
+      </div>
 
-        <div className="mt-6 space-y-5">
+      {/* 入力フォーム */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-6 space-y-6">
+          {/* 店舗名 */}
           <div>
-            <label className="text-sm font-medium text-slate-700">
+            <label
+              htmlFor="shop-name"
+              className="block text-sm font-medium text-slate-700"
+            >
               店舗名
             </label>
 
-          <input
-            type="text"
-            value={shopName}
-            onChange={(e) => setShopName(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-          />
+            <input
+              id="shop-name"
+              type="text"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              placeholder="店舗名を入力"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-slate-500 focus:bg-white focus:ring-4 focus:ring-slate-100"
+            />
           </div>
 
+          {/* 電話番号 */}
           <div>
-            <label className="text-sm font-medium text-slate-700">
+            <label
+              htmlFor="shop-phone"
+              className="block text-sm font-medium text-slate-700"
+            >
               電話番号
             </label>
-          <input
-            type="text"
-            value={shopPhone}
-            onChange={(e) => setShopPhone(e.target.value)}
-            placeholder="電話番号を入力"
-            className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
-          />
+
+            <input
+              id="shop-phone"
+              type="tel"
+              value={shopPhone}
+              onChange={(e) => setShopPhone(e.target.value)}
+              placeholder="電話番号を入力"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-slate-500 focus:bg-white focus:ring-4 focus:ring-slate-100"
+            />
           </div>
 
+          {/* 住所 */}
           <div>
-            <label className="text-sm font-medium text-slate-700">
+            <label
+              htmlFor="shop-address"
+              className="block text-sm font-medium text-slate-700"
+            >
               住所
             </label>
 
-          
             <input
+              id="shop-address"
               type="text"
               value={shopAddress}
               onChange={(e) => setShopAddress(e.target.value)}
               placeholder="住所を入力"
-              className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-100"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-slate-500 focus:bg-white focus:ring-4 focus:ring-slate-100"
             />
           </div>
+        </div>
+
+        {/* 保存ボタン */}
+        <div className="mt-8 flex justify-end border-t border-slate-100 pt-6">
           <button
             type="button"
             onClick={handleSaveProfile}
-            className="rounded-lg bg-slate-800 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-slate-200"
           >
-            保存
+            <Save size={17} strokeWidth={1.8} />
+            保存する
           </button>
         </div>
       </div>
     </div>
   )}
+
+
 <ReservationModal
   isOpen={isModalOpen}
 
