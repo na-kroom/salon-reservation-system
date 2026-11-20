@@ -5,4 +5,5 @@ export type Customer = {
   phone: string;
   visitCount: number;
   memo: string;
+  isProvisional?: boolean;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Customer } from "@/types/Customer";
 import type { Reservation } from "@/types/Reservation";
 import {
@@ -12,6 +12,16 @@ import {
   normalizeCustomerName,
   normalizePhoneNumber,
 } from "@/utils/customerFormat";
+
+const normalizeSearchText = (value: string) =>
+  value
+    .normalize("NFKC")
+    .trim()
+    .toLocaleLowerCase("ja")
+    .replace(/[\u30A1-\u30F6]/g, (char) =>
+      String.fromCharCode(char.charCodeAt(0) - 0x60)
+    )
+    .replace(/[\s　]/g, "");
 
 const kanaGroups: Record<string, string[]> = {
   あ: ["ア", "イ", "ウ", "エ", "オ"],
@@ -75,7 +85,9 @@ export default function CustomerManagement({
   const [customerMemo, setCustomerMemo] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
 
-  const [activeTab, setActiveTab] = useState<"list" | "register">("list");
+  const [activeTab, setActiveTab] = useState<"formal" | "provisional" | "register">("formal");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
   const [selectedKanaGroup, setSelectedKanaGroup] = useState("すべて");
   const [showCustomerList, setShowCustomerList] = useState(false);
   const [editingCustomerId, setEditingCustomerId] = useState<number | null>(
@@ -97,11 +109,17 @@ export default function CustomerManagement({
         reservation.status === "completed"
     ).length;
 
+  // 仮登録顧客の件数はタブの通知バッジに表示する。
+  const provisionalCount = customers.filter(
+    (customer) => customer.isProvisional
+  ).length;
+
   const filteredCustomers = customers
+    .filter((customer) => activeTab === "provisional" ? customer.isProvisional : activeTab === "formal" ? !customer.isProvisional : true)
     .filter((customer) => {
-      const keyword = normalizeCustomerName(customerSearch).toLowerCase();
-      const name = normalizeCustomerName(customer.name).toLowerCase();
-      const kana = normalizeCustomerName(customer.kana).toLowerCase();
+      const keyword = normalizeSearchText(customerSearch);
+      const name = normalizeSearchText(customer.name);
+      const kana = normalizeSearchText(customer.kana);
       const phone = normalizePhoneNumber(customer.phone);
       const phoneKeyword = normalizePhoneNumber(customerSearch).trim();
 
@@ -109,7 +127,7 @@ export default function CustomerManagement({
         keyword === "" ||
         name.includes(keyword) ||
         kana.includes(keyword) ||
-        phone.includes(phoneKeyword);
+        (phoneKeyword !== "" && phone.includes(phoneKeyword));
 
       const matchesKanaGroup =
         selectedKanaGroup === "すべて" ||
@@ -118,6 +136,13 @@ export default function CustomerManagement({
       return matchesSearch && matchesKanaGroup;
     })
     .sort((a, b) => a.kana.localeCompare(b.kana, "ja"));
+
+  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / PAGE_SIZE));
+  const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   const handleAddCustomer = async () => {
     const normalizedName = normalizeCustomerName(customerName);
@@ -131,11 +156,13 @@ export default function CustomerManagement({
 
     if (editingCustomerId !== null) {
       try {
+        const existing = customers.find((item) => item.id === editingCustomerId);
         const updatedCustomer = await updateCustomer(editingCustomerId, {
           name: normalizedName,
           kana: normalizedKana,
           phone: normalizedPhone,
           memo: customerMemo.trim(),
+          isProvisional: existing?.isProvisional ?? false,
         });
 
         setCustomers((prev) =>
@@ -145,7 +172,7 @@ export default function CustomerManagement({
         );
 
         resetForm();
-        setActiveTab("list");
+        setActiveTab(existing?.isProvisional ? "provisional" : "formal");
       } catch (error) {
         console.error("顧客編集に失敗しました", error);
         alert("顧客編集に失敗しました。");
@@ -160,6 +187,7 @@ export default function CustomerManagement({
         kana: normalizedKana,
         phone: normalizedPhone,
         memo: customerMemo.trim(),
+        isProvisional: false,
       });
 
       setCustomers((prev) => [...prev, newCustomer]);
@@ -167,7 +195,7 @@ export default function CustomerManagement({
       resetForm();
       setCustomerSearch("");
       setSelectedKanaGroup("すべて");
-      setActiveTab("list");
+      setActiveTab("formal");
     } catch (error) {
       console.error("顧客登録に失敗しました", error);
       alert("顧客登録に失敗しました。");
@@ -228,14 +256,34 @@ export default function CustomerManagement({
       <div className="flex items-end gap-2 border-b border-slate-200">
         <button
           type="button"
-          onClick={() => setActiveTab("list")}
+          onClick={() => { setActiveTab("formal"); setCurrentPage(1); }}
           className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
-            activeTab === "list"
+            activeTab === "formal"
               ? "border-slate-300 border-b-white bg-white text-slate-900"
               : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
           }`}
         >
-          顧客一覧
+          正式顧客
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("provisional");
+            setCurrentPage(1);
+            setSelectedKanaGroup("すべて");
+            setShowCustomerList(true);
+          }}
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${activeTab === "provisional" ? "border-slate-300 border-b-white bg-white text-slate-900" : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+        >
+          <span className="inline-flex items-center gap-2">
+            仮登録顧客
+            {provisionalCount > 0 && (
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">
+                {provisionalCount}
+              </span>
+            )}
+          </span>
         </button>
 
         <button
@@ -317,7 +365,7 @@ export default function CustomerManagement({
                   type="button"
                   onClick={() => {
                     resetForm();
-                    setActiveTab("list");
+                    setActiveTab("formal");
                   }}
                   className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                 >
@@ -328,7 +376,7 @@ export default function CustomerManagement({
           </div>
         )}
 
-        {activeTab === "list" && (
+        {(activeTab === "formal" || activeTab === "provisional") && (
           <div>
             <div className="mb-3 flex justify-end">
               <span className="shrink-0 text-sm text-slate-500">
@@ -340,52 +388,56 @@ export default function CustomerManagement({
               type="text"
               placeholder="顧客名・フリガナ・電話番号で検索"
               value={customerSearch}
-              onChange={(event) => setCustomerSearch(event.target.value)}
+              onChange={(event) => { setCustomerSearch(event.target.value); setCurrentPage(1); }}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
             />
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (showCustomerList) {
-                    setShowCustomerList(false);
-                  } else {
-                    setSelectedKanaGroup("すべて");
-                    setShowCustomerList(true);
-                  }
-                }}
-                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                  showCustomerList
-                    ? "border-slate-800 bg-slate-800 text-white"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {showCustomerList ? "一覧を閉じる" : "一覧"}
-              </button>
-
-              {[...Object.keys(kanaGroups), "他"].map((group) => (
+            {activeTab === "formal" && (
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
-                  key={group}
                   type="button"
                   onClick={() => {
-                    setSelectedKanaGroup(group);
-                    setShowCustomerList(true);
+                    if (showCustomerList) {
+                      setShowCustomerList(false);
+                    } else {
+                      setSelectedKanaGroup("すべて");
+                      setCurrentPage(1);
+                      setShowCustomerList(true);
+                    }
                   }}
                   className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                    selectedKanaGroup === group
+                    showCustomerList
                       ? "border-slate-800 bg-slate-800 text-white"
                       : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  {group}
+                  {showCustomerList ? "一覧を閉じる" : "一覧"}
                 </button>
-              ))}
-            </div>
 
-            {showCustomerList && (
+                {[...Object.keys(kanaGroups), "他"].map((group) => (
+                  <button
+                    key={group}
+                    type="button"
+                    onClick={() => {
+                      setSelectedKanaGroup(group);
+                      setCurrentPage(1);
+                      setShowCustomerList(true);
+                    }}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                      selectedKanaGroup === group
+                        ? "border-slate-800 bg-slate-800 text-white"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    {group}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {(showCustomerList || activeTab === "provisional") && (
               <div className="mt-6 space-y-3">
-                {filteredCustomers.map((customer) => (
+                {paginatedCustomers.map((customer) => (
                   <div
                     key={customer.id}
                     className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
@@ -394,6 +446,7 @@ export default function CustomerManagement({
                       <div className="min-w-0">
                         <div className="text-base font-semibold text-slate-900">
                           {normalizeCustomerName(customer.name)}
+                          {customer.isProvisional && <span className="ml-2 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">仮登録</span>}
                         </div>
 
                         <div className="mt-1 text-sm text-slate-500">
@@ -424,6 +477,15 @@ export default function CustomerManagement({
                           この顧客で予約
                         </button>
 
+                        {customer.isProvisional && (
+                          <button type="button" onClick={async () => {
+                            if (!confirm(`${customer.name}さんを正式顧客に変更しますか？`)) return;
+                            try {
+                              const updated = await updateCustomer(customer.id, { name: customer.name, kana: customer.kana, phone: customer.phone, memo: customer.memo, isProvisional: false });
+                              setCustomers((prev) => prev.map((item) => item.id === customer.id ? updated : item));
+                            } catch (error) { console.error("正式顧客への変更に失敗しました", error); alert("変更に失敗しました。"); }
+                          }} className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">正式登録にする</button>
+                        )}
                         <button
                           type="button"
                           onClick={() => startEditingCustomer(customer)}
@@ -448,6 +510,13 @@ export default function CustomerManagement({
                   <p className="rounded-xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
                     該当する顧客が見つかりません
                   </p>
+                )}
+                {filteredCustomers.length > PAGE_SIZE && (
+                  <div className="flex items-center justify-center gap-4 pt-3">
+                    <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40">前へ</button>
+                    <span className="text-sm text-slate-600">{currentPage} / {totalPages} ページ</span>
+                    <button type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40">次へ</button>
+                  </div>
                 )}
               </div>
             )}
