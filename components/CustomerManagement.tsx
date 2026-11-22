@@ -70,6 +70,7 @@ type CustomerManagementProps = {
   reservations: Reservation[];
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   onReserve: (customer: Customer) => void;
+  onOpenCustomerSettings: () => void;
 };
 
 export default function CustomerManagement({
@@ -77,6 +78,7 @@ export default function CustomerManagement({
   reservations,
   setCustomers,
   onReserve,
+  onOpenCustomerSettings,
 }: CustomerManagementProps) {
   const customerFormRef = useRef<HTMLDivElement>(null);
 
@@ -86,9 +88,8 @@ export default function CustomerManagement({
   const [customerMemo, setCustomerMemo] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
 
-  
   const [activeTab, setActiveTab] = useState<
-    "formal" | "provisional" | "archived" | "register"
+    "formal" | "provisional" | "register"
   >("formal");
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
@@ -119,10 +120,7 @@ export default function CustomerManagement({
   ).length;
 
   const filteredCustomers = customers
-    .filter((customer) => {
-      if (activeTab === "archived") {
-        return customer.isArchived === true;
-      }
+    .filter((customer) => { 
 
       if (customer.isArchived) {
         return false;
@@ -162,6 +160,13 @@ export default function CustomerManagement({
   const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / PAGE_SIZE));
   const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
+  // 一覧表示の条件を先に判定し、JSX内でactiveTabの型が不必要に絞り込まれないようにする。
+  const isCustomerListTab =
+    activeTab === "formal" || activeTab === "provisional";
+  const shouldShowCustomerList =
+    activeTab === "provisional" ||
+    (activeTab === "formal" && showCustomerList);
+
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
@@ -175,7 +180,17 @@ export default function CustomerManagement({
       alert("顧客名・フリガナ・電話番号を入力してください。");
       return;
     }
+    if (editingCustomerId !== null) {
+      const existing = customers.find(
+        (item) => item.id === editingCustomerId
+      );
 
+      if (existing?.name === "削除済み顧客") {
+        alert("匿名化済みの顧客は編集できません。");
+        resetForm();
+        return;
+      }
+    }
     if (editingCustomerId !== null) {
       try {
         const existing = customers.find((item) => item.id === editingCustomerId);
@@ -225,6 +240,10 @@ export default function CustomerManagement({
   };
 
   const startEditingCustomer = (customer: Customer) => {
+    if (customer.name === "削除済み顧客") {
+      alert("匿名化済みの顧客は編集できません。");
+      return;
+    }
     setEditingCustomerId(customer.id);
     setCustomerName(customer.name);
     setCustomerKana(customer.kana);
@@ -240,7 +259,7 @@ export default function CustomerManagement({
     });
   };
 
-  // 顧客をアーカイブ
+  // 顧客を非表示
   const handleArchiveCustomer = async (customer: Customer) => {
     const today = new Date().toLocaleDateString("sv-SE");
 
@@ -252,11 +271,11 @@ export default function CustomerManagement({
     );
 
     if (hasFutureReservation) {
-      alert("未来の予約があるためアーカイブできません。予約を確認してください。");
+      alert("未来の予約があるため非表示にできません。予約を確認してください。");
       return;
     }
 
-    if (!confirm(`${customer.name}さんをアーカイブしますか？`)) {
+    if (!confirm(`${customer.name}さんを非表示しますか？`)) {
       return;
     }
 
@@ -276,7 +295,7 @@ export default function CustomerManagement({
         )
       );
       } catch (error) {
-        console.error("顧客のアーカイブに失敗しました:", error);
+        console.error("顧客の非表示に失敗しました:", error);
 
         const err = error as {
           message?: string;
@@ -287,7 +306,7 @@ export default function CustomerManagement({
 
         alert(
           [
-            "アーカイブに失敗しました。",
+            "非表示に失敗しました。",
             `エラー: ${err.message ?? "不明"}`,
             `詳細: ${err.details ?? "なし"}`,
             `コード: ${err.code ?? "なし"}`,
@@ -297,37 +316,6 @@ export default function CustomerManagement({
       }
   };
 
-  // アーカイブから復元
-  const handleRestoreCustomer = async (customer: Customer) => {
-    if (!confirm(`${customer.name}さんを通常の顧客一覧に戻しますか？`)) {
-      return;
-    }
-
-    try {
-      const updated = await updateCustomer(customer.id, {
-        name: customer.name,
-        kana: customer.kana,
-        phone: customer.phone,
-        memo: customer.memo,
-        isArchived: false,
-        archivedAt: null,
-      });
-
-      setCustomers((prev) =>
-        prev.map((item) =>
-          item.id === customer.id ? updated : item
-        )
-      );
-    } catch (error) {
-      console.error("顧客の復元に失敗しました:", error);
-
-      if (error instanceof Error) {
-        alert(`復元失敗: ${error.message}`);
-      } else {
-        alert(`復元失敗: ${JSON.stringify(error)}`);
-      }
-    }
-  };
     // 顧客情報を匿名化
   const handleAnonymizeCustomer = async (customer: Customer) => {
     if (customer.name === "削除済み顧客") {
@@ -408,6 +396,17 @@ export default function CustomerManagement({
 
   return (
     <div>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-slate-900">顧客管理</h2>
+        <button
+          type="button"
+          onClick={onOpenCustomerSettings}
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          顧客設定
+        </button>
+      </div>
+
       {/* タブ：商品管理画面と同じく、カードの外側に配置 */}
       <div className="flex items-end gap-2 border-b border-slate-200">
         <button
@@ -442,23 +441,6 @@ export default function CustomerManagement({
           </span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("archived");
-            setCurrentPage(1);
-            setSelectedKanaGroup("すべて");
-            setShowCustomerList(true);
-            setCustomerSearch("");
-          }}
-          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
-            activeTab === "archived"
-              ? "border-slate-300 border-b-white bg-white text-slate-900"
-              : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
-          }`}
-        >
-          アーカイブ済み
-        </button>
         <button
           type="button"
           onClick={() => {
@@ -549,9 +531,7 @@ export default function CustomerManagement({
           </div>
         )}
 
-        {(activeTab === "formal" ||
-          activeTab === "provisional" ||
-          activeTab === "archived") && (
+        {isCustomerListTab && (
           <div>
             <div className="mb-3 flex justify-end">
               <span className="shrink-0 text-sm text-slate-500">
@@ -610,9 +590,7 @@ export default function CustomerManagement({
               </div>
             )}
 
-            {(showCustomerList ||
-              activeTab === "provisional" ||
-              activeTab === "archived") && (
+            {shouldShowCustomerList && (
               <div className="mt-6 space-y-3">
                 {paginatedCustomers.map((customer) => (
                   <div
@@ -646,86 +624,82 @@ export default function CustomerManagement({
                       </div>
 
                       <div className="flex shrink-0 flex-wrap gap-2">
-                        {activeTab === "archived" ? (
-                          <button
-                            type="button"
-                            onClick={() => handleRestoreCustomer(customer)}
-                            className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
-                          >
-                            復元
-                          </button>
+                        {customer.name === "削除済み顧客" ? (
+                          <span className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-500">
+                            個人情報は匿名化済みです
+                          </span>
                         ) : (
                           <>
-                            <button
-                              type="button"
-                              onClick={() => onReserve(customer)}
-                              className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                            >
-                              この顧客で予約
-                            </button>
+                        <button
+                          type="button"
+                          onClick={() => onReserve(customer)}
+                          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                        >
+                          この顧客で予約
+                        </button>
 
-                            {customer.isProvisional && (
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  if (!confirm(`${customer.name}さんを正式顧客に変更しますか？`)) return;
+                        {customer.isProvisional && (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (!confirm(`${customer.name}さんを正式顧客に変更しますか？`)) return;
 
-                                  try {
-                                    const updated = await updateCustomer(customer.id, {
-                                      name: customer.name,
-                                      kana: customer.kana,
-                                      phone: customer.phone,
-                                      memo: customer.memo,
-                                      isProvisional: false,
-                                    });
+                              try {
+                                const updated = await updateCustomer(customer.id, {
+                                  name: customer.name,
+                                  kana: customer.kana,
+                                  phone: customer.phone,
+                                  memo: customer.memo,
+                                  isProvisional: false,
+                                });
 
-                                    setCustomers((prev) =>
-                                      prev.map((item) =>
-                                        item.id === customer.id ? updated : item
-                                      )
-                                    );
-                                  } catch (error) {
-                                    console.error("正式顧客への変更に失敗しました", error);
-                                    alert("変更に失敗しました。");
-                                  }
-                                }}
-                                className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
-                              >
-                                正式登録にする
-                              </button>
-                            )}
+                                setCustomers((prev) =>
+                                  prev.map((item) =>
+                                    item.id === customer.id ? updated : item
+                                  )
+                                );
+                              } catch (error) {
+                                console.error("正式顧客への変更に失敗しました", error);
+                                alert("変更に失敗しました。");
+                              }
+                            }}
+                            className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+                          >
+                            正式登録にする
+                          </button>
+                        )}
 
-                            <button
-                              type="button"
-                              onClick={() => startEditingCustomer(customer)}
-                              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                            >
-                              編集
-                            </button>
+                        <button
+                          type="button"
+                          onClick={() => startEditingCustomer(customer)}
+                          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                        >
+                          編集
+                        </button>
 
-                            <button
-                              type="button"
-                              onClick={() => handleArchiveCustomer(customer)}
-                              className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
-                            >
-                              アーカイブ
-                            </button>
-                            {customer.name !== "削除済み顧客" && (
-                              <button
-                                type="button"
-                                onClick={() => handleAnonymizeCustomer(customer)}
-                                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
-                              >
-                                個人情報を匿名化
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteCustomer(customer)}
-                              className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
-                            >
-                              削除
-                            </button>
+                        <button
+                          type="button"
+                          onClick={() => handleArchiveCustomer(customer)}
+                          className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
+                        >
+                          非表示
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleAnonymizeCustomer(customer)}
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                        >
+                          個人情報を匿名化
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCustomer(customer)}
+                          className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
+                        >
+                          削除
+                        </button>
                           </>
                         )}
                       </div>

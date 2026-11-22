@@ -11,6 +11,7 @@ import ProductManagement from "@/components/ProductManagement";
 import type { Customer } from "@/types/Customer";
 import { useCustomers } from "@/hooks/useCustomers";
 import CustomerManagement from "@/components/CustomerManagement";
+import HiddenCustomersManagement from "@/components/HiddenCustomersManagement";
 import { useProducts } from "@/hooks/useProducts";
 import {calculateEndTime,} from "@/utils/time";
 import {calculateTodaySales,calculateMonthlySales,} from "@/utils/sales";
@@ -25,6 +26,7 @@ import { formatLocalDate } from "@/utils/date";
 import { getCurrentShop, getCurrentShopId } from "@/utils/shop";
 import {normalizeCustomerName,normalizePhoneNumber,} from "@/utils/customerFormat";
 import { createCustomer } from "@/utils/customerApi";
+import CustomerAnonymizationManagement from "@/components/CustomerAnonymizationManagement";
 export default function Home() {
   useEffect(() => {
   const checkUser = async () => {
@@ -191,11 +193,11 @@ export default function Home() {
   : 0;
 
   const lastVisit = selectedReservation
-  ? getLastVisit(
-      reservations,
-      selectedReservation.customer
-    )
-  : "-";
+    ? getLastVisit(
+        reservations,
+        selectedReservation.customerId
+      )
+    : "-";
 
   const {
     products,
@@ -205,9 +207,20 @@ export default function Home() {
     useState("");
 
   const [currentPage, setCurrentPage] = useState<
-    "home" | "reservation" | "customer" | "product" | "checkout" | "profile" | "customer-register"
+    | "home"
+    | "reservation"
+    | "customer"
+    | "product"
+    | "checkout"
+    | "profile"
+    | "customer-register"
+    | "customer-settings"
+    | "hidden-customers"
+    | "customer-anonymization"
   >("home");
   const [quickCustomerName, setQuickCustomerName] = useState("");
+  const [customerRegisterReturnPage, setCustomerRegisterReturnPage] =
+  useState<"reservation" | "customer-settings">("reservation");
   const [quickCustomerKana, setQuickCustomerKana] = useState("");
   const [quickCustomerPhone, setQuickCustomerPhone] = useState("");
   const [quickCustomerMemo, setQuickCustomerMemo] = useState("");
@@ -330,6 +343,7 @@ const handleReserveWithCustomer = (selectedCustomer: Customer) => {
 };
 
 const openQuickCustomerRegistration = () => {
+  setCustomerRegisterReturnPage("reservation");
   setQuickCustomerName("");
   setQuickCustomerKana("");
   setQuickCustomerPhone("");
@@ -507,7 +521,68 @@ const saveQuickCustomer = async () => {
           reservations={reservations}
           setCustomers={setCustomers}
           onReserve={handleReserveWithCustomer}
-        /> 
+          onOpenCustomerSettings={() => setCurrentPage("customer-settings")}
+        />
+      )}
+
+      {currentPage === "customer-settings" && (
+        <div className="mx-auto max-w-3xl">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-slate-900">
+            顧客設定
+          </h2>
+
+          <button
+            type="button"
+            onClick={() => setCurrentPage("customer")}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            戻る
+          </button>
+        </div>
+
+          <div className="space-y-3">
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage("hidden-customers")}
+              className="w-full rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:bg-slate-50"
+            >
+              <p className="font-medium text-slate-900">
+                非表示顧客の管理
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                非表示にした顧客の確認と再表示を行います。
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentPage("customer-anonymization")}
+              className="w-full rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:bg-slate-50"
+            >
+              <p className="font-medium text-slate-900">
+                顧客データ管理
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                長期間来店していない顧客の確認と匿名化候補の管理を行います。
+              </p>
+            </button>
+          </div>
+        </div>
+      )}
+      {currentPage === "hidden-customers" && (
+        <HiddenCustomersManagement
+          customers={customers}
+          setCustomers={setCustomers}
+          onBack={() => setCurrentPage("customer-settings")}
+        />
+      )}
+      {currentPage === "customer-anonymization" && (
+        <CustomerAnonymizationManagement
+          customers={customers}
+          reservations={reservations}
+          onBack={() => setCurrentPage("customer-settings")}
+        />
       )}
       {currentPage === "product" && (
         <>
@@ -568,7 +643,25 @@ const saveQuickCustomer = async () => {
   )}
   {currentPage === "customer-register" && (
     <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-slate-900">新規顧客の仮登録</h2>
+    <div className="flex items-center justify-between">
+      <h2 className="text-xl font-semibold text-slate-900">
+        新規顧客の仮登録
+      </h2>
+
+      <button
+        type="button"
+        onClick={() => {
+          setCurrentPage(customerRegisterReturnPage);
+
+          if (customerRegisterReturnPage === "reservation") {
+            setIsModalOpen(true);
+          }
+        }}
+        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      >
+        戻る
+      </button>
+    </div>
       <p className="mt-2 text-sm text-slate-500">予約に必要な情報だけで登録できます。フリガナ・電話番号は後から追加できます。</p>
       <div className="mt-6 space-y-4">
         <div><label className="mb-1 block text-sm font-medium text-slate-700">顧客名 *</label><input value={quickCustomerName} onChange={(e) => setQuickCustomerName(e.target.value)} placeholder="例：山田 花子" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" /></div>

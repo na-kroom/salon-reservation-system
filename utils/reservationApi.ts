@@ -27,6 +27,7 @@ export async function fetchReservations(): Promise<Reservation[]> {
     memo: reservation.memo ?? "",
     product: reservation.product ?? "",
     status: reservation.status,
+    completedAt: reservation.completed_at ?? null,
   }));
 }
 
@@ -50,6 +51,7 @@ export async function createReservation(
       memo: reservation.memo,
       product: reservation.product,
       status: reservation.status,
+      completed_at: reservation.completedAt ?? null,
     })
     .select()
     .single();
@@ -71,6 +73,7 @@ export async function createReservation(
     memo: data.memo ?? "",
     product: data.product ?? "",
     status: data.status,
+    completedAt: data.completed_at ?? null,
   };
 }
 export async function updateReservation(
@@ -93,6 +96,7 @@ export async function updateReservation(
       memo: reservation.memo,
       product: reservation.product,
       status: reservation.status,
+      completed_at: reservation.completedAt ?? null,
     })
     .eq("id", id)
     .eq("shop_id", shopId)
@@ -116,6 +120,7 @@ export async function updateReservation(
     memo: data.memo ?? "",
     product: data.product ?? "",
     status: data.status,
+    completedAt: data.completed_at ?? null,
   };
 }
 
@@ -141,6 +146,7 @@ export async function completeReservation(
     .from("reservations")
     .update({
       status: "completed",
+      completed_at: new Date().toISOString(),
     })
     .eq("id", id)
     .eq("shop_id", shopId)
@@ -164,5 +170,6 @@ export async function completeReservation(
     memo: data.memo ?? "",
     product: data.product ?? "",
     status: data.status,
+    completedAt: data.completed_at ?? null,
   };
 }
