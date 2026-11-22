@@ -527,22 +527,20 @@ const saveQuickCustomer = async () => {
 
       {currentPage === "customer-settings" && (
         <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">
-            顧客設定
-          </h2>
-
-          <button
-            type="button"
-            onClick={() => setCurrentPage("customer")}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            戻る
-          </button>
-        </div>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-slate-900">
+              顧客設定
+            </h2>
+            <button
+              type="button"
+              onClick={() => setCurrentPage("customer")}
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              戻る
+            </button>
+          </div>
 
           <div className="space-y-3">
-
             <button
               type="button"
               onClick={() => setCurrentPage("hidden-customers")}
@@ -644,24 +642,12 @@ const saveQuickCustomer = async () => {
   {currentPage === "customer-register" && (
     <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
     <div className="flex items-center justify-between">
-      <h2 className="text-xl font-semibold text-slate-900">
-        新規顧客の仮登録
-      </h2>
+    <h2 className="text-xl font-semibold text-slate-900">
+      新規顧客の仮登録
+    </h2>
 
-      <button
-        type="button"
-        onClick={() => {
-          setCurrentPage(customerRegisterReturnPage);
 
-          if (customerRegisterReturnPage === "reservation") {
-            setIsModalOpen(true);
-          }
-        }}
-        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-      >
-        戻る
-      </button>
-    </div>
+  </div>
       <p className="mt-2 text-sm text-slate-500">予約に必要な情報だけで登録できます。フリガナ・電話番号は後から追加できます。</p>
       <div className="mt-6 space-y-4">
         <div><label className="mb-1 block text-sm font-medium text-slate-700">顧客名 *</label><input value={quickCustomerName} onChange={(e) => setQuickCustomerName(e.target.value)} placeholder="例：山田 花子" className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm" /></div>

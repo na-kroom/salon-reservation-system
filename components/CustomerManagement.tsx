@@ -6,8 +6,6 @@ import type { Reservation } from "@/types/Reservation";
 import {
   createCustomer,
   updateCustomer,
-  deleteCustomer,
-  anonymizeCustomer,
 } from "@/utils/customerApi";
 import {
   normalizeCustomerName,
@@ -122,7 +120,8 @@ export default function CustomerManagement({
   const filteredCustomers = customers
     .filter((customer) => { 
 
-      if (customer.isArchived) {
+      // 非表示顧客と匿名化済み顧客は通常一覧に表示しない
+      if (customer.isArchived || customer.name === "削除済み顧客") {
         return false;
       }
 
@@ -316,83 +315,6 @@ export default function CustomerManagement({
       }
   };
 
-    // 顧客情報を匿名化
-  const handleAnonymizeCustomer = async (customer: Customer) => {
-    if (customer.name === "削除済み顧客") {
-      alert("この顧客はすでに匿名化されています。");
-      return;
-    }
-
-    const confirmed = confirm(
-      `${customer.name}さんの個人情報を匿名化します。\n\n` +
-      "・顧客名を「削除済み顧客」に変更\n" +
-      "・フリガナ、電話番号、顧客メモを削除\n" +
-      "・予約履歴の顧客名も変更\n\n" +
-      "予約・売上履歴は保持されます。\n" +
-      "この操作は元に戻せません。実行しますか？"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      await anonymizeCustomer(customer.id);
-
-      setCustomers((prev) =>
-        prev.map((item) =>
-          item.id === customer.id
-            ? {
-                ...item,
-                name: "削除済み顧客",
-                kana: "",
-                phone: "",
-                memo: "",
-              }
-            : item
-        )
-      );
-
-      alert("顧客情報を匿名化しました。");
-    } catch (error) {
-      console.error("顧客情報の匿名化に失敗しました:", error);
-
-      if (error instanceof Error) {
-        alert(`匿名化に失敗しました。\n${error.message}`);
-      } else {
-        alert("顧客情報の匿名化に失敗しました。");
-      }
-    }
-  };
-  const handleDeleteCustomer = async (customer: Customer) => {
-    const hasReservation = reservations.some(
-      (reservation) => reservation.customerId === customer.id
-    );
-
-    if (hasReservation) {
-      alert("予約履歴があるため削除できません。");
-      return;
-    }
-
-    if (
-      !confirm(`${normalizeCustomerName(customer.name)}さんを削除しますか？`)
-    ) {
-      return;
-    }
-
-    try {
-      await deleteCustomer(customer.id);
-
-      setCustomers((prev) =>
-        prev.filter((item) => item.id !== customer.id)
-      );
-
-      if (editingCustomerId === customer.id) {
-        resetForm();
-      }
-    } catch (error) {
-      console.error("顧客削除に失敗しました", error);
-      alert("顧客削除に失敗しました。");
-    }
-  };
 
   return (
     <div>
@@ -685,21 +607,6 @@ export default function CustomerManagement({
                           非表示
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleAnonymizeCustomer(customer)}
-                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
-                        >
-                          個人情報を匿名化
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCustomer(customer)}
-                          className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
-                        >
-                          削除
-                        </button>
                           </>
                         )}
                       </div>

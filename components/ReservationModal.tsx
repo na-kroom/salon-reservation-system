@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { Product } from "@/types/Product";
 import type { Customer } from "@/types/Customer";
 
@@ -37,6 +37,17 @@ type Props = {
   onCreateNewCustomer: () => void;
 };
 
+// 全角・半角、ひらがな・カタカナの違いを吸収して検索する。
+const normalizeSearchText = (value: string): string =>
+  value
+    .normalize("NFKC")
+    .toLocaleLowerCase("ja")
+    .replace(/[\u30A1-\u30F6]/g, (char) =>
+      String.fromCharCode(char.charCodeAt(0) - 0x60)
+    )
+    .replace(/[\s　]/g, "")
+    .trim();
+
 export default function ReservationModal({
   isOpen,
   customer,
@@ -69,17 +80,49 @@ export default function ReservationModal({
   onClose,
   onCreateNewCustomer,
 }: Props) {
-  if (!isOpen) return null;
+  const [customerSearch, setCustomerSearch] = useState(customer);
+  const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
-  const handleCustomerChange = (value: string) => {
-    const selected = customers.find((item) => String(item.id) === value);
-    if (!selected) {
-      setCustomerId(null);
-      setCustomer("");
+  useEffect(() => {
+    if (!isOpen) {
+      setIsCustomerListOpen(false);
       return;
     }
+
+    const selectedCustomer = customers.find((item) => item.id === customerId);
+    setCustomerSearch(selectedCustomer?.name ?? customer);
+  }, [isOpen, customerId, customer, customers]);
+
+  const filteredCustomers = useMemo(() => {
+    const keyword = normalizeSearchText(customerSearch);
+
+    // 検索文字が入力されるまでは候補を表示しない。
+    if (!keyword) return [];
+
+    return customers
+      .filter((item) => {
+        const name = normalizeSearchText(item.name);
+        const kana = normalizeSearchText(item.kana ?? "");
+
+        return name.includes(keyword) || kana.includes(keyword);
+      })
+      .slice(0, 30);
+  }, [customers, customerSearch]);
+
+  if (!isOpen) return null;
+
+  const handleCustomerSearch = (value: string) => {
+    setCustomerSearch(value);
+    setCustomerId(null);
+    setCustomer("");
+    setIsCustomerListOpen(true);
+  };
+
+  const handleCustomerSelect = (selected: Customer) => {
     setCustomerId(selected.id);
     setCustomer(selected.name);
+    setCustomerSearch(selected.name);
+    setIsCustomerListOpen(false);
   };
 
   const handleProductChange = (value: string) => {
@@ -120,18 +163,61 @@ export default function ReservationModal({
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">顧客 *</label>
             <div className="flex gap-2">
-              <select
-                value={customerId === null ? "" : String(customerId)}
-                onChange={(event) => handleCustomerChange(event.target.value)}
-                className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-3 text-sm"
-              >
-                <option value="">顧客を選択</option>
-                {customers.map((item) => (
-                  <option key={item.id} value={String(item.id)}>
-                    {item.name}{item.isProvisional ? "（仮登録）" : ""}
-                  </option>
-                ))}
-              </select>
+              <div className="relative min-w-0 flex-1">
+                <input
+                  type="text"
+                  value={customerSearch}
+                  onChange={(event) => handleCustomerSearch(event.target.value)}
+                  onFocus={() => {
+                    if (normalizeSearchText(customerSearch)) {
+                      setIsCustomerListOpen(true);
+                    }
+                  }}
+                  placeholder="顧客名・フリガナで検索"
+                  autoComplete="off"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm"
+                  role="combobox"
+                  aria-expanded={isCustomerListOpen}
+                  aria-controls="reservation-customer-options"
+                  aria-autocomplete="list"
+                />
+
+                {isCustomerListOpen && (
+                  <div
+                    id="reservation-customer-options"
+                    role="listbox"
+                    className="absolute left-0 right-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg"
+                  >
+                    {filteredCustomers.length > 0 ? (
+                      filteredCustomers.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          role="option"
+                          aria-selected={customerId === item.id}
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => handleCustomerSelect(item)}
+                          className="block w-full border-b border-slate-100 px-3 py-3 text-left text-sm last:border-b-0 hover:bg-slate-50"
+                        >
+                          <span className="block font-medium text-slate-900">
+                            {item.name}{item.isProvisional ? "（仮登録）" : ""}
+                          </span>
+                          {item.kana && (
+                            <span className="mt-0.5 block text-xs text-slate-500">
+                              {item.kana}
+                            </span>
+                          )}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-3 py-4 text-sm text-slate-500">
+                        該当する顧客が見つかりません
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={onCreateNewCustomer}
@@ -140,7 +226,9 @@ export default function ReservationModal({
                 新規顧客
               </button>
             </div>
-            {customer && <p className="mt-1 text-xs text-slate-500">選択中：{customer}</p>}
+            {customerId !== null && customer && (
+              <p className="mt-1 text-xs text-slate-500">選択中：{customer}</p>
+            )}
           </div>
 
           <div>

@@ -92,22 +92,6 @@ export default function CustomerAnonymizationManagement({
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-500">匿名化候補</p>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
-            {candidates.length}人
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-500">今回の未確認候補</p>
-          <p className="mt-2 text-2xl font-bold text-red-600">
-            {unreviewedCount}人
-          </p>
-        </div>
-      </div>
-
       <div className="mb-5 rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
         最終来店から3年以上経過した顧客を表示しています。
         この画面を開くと、表示された候補は確認済みとして記録されます。

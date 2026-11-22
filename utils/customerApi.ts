@@ -118,7 +118,8 @@ export async function deleteCustomer(id: number) {
 
   if (error) throw error;
 }
-// 顧客情報の匿名化
+
+// 顧客の個人情報を匿名化（予約履歴は保持）
 export async function anonymizeCustomer(id: number): Promise<void> {
   const { error } = await supabase.rpc("anonymize_customer", {
     p_customer_id: id,
