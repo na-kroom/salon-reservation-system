@@ -7,6 +7,7 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  anonymizeCustomer,
 } from "@/utils/customerApi";
 import {
   normalizeCustomerName,
@@ -85,7 +86,10 @@ export default function CustomerManagement({
   const [customerMemo, setCustomerMemo] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
 
-  const [activeTab, setActiveTab] = useState<"formal" | "provisional" | "register">("formal");
+  
+  const [activeTab, setActiveTab] = useState<
+    "formal" | "provisional" | "archived" | "register"
+  >("formal");
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
   const [selectedKanaGroup, setSelectedKanaGroup] = useState("すべて");
@@ -115,7 +119,25 @@ export default function CustomerManagement({
   ).length;
 
   const filteredCustomers = customers
-    .filter((customer) => activeTab === "provisional" ? customer.isProvisional : activeTab === "formal" ? !customer.isProvisional : true)
+    .filter((customer) => {
+      if (activeTab === "archived") {
+        return customer.isArchived === true;
+      }
+
+      if (customer.isArchived) {
+        return false;
+      }
+
+      if (activeTab === "provisional") {
+        return customer.isProvisional;
+      }
+
+      if (activeTab === "formal") {
+        return !customer.isProvisional;
+      }
+
+      return true;
+    })
     .filter((customer) => {
       const keyword = normalizeSearchText(customerSearch);
       const name = normalizeSearchText(customer.name);
@@ -218,6 +240,140 @@ export default function CustomerManagement({
     });
   };
 
+  // 顧客をアーカイブ
+  const handleArchiveCustomer = async (customer: Customer) => {
+    const today = new Date().toLocaleDateString("sv-SE");
+
+    const hasFutureReservation = reservations.some(
+      (reservation) =>
+        reservation.customerId === customer.id &&
+        reservation.status === "reserved" &&
+        reservation.date >= today
+    );
+
+    if (hasFutureReservation) {
+      alert("未来の予約があるためアーカイブできません。予約を確認してください。");
+      return;
+    }
+
+    if (!confirm(`${customer.name}さんをアーカイブしますか？`)) {
+      return;
+    }
+
+    try {
+      const updated = await updateCustomer(customer.id, {
+        name: customer.name,
+        kana: customer.kana,
+        phone: customer.phone,
+        memo: customer.memo,
+        isArchived: true,
+        archivedAt: new Date().toISOString(),
+      });
+
+      setCustomers((prev) =>
+        prev.map((item) =>
+          item.id === customer.id ? updated : item
+        )
+      );
+      } catch (error) {
+        console.error("顧客のアーカイブに失敗しました:", error);
+
+        const err = error as {
+          message?: string;
+          details?: string;
+          hint?: string;
+          code?: string;
+        };
+
+        alert(
+          [
+            "アーカイブに失敗しました。",
+            `エラー: ${err.message ?? "不明"}`,
+            `詳細: ${err.details ?? "なし"}`,
+            `コード: ${err.code ?? "なし"}`,
+            `ヒント: ${err.hint ?? "なし"}`,
+          ].join("\n")
+        );
+      }
+  };
+
+  // アーカイブから復元
+  const handleRestoreCustomer = async (customer: Customer) => {
+    if (!confirm(`${customer.name}さんを通常の顧客一覧に戻しますか？`)) {
+      return;
+    }
+
+    try {
+      const updated = await updateCustomer(customer.id, {
+        name: customer.name,
+        kana: customer.kana,
+        phone: customer.phone,
+        memo: customer.memo,
+        isArchived: false,
+        archivedAt: null,
+      });
+
+      setCustomers((prev) =>
+        prev.map((item) =>
+          item.id === customer.id ? updated : item
+        )
+      );
+    } catch (error) {
+      console.error("顧客の復元に失敗しました:", error);
+
+      if (error instanceof Error) {
+        alert(`復元失敗: ${error.message}`);
+      } else {
+        alert(`復元失敗: ${JSON.stringify(error)}`);
+      }
+    }
+  };
+    // 顧客情報を匿名化
+  const handleAnonymizeCustomer = async (customer: Customer) => {
+    if (customer.name === "削除済み顧客") {
+      alert("この顧客はすでに匿名化されています。");
+      return;
+    }
+
+    const confirmed = confirm(
+      `${customer.name}さんの個人情報を匿名化します。\n\n` +
+      "・顧客名を「削除済み顧客」に変更\n" +
+      "・フリガナ、電話番号、顧客メモを削除\n" +
+      "・予約履歴の顧客名も変更\n\n" +
+      "予約・売上履歴は保持されます。\n" +
+      "この操作は元に戻せません。実行しますか？"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await anonymizeCustomer(customer.id);
+
+      setCustomers((prev) =>
+        prev.map((item) =>
+          item.id === customer.id
+            ? {
+                ...item,
+                name: "削除済み顧客",
+                kana: "",
+                phone: "",
+                memo: "",
+              }
+            : item
+        )
+      );
+
+      alert("顧客情報を匿名化しました。");
+    } catch (error) {
+      console.error("顧客情報の匿名化に失敗しました:", error);
+
+      if (error instanceof Error) {
+        alert(`匿名化に失敗しました。\n${error.message}`);
+      } else {
+        alert("顧客情報の匿名化に失敗しました。");
+      }
+    }
+  };
   const handleDeleteCustomer = async (customer: Customer) => {
     const hasReservation = reservations.some(
       (reservation) => reservation.customerId === customer.id
@@ -286,6 +442,23 @@ export default function CustomerManagement({
           </span>
         </button>
 
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("archived");
+            setCurrentPage(1);
+            setSelectedKanaGroup("すべて");
+            setShowCustomerList(true);
+            setCustomerSearch("");
+          }}
+          className={`rounded-t-xl border px-5 py-3 text-sm font-semibold transition ${
+            activeTab === "archived"
+              ? "border-slate-300 border-b-white bg-white text-slate-900"
+              : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
+          }`}
+        >
+          アーカイブ済み
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -376,7 +549,9 @@ export default function CustomerManagement({
           </div>
         )}
 
-        {(activeTab === "formal" || activeTab === "provisional") && (
+        {(activeTab === "formal" ||
+          activeTab === "provisional" ||
+          activeTab === "archived") && (
           <div>
             <div className="mb-3 flex justify-end">
               <span className="shrink-0 text-sm text-slate-500">
@@ -435,7 +610,9 @@ export default function CustomerManagement({
               </div>
             )}
 
-            {(showCustomerList || activeTab === "provisional") && (
+            {(showCustomerList ||
+              activeTab === "provisional" ||
+              activeTab === "archived") && (
               <div className="mt-6 space-y-3">
                 {paginatedCustomers.map((customer) => (
                   <div
@@ -468,39 +645,89 @@ export default function CustomerManagement({
                         )}
                       </div>
 
-                      <div className="flex shrink-0 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onReserve(customer)}
-                          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                        >
-                          この顧客で予約
-                        </button>
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        {activeTab === "archived" ? (
+                          <button
+                            type="button"
+                            onClick={() => handleRestoreCustomer(customer)}
+                            className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                          >
+                            復元
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => onReserve(customer)}
+                              className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                            >
+                              この顧客で予約
+                            </button>
 
-                        {customer.isProvisional && (
-                          <button type="button" onClick={async () => {
-                            if (!confirm(`${customer.name}さんを正式顧客に変更しますか？`)) return;
-                            try {
-                              const updated = await updateCustomer(customer.id, { name: customer.name, kana: customer.kana, phone: customer.phone, memo: customer.memo, isProvisional: false });
-                              setCustomers((prev) => prev.map((item) => item.id === customer.id ? updated : item));
-                            } catch (error) { console.error("正式顧客への変更に失敗しました", error); alert("変更に失敗しました。"); }
-                          }} className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">正式登録にする</button>
+                            {customer.isProvisional && (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (!confirm(`${customer.name}さんを正式顧客に変更しますか？`)) return;
+
+                                  try {
+                                    const updated = await updateCustomer(customer.id, {
+                                      name: customer.name,
+                                      kana: customer.kana,
+                                      phone: customer.phone,
+                                      memo: customer.memo,
+                                      isProvisional: false,
+                                    });
+
+                                    setCustomers((prev) =>
+                                      prev.map((item) =>
+                                        item.id === customer.id ? updated : item
+                                      )
+                                    );
+                                  } catch (error) {
+                                    console.error("正式顧客への変更に失敗しました", error);
+                                    alert("変更に失敗しました。");
+                                  }
+                                }}
+                                className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+                              >
+                                正式登録にする
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => startEditingCustomer(customer)}
+                              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                            >
+                              編集
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleArchiveCustomer(customer)}
+                              className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
+                            >
+                              アーカイブ
+                            </button>
+                            {customer.name !== "削除済み顧客" && (
+                              <button
+                                type="button"
+                                onClick={() => handleAnonymizeCustomer(customer)}
+                                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                              >
+                                個人情報を匿名化
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCustomer(customer)}
+                              className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
+                            >
+                              削除
+                            </button>
+                          </>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => startEditingCustomer(customer)}
-                          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                        >
-                          編集
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCustomer(customer)}
-                          className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-red-100 hover:text-red-600"
-                        >
-                          削除
-                        </button>
                       </div>
                     </div>
                   </div>

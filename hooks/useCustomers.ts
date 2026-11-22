@@ -19,12 +19,19 @@ export function useCustomers() {
         if (data) {
           setCustomers(data);
         }
-      } catch (error) {
-        console.error(
-          "顧客データ取得失敗",
-          error
-        );
-      }
+        } catch (error) {
+          console.error(
+            "顧客データ取得失敗:",
+            JSON.stringify(error, Object.getOwnPropertyNames(error))
+          );
+
+          console.error("エラー詳細:", {
+            message: (error as any)?.message,
+            code: (error as any)?.code,
+            details: (error as any)?.details,
+            hint: (error as any)?.hint,
+          });
+        }
     }
 
     loadCustomers();
