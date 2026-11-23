@@ -27,6 +27,46 @@ const categories: (ProductCategory | "すべて")[] = [
   "その他",
 ];
 
+// 予約詳細で保存している「商品A × 2、商品B」の形式を会計用データに変換する。
+function parseReservationProducts(
+  value: string | null | undefined,
+  products: Product[]
+): CheckoutProduct[] {
+  if (!value?.trim()) return [];
+
+  const quantities = new Map<string, number>();
+  value
+    .split(/[、,，]/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .forEach((part) => {
+      const match = part.match(/^(.*?)(?:\s*[×xX]\s*(\d+))?$/);
+      if (!match) return;
+      const name = match[1].trim();
+      const quantity = Math.max(1, Number(match[2] ?? 1));
+      if (name) quantities.set(name, (quantities.get(name) ?? 0) + quantity);
+    });
+
+  return Array.from(quantities.entries()).flatMap(([name, quantity]) => {
+    const product = products.find((item) => item.name === name);
+    // 商品マスタに存在しない商品は価格を特定できないため、自動計上しない。
+    if (!product) return [];
+    return [{
+      id: product.id,
+      name: product.name,
+      price: Number(product.price) || 0,
+      quantity,
+    }];
+  });
+}
+
+function formatReservationProducts(items: CheckoutProduct[]): string {
+  return items
+    .filter((item) => item.quantity > 0)
+    .map((item) => item.quantity > 1 ? `${item.name} × ${item.quantity}` : item.name)
+    .join("、");
+}
+
 export default function Checkout({
   reservations,
   setReservations,
@@ -77,33 +117,17 @@ export default function Checkout({
       return;
     }
 
-    const selectedProducts = products.filter(
-      (product) => (pendingQuantities[product.id] ?? 0) > 0
-    );
-    if (selectedProducts.length === 0) return;
+    // 商品追加画面には現在の会計商品も表示されるため、選択内容で会計商品を更新する。
+    const nextProducts = products
+      .filter((product) => (pendingQuantities[product.id] ?? 0) > 0)
+      .map((product) => ({
+        id: product.id,
+        name: product.name,
+        price: Number(product.price) || 0,
+        quantity: pendingQuantities[product.id],
+      }));
 
-    setCheckoutProducts((previous) => {
-      const next = [...previous];
-      selectedProducts.forEach((product) => {
-        const quantity = pendingQuantities[product.id] ?? 0;
-        const existingIndex = next.findIndex((item) => item.id === product.id);
-        if (existingIndex >= 0) {
-          next[existingIndex] = {
-            ...next[existingIndex],
-            quantity: next[existingIndex].quantity + quantity,
-          };
-        } else {
-          next.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            quantity,
-          });
-        }
-      });
-      return next;
-    });
-
+    setCheckoutProducts(nextProducts);
     setPendingQuantities({});
     setCheckoutCompleted(false);
     setCheckoutPage("input");
@@ -119,6 +143,7 @@ export default function Checkout({
       const updatedReservation = await updateReservation(selectedReservation.id, {
         ...selectedReservation,
         price: Number(editingPrice) || 0,
+        product: formatReservationProducts(checkoutProducts),
       });
       const completedReservation = await completeReservation(updatedReservation.id);
       setReservations((previous) =>
@@ -136,6 +161,7 @@ export default function Checkout({
     setCheckoutCompleted(true);
     setEditingPrice("");
     setCheckoutProducts([]);
+    setPendingQuantities({});
     setSelectedReservationId(null);
     setCheckoutPage("input");
   };
@@ -159,7 +185,10 @@ export default function Checkout({
         <button type="button" onClick={() => setCheckoutPage("input")} className={tabClass(checkoutPage === "input")}>
           会計入力
         </button>
-        <button type="button" onClick={() => setCheckoutPage("products")} className={tabClass(checkoutPage === "products")}>
+        <button type="button" onClick={() => {
+          setPendingQuantities(Object.fromEntries(checkoutProducts.map((item) => [item.id, item.quantity])));
+          setCheckoutPage("products");
+        }} className={tabClass(checkoutPage === "products")}>
           商品を追加
         </button>
       </div>
@@ -177,10 +206,18 @@ export default function Checkout({
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-100"
                   value={selectedReservationId ?? ""}
                   onChange={(event) => {
-                    const id = Number(event.target.value);
+                    const value = event.target.value;
+                    const id = value ? Number(value) : null;
+                    const reservation = id === null
+                      ? undefined
+                      : todayReservations.find((item) => item.id === id);
                     setSelectedReservationId(id);
-                    const reservation = todayReservations.find((item) => item.id === id);
                     setEditingPrice(reservation ? String(reservation.price) : "");
+                    const initialProducts = parseReservationProducts(reservation?.product, products);
+                    setCheckoutProducts(initialProducts);
+                    setPendingQuantities(
+                      Object.fromEntries(initialProducts.map((item) => [item.id, item.quantity]))
+                    );
                     setCheckoutCompleted(false);
                   }}
                 >
@@ -219,7 +256,12 @@ export default function Checkout({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setCheckoutPage("products")}
+                  onClick={() => {
+                    setPendingQuantities(
+                      Object.fromEntries(checkoutProducts.map((item) => [item.id, item.quantity]))
+                    );
+                    setCheckoutPage("products");
+                  }}
                   className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-slate-400 hover:bg-slate-50"
                 >
                   <span className={`text-sm font-medium ${selectedReservation ? "text-slate-700" : "text-slate-400"}`}>
