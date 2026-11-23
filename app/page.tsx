@@ -6,6 +6,7 @@ import { supabase } from "@/utils/supabase";
 import ReservationModal from "@/components/ReservationModal";
 import type { Reservation } from "@/types/Reservation";
 import CustomerModal from "@/components/CustomerModal";
+import CustomerProfileModal from "@/components/CustomerProfileModal";
 import ReservationPage from "@/components/ReservationPage";
 import ProductManagement from "@/components/ProductManagement";
 import type { Customer } from "@/types/Customer";
@@ -166,6 +167,8 @@ export default function Home() {
     useState<Reservation | null>(null);
   const [isCustomerModalOpen, setIsCustomerModalOpen] =
     useState(false);
+  const [isCustomerProfileOpen, setIsCustomerProfileOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const monthlySales =
     calculateMonthlySales(
       reservations,
@@ -272,7 +275,9 @@ export default function Home() {
     price: Number(price) || 0,
     memo,
     product,
-    status: "reserved",
+    status: editingId !== null
+      ? reservations.find((item) => item.id === editingId)?.status ?? "reserved"
+      : "reserved",
   };
   if (editingId !== null) {
     try {
@@ -522,6 +527,7 @@ const saveQuickCustomer = async () => {
           setCustomers={setCustomers}
           onReserve={handleReserveWithCustomer}
           onOpenCustomerSettings={() => setCurrentPage("customer-settings")}
+          onOpenCustomerProfile={(selected) => { setSelectedCustomer(selected); setIsCustomerProfileOpen(true); }}
         />
       )}
 
@@ -755,6 +761,7 @@ const saveQuickCustomer = async () => {
   customers={customers}
   onClose={() => setIsModalOpen(false)}
   onCreateNewCustomer={openQuickCustomerRegistration}
+  isEditing={editingId !== null}
 />
 <CustomerModal
   isOpen={isCustomerModalOpen}
@@ -773,6 +780,28 @@ const saveQuickCustomer = async () => {
   setIsModalOpen={setIsModalOpen}
   setReservations={setReservations}
   reservations={reservations}
+  products={products}
+  setProduct={setProduct}
+  setSelectedProductId={setSelectedProductId}
+  setDate={setDate}
+  setStartTime={setStartTime}
+  setLane={setLane}
+  setDuration={setDuration}
+  onOpenCustomerProfile={(id) => {
+    const found = customers.find((item) => item.id === id);
+    if (found) { setSelectedCustomer(found); setIsCustomerProfileOpen(true); }
+  }}
+/>
+<CustomerProfileModal
+  isOpen={isCustomerProfileOpen}
+  customer={selectedCustomer}
+  reservations={reservations}
+  onClose={() => setIsCustomerProfileOpen(false)}
+  onOpenReservation={(reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setIsCustomerProfileOpen(false);
+    setIsCustomerModalOpen(true);
+  }}
 />
     </div>
    </main>

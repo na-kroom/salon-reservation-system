@@ -35,6 +35,7 @@ type Props = {
   customers: Customer[];
   onClose: () => void;
   onCreateNewCustomer: () => void;
+  isEditing?: boolean;
 };
 
 // 全角・半角、ひらがな・カタカナの違いを吸収して検索する。
@@ -79,6 +80,7 @@ export default function ReservationModal({
   customers,
   onClose,
   onCreateNewCustomer,
+  isEditing = false,
 }: Props) {
   const [customerSearch, setCustomerSearch] = useState(customer);
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
@@ -96,11 +98,12 @@ export default function ReservationModal({
   const filteredCustomers = useMemo(() => {
     const keyword = normalizeSearchText(customerSearch);
 
-    // 検索文字が入力されるまでは候補を表示しない。
     if (!keyword) return [];
 
     return customers
       .filter((item) => {
+        if (item.isArchived || item.name === "削除済み顧客") return false;
+
         const name = normalizeSearchText(item.name);
         const kana = normalizeSearchText(item.kana ?? "");
 
@@ -148,7 +151,7 @@ export default function ReservationModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
       <div className="max-h-full w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">予約登録</h2>
+          <h2 className="text-xl font-bold text-slate-900">{isEditing ? "予約編集" : "予約登録"}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -168,11 +171,7 @@ export default function ReservationModal({
                   type="text"
                   value={customerSearch}
                   onChange={(event) => handleCustomerSearch(event.target.value)}
-                  onFocus={() => {
-                    if (normalizeSearchText(customerSearch)) {
-                      setIsCustomerListOpen(true);
-                    }
-                  }}
+                  onFocus={() => setIsCustomerListOpen(Boolean(normalizeSearchText(customerSearch)))}
                   placeholder="顧客名・フリガナで検索"
                   autoComplete="off"
                   className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm"
@@ -282,53 +281,34 @@ export default function ReservationModal({
             </select>
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">メニュー</label>
-            <input
-              value={menu}
-              onChange={(event) => setMenu(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm"
-              placeholder="例：カット"
-            />
-          </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">商品（任意）</label>
-            <select
-              value={selectedProductId}
-              onChange={(event) => handleProductChange(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm"
-            >
-              <option value="">商品を選択しない</option>
-              {products.map((item) => (
-                <option key={item.id} value={String(item.id)}>{item.name}</option>
-              ))}
-            </select>
-            {product && <p className="mt-1 text-xs text-slate-500">選択中：{product}</p>}
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">金額</label>
-            <input
-              type="number"
-              min="0"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm"
-              placeholder="0"
-            />
-          </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">メモ</label>
+            <div className="mb-2 flex flex-wrap gap-2">
+              {["カット", "カラー", "縮毛矯正", "トリートメント", "パーマ", "ヘッドスパ", "リタッチ"].map((word) => (
+                <button
+                  key={word}
+                  type="button"
+                  onClick={() => {
+                    setMemo((current) => current.trim() ? `${current.trim()}・${word}` : word);
+                    setMenu(word);
+                  }}
+                  className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                >
+                  {word}
+                </button>
+              ))}
+            </div>
             <textarea
               value={memo}
               onChange={(event) => setMemo(event.target.value)}
               rows={3}
               className="w-full resize-none rounded-lg border border-slate-300 px-3 py-3 text-sm"
-              placeholder="予約に関するメモ"
+              placeholder="予約に関するメモ・施術メニューなど"
             />
           </div>
+
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
@@ -345,7 +325,7 @@ export default function ReservationModal({
             disabled={!customerId}
             className="rounded-lg bg-slate-800 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            予約を登録
+            {isEditing ? "予約を更新" : "予約を登録"}
           </button>
         </div>
       </div>

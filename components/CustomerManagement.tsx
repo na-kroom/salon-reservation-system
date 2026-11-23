@@ -69,6 +69,7 @@ type CustomerManagementProps = {
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   onReserve: (customer: Customer) => void;
   onOpenCustomerSettings: () => void;
+  onOpenCustomerProfile: (customer: Customer) => void;
 };
 
 export default function CustomerManagement({
@@ -77,6 +78,7 @@ export default function CustomerManagement({
   setCustomers,
   onReserve,
   onOpenCustomerSettings,
+  onOpenCustomerProfile,
 }: CustomerManagementProps) {
   const customerFormRef = useRef<HTMLDivElement>(null);
 
@@ -521,9 +523,15 @@ export default function CustomerManagement({
                   >
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                       <div className="min-w-0">
-                        <div className="text-base font-semibold text-slate-900">
-                          {normalizeCustomerName(customer.name)}
-                          {customer.isProvisional && <span className="ml-2 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">仮登録</span>}
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => onOpenCustomerProfile(customer)}
+                            className="text-left text-base font-semibold text-slate-900 hover:text-blue-700 hover:underline"
+                          >
+                            {normalizeCustomerName(customer.name)}
+                          </button>
+                          {customer.isProvisional && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">仮登録</span>}
                         </div>
 
                         <div className="mt-1 text-sm text-slate-500">
